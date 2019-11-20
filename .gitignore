@@ -11,3 +11,6 @@
 
 .cache
 .env
+
+build/
+dist/
