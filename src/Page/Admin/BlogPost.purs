@@ -1,37 +1,31 @@
 module Page.Admin.BlogPost where
 
 import Prelude
-import Control.Monad.Error.Class    (class MonadError)
-import Data.Const                   (Const)
-import Data.Maybe                   (Maybe(..))
-import Data.Newtype                 (unwrap)
-import Data.Symbol                  (SProxy(..))
-import Effect.Aff.Class             (class MonadAff)
-import Effect.Class                 (class MonadEffect)
-import Effect.Class.Console         (logShow)
-import Foreign                      as Foreign
-import Formless                     as F
-import Halogen                      as H
-import Halogen.HTML                 as HH
 
-import Api.Endpoint                 (Pagination)
-import Capability.Navigate          (class Navigate
-                                    ,navigate)
-import Component.Utils              (OpaqueSlot)
-import Component.HTML.Admin         (withAdmin)
-import Component.HTML.Utils         (css)
-import Component.Table              as Table
-import Data.BlogPost                (BlogPost(..)
-                                    ,BlogPostId(..)
-                                    ,BlogPostArray)
-import Data.Route                   as R
-import Form.Admin.BlogPost          as BlogPostForm
-import Resource.BlogPost            (class ManageBlogPost
-                                    ,getBlogPost
-                                    ,createBlogPost
-                                    ,updateBlogPost)
-import Resource.Media               (class ManageMedia)
-import Timestamp                    (formatToDateStr)
+import Api.Endpoint (Pagination)
+import Capability.Navigate (class Navigate, navigate)
+import Component.HTML.Admin (withAdmin)
+import Component.HTML.Utils (css)
+import Component.Table as Table
+import Component.Utils (OpaqueSlot)
+import Control.Monad.Error.Class (class MonadError)
+import Data.BlogPost (BlogPost(..), BlogPostId(..), BlogPostArray)
+import Data.Const (Const)
+import Data.Maybe (Maybe(..))
+import Data.Newtype (unwrap)
+import Data.Route as R
+import Data.Symbol (SProxy(..))
+import Effect.Aff.Class (class MonadAff)
+import Effect.Class (class MonadEffect)
+import Effect.Class.Console (logShow)
+import Foreign as Foreign
+import Form.Admin.BlogPost as BlogPostForm
+import Formless as F
+import Halogen as H
+import Halogen.HTML as HH
+import Resource.BlogPost (class ManageBlogPost, createBlogPost, getBlogPost, updateBlogPost)
+import Resource.Media (class ManageMedia)
+import Timestamp (nowTimestamp, formatToDateStr)
 
 type Input = 
   { blogPostId :: BlogPostId
@@ -83,12 +77,37 @@ component =
            $ handleAction 
            $ LoadBlogPost state.blogPostId
 
-    HandleBlogPostForm blogPost -> do
-      logShow blogPost
+    HandleBlogPostForm (BlogPost blogPost) -> do
+      case blogPost.id of
+        BlogPostId 0 -> do
+          newBlogPost <- createBlogPost (BlogPost blogPost)
+          case newBlogPost of
+            Just (BlogPost bp) -> do
+              H.modify_ _ { blogPost = newBlogPost }
+              navigate $ R.AdminBlogPost bp.id
+            Nothing -> pure unit
+        _ -> do
+          updatedBlogPost <- updateBlogPost (BlogPost blogPost)
+          H.modify_ _ { blogPost = updatedBlogPost }
 
-    LoadBlogPost postId -> do
-      post <- getBlogPost postId
-      H.modify_ _ { blogPost = post }
+
+    LoadBlogPost postId -> case postId of
+      BlogPostId 0 -> do
+        now <- H.liftEffect nowTimestamp
+        let 
+          defaultBlogPost = BlogPost
+            { id: (BlogPostId 0)
+            , title: ""
+            , content: "{ 'ops': [] }"
+            , featuredImage: Nothing
+            , publishTime: now
+            , createdAt: now
+            , updatedAt: Nothing
+            }
+        H.modify_ _ { blogPost = Just defaultBlogPost }
+      _ -> do
+        post <- getBlogPost postId
+        H.modify_ _ { blogPost = post }
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =

@@ -199,6 +199,11 @@ component = F.component input F.defaultSpec
         , HP.value $ F.getInput prx.title st.form
         , HE.onValueInput $ Just <<< F.setValidate prx.title
         ])
+      , withLabel "Publish time" (HH.input
+        [ css "text-input" 
+        , HP.value $ F.getInput prx.publishTime st.form
+        , HE.onValueInput $ Just <<< F.setValidate prx.publishTime
+        ])
       , HH.div
         [ css "editor" ]
         [ HH.label
