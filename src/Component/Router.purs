@@ -2,10 +2,12 @@ module Component.Router where
 
 import Prelude
 
+import Control.Monad.Error.Class        (class MonadError)
 import Data.Either                      (hush)
 import Data.Maybe                       (fromMaybe, Maybe(..))
 import Data.Symbol                      (SProxy(..))
 import Effect.Aff.Class                 (class MonadAff)
+import Foreign                          as Foreign
 import Halogen                          (liftEffect)
 import Halogen                          as H
 import Halogen.HTML                     as HH

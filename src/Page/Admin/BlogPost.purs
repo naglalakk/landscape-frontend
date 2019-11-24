@@ -1,6 +1,7 @@
 module Page.Admin.BlogPost where
 
 import Prelude
+import Control.Monad.Error.Class    (class MonadError)
 import Data.Const                   (Const)
 import Data.Maybe                   (Maybe(..))
 import Data.Newtype                 (unwrap)
@@ -8,6 +9,7 @@ import Data.Symbol                  (SProxy(..))
 import Effect.Aff.Class             (class MonadAff)
 import Effect.Class                 (class MonadEffect)
 import Effect.Class.Console         (logShow)
+import Foreign                      as Foreign
 import Formless                     as F
 import Halogen                      as H
 import Halogen.HTML                 as HH

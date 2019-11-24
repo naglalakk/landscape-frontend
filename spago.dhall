@@ -20,6 +20,7 @@ You can edit this file as you like.
     , "halogen-css"
     , "halogen-formless"
     , "halogen-media"
+    , "js-timers"
     , "precise-datetime"
     , "psci-support"
     , "routing"
@@ -28,6 +29,7 @@ You can edit this file as you like.
     , "stringutils"
     , "spec"
     , "timestamp"
+    , "quill"
     ]
 , packages =
     ./packages.dhall

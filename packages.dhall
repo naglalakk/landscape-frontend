@@ -207,6 +207,11 @@ let additions =
       ,"precise-datetime"]
       "https://github.com/naglalakk/purescript-timestamp"
       "master"
+  , quill = 
+      mkPackage
+      ["colors"]
+      "https://github.com/naglalakk/purescript-quill"
+      "master"
   }
 
 in  upstream ⫽ overrides ⫽ additions
