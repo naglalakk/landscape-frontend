@@ -43,6 +43,7 @@ newtype BlogPost = BlogPost
   { id            :: BlogPostId
   , title         :: String
   , content       :: String
+  , htmlContent   :: Maybe String
   , featuredImage :: Maybe Image
   , publishTime   :: Timestamp
   , createdAt     :: Timestamp
@@ -64,6 +65,7 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
     id            <- obj .:  "id"
     title         <- obj .:  "title"
     content       <- obj .:  "content"
+    htmlContent   <- obj .:? "htmlContent"
     featuredImage <- obj .:? "featured_image"
     publishTime   <- obj .:  "publish_time"
     createdAt     <- obj .:  "created_at"
@@ -72,6 +74,7 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
       { id
       , title
       , content
+      , htmlContent
       , featuredImage
       , publishTime
       , createdAt
@@ -82,6 +85,7 @@ instance encodeJsonBlogPost :: EncodeJson BlogPost where
   encodeJson (BlogPost blogPost) 
     =  "title"          := blogPost.title
     ~> "content"        := blogPost.content
+    ~> "htmlContent"    := blogPost.htmlContent
     ~> "featured_image" := blogPost.featuredImage
     ~> "publish_time"   := blogPost.publishTime
     ~> "created_at"     := blogPost.createdAt

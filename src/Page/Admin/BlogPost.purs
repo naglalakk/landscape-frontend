@@ -99,6 +99,7 @@ component =
             { id: (BlogPostId 0)
             , title: ""
             , content: "{ 'ops': [] }"
+            , htmlContent: Nothing
             , featuredImage: Nothing
             , publishTime: now
             , createdAt: now

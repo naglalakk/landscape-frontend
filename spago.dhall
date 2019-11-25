@@ -20,6 +20,7 @@ You can edit this file as you like.
     , "halogen-css"
     , "halogen-formless"
     , "halogen-media"
+    , "halogen-rawhtml"
     , "js-timers"
     , "precise-datetime"
     , "psci-support"

@@ -4,16 +4,19 @@ import Prelude
 import Data.Const                   (Const)
 import Data.Maybe                   (Maybe(..))
 import Data.Symbol                  (SProxy(..))
+import Effect.Class                 (class MonadEffect)
 import Halogen                      as H
 import Halogen.HTML                 as HH
+import Halogen.Component.RawHTML    as RawHTML
 
 import Component.Utils              (OpaqueSlot)
-import Component.HTML.Utils         (css)
+import Component.HTML.Utils         (css, maybeElem)
 import Data.BlogPost                (BlogPost(..)
                                     ,BlogPostArray)
 import Resource.BlogPost            (class ManageBlogPost
                                     ,getBlogPosts)
 import Timestamp                    (formatToDateStr)
+
 
 type State = 
   { blogPosts :: BlogPostArray
@@ -22,7 +25,7 @@ type State =
 data Action 
   = Initialize
 
-type ChildSlots = ()
+type ChildSlots = ( html :: H.Slot (Const Void) Void Unit )
 
 initialState :: State
 initialState = 
@@ -30,7 +33,8 @@ initialState =
   }
 
 component :: forall m
-           . ManageBlogPost m
+           . MonadEffect m
+          => ManageBlogPost m
           => H.Component HH.HTML (Const Void) Unit Void m
 component =
   H.mkComponent
@@ -61,8 +65,7 @@ component =
           , HH.div
             [ css "post-date" ]
             [ HH.text $ formatToDateStr post.publishTime ]
-          , HH.div
-            [ css "post-content" ]
-            [ HH.text post.content ]
+          , maybeElem post.htmlContent \htmlContent ->
+            HH.slot (SProxy :: _ "html") unit RawHTML.component { html: htmlContent, elRef: "blogDiv" } absurd
           ]
         ) state.blogPosts )

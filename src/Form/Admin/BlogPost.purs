@@ -51,6 +51,7 @@ newtype BlogPostForm r f = BlogPostForm (r
   ( id              :: f Void       BlogPostId          BlogPostId
   , title           :: f FormError  String              String
   , content         :: f Void       String              String
+  , htmlContent     :: f Void       (Maybe String)      (Maybe String)
   , featuredImage   :: f Void       (Maybe Image)       (Maybe Image)
   , publishTime     :: f FormError  String              Timestamp
   , createdAt       :: f Void       Timestamp           Timestamp
@@ -131,6 +132,7 @@ component = F.component input F.defaultSpec
           eval $ F.setValidate prx.id blogPost.id
           eval $ F.setValidate prx.title blogPost.title
           eval $ F.setValidate prx.content blogPost.content
+          eval $ F.setValidate prx.htmlContent blogPost.htmlContent
           eval $ F.setValidate prx.publishTime 
                $ formatToDateTimeShortStr blogPost.publishTime
           eval $ F.setValidate prx.createdAt blogPost.createdAt
@@ -163,8 +165,9 @@ component = F.component input F.defaultSpec
               -> F.HalogenM BlogPostForm AddedState Action ChildSlots BlogPost m Unit
   handleEvent = case _ of
     F.Submitted form -> do
+      query <- H.query (SProxy :: SProxy "editor") unit (H.request Editor.GetHTMLText)
       let 
-        fields = F.unwrapOutputFields form
+        fields = (F.unwrapOutputFields form) { htmlContent = query }
       H.raise $ BlogPost fields
     _ -> pure unit
 
@@ -181,6 +184,7 @@ component = F.component input F.defaultSpec
       { id: F.noValidation
       , title: validateStr
       , content: F.noValidation
+      , htmlContent: F.noValidation
       , featuredImage: F.noValidation
       , publishTime: validateDateTime
       , createdAt: F.noValidation

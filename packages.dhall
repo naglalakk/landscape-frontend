@@ -157,6 +157,11 @@ let additions =
       ]
       "https://github.com/naglalakk/purescript-halogen-media"
       "master"
+  , halogen-rawhtml =
+    mkPackage
+    ["halogen"]
+    "https://github.com/naglalakk/purescript-halogen-rawhtml"
+    "master"
   , halogen-select = 
       mkPackage
       ["halogen", "record"]

@@ -24,6 +24,7 @@ import Quill.API.Formats            as QFormats
 import Quill.API.Range              (Range)
 import Quill.Editor                 as QEditor
 import Quill.API.Source             as QSource
+import Quill.API.HTML               as QHTML
 import Web.HTML.HTMLElement         (HTMLElement)
 
 import Component.Utils              (OpaqueSlot)
@@ -60,6 +61,7 @@ data Action
 type ChildSlots = ()
 
 data Query a = GetText (QDelta.Ops -> a)
+             | GetHTMLText (String -> a)
 
 initialState :: State
 initialState = 
@@ -122,6 +124,16 @@ component =
               case content of
                 Right c  -> Just <<< t <$> (pure c)
                 Left err -> pure Nothing
+            Left err -> pure Nothing
+        Nothing -> pure Nothing
+
+    GetHTMLText t -> do
+      state <- H.get
+      case state.editor of
+        Just editor -> do
+          htmlStr <- runExceptT $ QHTML.getHTMLString editor
+          case htmlStr of
+            Right str -> Just <<< t <$> (pure str)
             Left err -> pure Nothing
         Nothing -> pure Nothing
 
