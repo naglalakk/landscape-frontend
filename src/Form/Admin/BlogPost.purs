@@ -2,48 +2,56 @@ module Form.Admin.BlogPost where
 
 import Prelude
 
+import Control.Monad.Except             (runExcept)
+import Control.Monad.Except.Trans       (runExceptT)
+import Data.Argonaut                    (encodeJson
+                                        ,decodeJson)
+import Data.Argonaut.Core               (Json)
+import Data.Array                       (head
+                                        ,filter
+                                        ,length)
+import Data.Const                       (Const(..))
+import Data.Either                      (Either(..))
+import Data.Maybe                       (Maybe(..)
+                                        ,fromMaybe)
+import Data.Newtype                     (class Newtype)
+import Data.Number.Format               as Number
+import Data.String.Utils                (startsWith)
+import Data.Symbol                      (SProxy(..))
+import Data.Traversable                 (traverse)
+import Effect.Aff                       as Aff
+import Effect.Aff.Class                 (class MonadAff)
+import Effect.Class                     (class MonadEffect)
+import Effect.Class.Console             (logShow)
+import Foreign                          (unsafeFromForeign)
+import Foreign                          as Foreign
+import Foreign.Generic                  (genericDecodeJSON
+                                        ,decodeJSON
+                                        ,encodeJSON)
+import Foreign.Generic.Class            (encode, decode)
+import Foreign.Object                   as Object
+import Formless                         as F
+import Halogen                          as H
+import Halogen.HTML                     as HH
+import Halogen.HTML.Events              as HE
+import Halogen.HTML.Properties          as HP
+import Halogen.Media.Component.Browser  as Browser
+import Halogen.Media.Component.Upload   as Upload
+import Halogen.Media.Data.Media         (Media(..))
+import Halogen.Media.Utils              (filesToFormData)
+import Halogen.Query.EventSource        as HES
+import Quill.API.Delta                  as QDelta
+import Timestamp (Timestamp, nowTimestamp, formatToDateTimeShortStr, defaultTimestamp)
+
+
 import Component.Editor as Editor
 import Component.HTML.Utils (css, withLabel)
 import Component.Modal as Modal
-import Control.Monad.Except (runExcept)
-import Control.Monad.Except.Trans (runExceptT)
-import Data.Argonaut (encodeJson, decodeJson)
-import Data.Argonaut.Core (Json)
-import Data.Array (head, filter, length)
 import Data.BlogPost (BlogPost(..), BlogPostId)
-import Data.Const (Const(..))
-import Data.Either (Either(..))
 import Data.Image (Image(..), ImageType)
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Newtype (class Newtype)
-import Data.Number.Format as Number
-import Data.String.Utils (startsWith)
-import Data.Symbol (SProxy(..))
-import Data.Traversable (traverse)
-import Effect.Aff as Aff
-import Effect.Aff.Class (class MonadAff)
-import Effect.Class (class MonadEffect)
-import Effect.Class.Console (logShow)
-import Foreign (unsafeFromForeign)
-import Foreign as Foreign
-import Foreign.Generic (genericDecodeJSON, decodeJSON, encodeJSON)
-import Foreign.Generic.Class (encode, decode)
-import Foreign.Object as Object
 import Form.Error (FormError(..))
 import Form.Validation (validateStr, validateDateTime)
-import Formless as F
-import Halogen as H
-import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
-import Halogen.HTML.Properties as HP
-import Halogen.Media.Component.Browser as Browser
-import Halogen.Media.Component.Upload as Upload
-import Halogen.Media.Data.Media (Media(..))
-import Halogen.Media.Utils (filesToFormData)
-import Halogen.Query.EventSource as HES
-import Quill.API.Delta as QDelta
 import Resource.Media (class ManageMedia)
-import Timestamp (Timestamp, nowTimestamp, formatToDateTimeShortStr, defaultTimestamp)
 import Utils.Record (fromTimestampField)
 
 
@@ -68,8 +76,7 @@ type Input =
   }
 
 type AddedState = (
-  featuredModalActive :: Boolean,
-  editorOps :: Maybe QDelta.Ops
+  featuredModalActive :: Boolean
 )
 
 data Action
@@ -79,6 +86,7 @@ data Action
   | HandleFeaturedBrowserModal
   | RemoveFeaturedImage Image
   | HandleEditorDelta
+  | SubmitForm
 
 type ChildSlots = (
   featuredModal :: H.Slot (Const Void) (Browser.Output ImageType) Unit,
@@ -103,32 +111,30 @@ component = F.component input F.defaultSpec
   handleAction :: Action
                -> F.HalogenM BlogPostForm AddedState Action ChildSlots BlogPost m Unit
   handleAction = case _ of
-    Initialize -> do
-      void $ H.fork $ handleAction $ HandleEditorDelta 
+    Initialize -> pure unit
 
     HandleEditorDelta -> do
-      H.liftAff $ Aff.delay $ Aff.Milliseconds 3000.0
+
+      -- Fetch latest delta as Text
       query <- H.query (SProxy :: SProxy "editor") unit (H.request Editor.GetText)
       case query of
-        Just (QDelta.Ops deltas) -> do
-          -- encode ops
-          let 
-            encodedOps = encodeJSON $ QDelta.Ops deltas
-          logShow encodedOps
-          eval $ F.setValidate prx.content encodedOps
+        Just content -> do
+          eval $ F.setValidate prx.content content
         Nothing  -> pure unit
-      handleAction HandleEditorDelta
+
+      -- We save the raw html separately
+      htmlQuery <- H.query (SProxy :: SProxy "editor") unit (H.request Editor.GetHTMLText)
+      case htmlQuery of 
+        Just hContent -> 
+          eval $ F.setValidate prx.htmlContent 
+               $ Just hContent
+        Nothing -> pure unit
+
+      -- handleAction HandleEditorDelta
 
     Receive inp -> do
       case inp.blogPost of
         Just (BlogPost blogPost) -> do
-          let 
-            contentDeltas :: Either Foreign.MultipleErrors QDelta.Ops
-            contentDeltas = runExcept $ decodeJSON blogPost.content
-          case contentDeltas of
-            Right ops -> do
-              H.modify_ _ { editorOps = Just ops }
-            Left err -> pure unit
           eval $ F.setValidate prx.id blogPost.id
           eval $ F.setValidate prx.title blogPost.title
           eval $ F.setValidate prx.content blogPost.content
@@ -157,17 +163,22 @@ component = F.component input F.defaultSpec
     
     RemoveFeaturedImage (Image image) ->
       eval $ F.setValidate prx.featuredImage Nothing
+    
+    SubmitForm -> do
+      handleAction HandleEditorDelta
+      eval F.submit
 
     where
       eval act = F.handleAction handleAction handleEvent act
+
+
 
   handleEvent :: F.Event BlogPostForm AddedState
               -> F.HalogenM BlogPostForm AddedState Action ChildSlots BlogPost m Unit
   handleEvent = case _ of
     F.Submitted form -> do
-      query <- H.query (SProxy :: SProxy "editor") unit (H.request Editor.GetHTMLText)
       let 
-        fields = (F.unwrapOutputFields form) { htmlContent = query }
+        fields = F.unwrapOutputFields form
       H.raise $ BlogPost fields
     _ -> pure unit
 
@@ -191,7 +202,6 @@ component = F.component input F.defaultSpec
       , updatedAt: F.noValidation
       }
     , featuredModalActive: false
-    , editorOps: Nothing
     }
 
   render :: F.PublicState BlogPostForm AddedState
@@ -217,12 +227,14 @@ component = F.component input F.defaultSpec
           (SProxy :: _ "editor")
           unit
           Editor.component
-          { content: st.editorOps }
+          { content: Just content }
           (\_ -> Nothing)
         ]
       , HH.button
         [ css "button"
-        , HE.onClick \_ -> Just F.submit
+        , HE.onClick \_ -> Just $ F.injAction SubmitForm
         ]
         [ HH.text "Save" ]
       ]
+    where
+      content = F.getInput prx.content st.form

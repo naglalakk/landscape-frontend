@@ -113,7 +113,7 @@ component =
       win <- H.liftEffect Web.window
       height <- H.liftEffect $ Web.innerHeight win
       scrollY <- H.liftEffect $ Web.scrollY win
-      case ((height - 200) - scrollY <= 0) of
+      case ((height - 250) - scrollY <= 0) of
         true -> do
           state <- H.get
           let

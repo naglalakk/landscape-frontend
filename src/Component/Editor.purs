@@ -1,17 +1,23 @@
 module Component.Editor where
 
 import Prelude
+import Color                        as Color
+import Control.Monad.Except         (runExcept)
 import Control.Monad.Except.Trans   (runExceptT)
 import Control.Monad.Error.Class    (class MonadError
                                     ,throwError)
+import Data.Argonaut                (encodeJson, decodeJson)
 import Data.Const                   (Const)
 import Data.Either                  (Either(..))
 import Data.Foldable                (fold, intercalate)
 import Data.Maybe                   (Maybe(..))
 import Data.Options                 (Options, (:=))
+import Data.String.Utils            (startsWith)
 import Data.Symbol                  (SProxy(..))
 import Effect.Class                 (class MonadEffect)
 import Effect.Class.Console         as Console
+import Foreign.Generic              (genericDecodeJSON
+                                    ,decodeJSON, encodeJSON)
 import Halogen                      as H
 import Halogen.HTML                 as HH
 import Halogen.HTML.Properties      as HP
@@ -42,16 +48,18 @@ editorConfig = fold
     , QConfig.allow QFormats.header
     , QConfig.allow QFormats.align
     , QConfig.allow QFormats.color
+    , QConfig.allow QFormats.code
+    , QConfig.allow QFormats.codeBlock
     ]
   ]
 
 type Input =
-  { content :: Maybe QDelta.Ops
+  { content :: Maybe String
   }
 
 type State = 
   { editor :: Maybe QEditor.Editor
-  , content :: Maybe QDelta.Ops
+  , content :: Maybe String
   }
 
 data Action 
@@ -60,7 +68,7 @@ data Action
 
 type ChildSlots = ()
 
-data Query a = GetText (QDelta.Ops -> a)
+data Query a = GetText (String -> a)
              | GetHTMLText (String -> a)
 
 initialState :: State
@@ -101,10 +109,19 @@ component =
         Just editor -> do
           case input.content of
             Just cnt -> do
-              ops <- runExceptT $ QContent.setContents cnt QSource.API editor
-              case ops of
-                Right op -> H.modify_ _ { content = Just op }
-                Left err -> pure unit
+              case (startsWith "{" cnt) of
+                true -> do
+                  let 
+                    contentDeltas :: Either Foreign.MultipleErrors QDelta.Ops
+                    contentDeltas = runExcept $ decodeJSON cnt
+                  case contentDeltas of
+                    Right cnd -> do
+                      ops <- runExceptT $ QContent.setContents cnd QSource.API editor
+                      pure unit
+                    Left err -> pure unit
+                false -> do
+                  ops <- runExceptT $ QContent.setText cnt QSource.API editor
+                  pure unit
             Nothing -> pure unit
         Nothing -> pure unit
 
@@ -122,7 +139,11 @@ component =
               content <- runExceptT $ QContent.getContents 
                 {index: 0, length: Just le} editor
               case content of
-                Right c  -> Just <<< t <$> (pure c)
+                Right c  -> do
+                  let 
+                    encodedOps = encodeJSON c
+                  Console.logShow encodedOps
+                  Just <<< t <$> (pure encodedOps)
                 Left err -> pure Nothing
             Left err -> pure Nothing
         Nothing -> pure Nothing
