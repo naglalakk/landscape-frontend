@@ -13,7 +13,7 @@ import Halogen.HTML.Events          as HE
 
 import Api.Endpoint                 (Pagination)
 import Capability.Navigate          (class Navigate
-                                    ,navigate)
+                                    ,navigateForm)
 import Component.Utils              (OpaqueSlot)
 import Component.HTML.Admin         (withAdmin)
 import Component.HTML.Utils         (css)
@@ -76,7 +76,7 @@ component =
     HandleTableAction act -> do
       case act of
         Table.UpdateRow row ->
-          navigate $ R.AdminBlogPost $ BlogPostId row.id
+          navigateForm $ R.AdminBlogPost $ BlogPostId row.id
         Table.DeleteRow row -> do
           _ <- deleteBlogPost $ BlogPostId row.id
           state <- H.get
@@ -85,7 +85,7 @@ component =
           H.modify_ _ { blogPosts = posts }
 
     NavigateToBlogPost blogPostId ->
-      navigate $ R.AdminBlogPost blogPostId
+      navigateForm $ R.AdminBlogPost blogPostId
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =

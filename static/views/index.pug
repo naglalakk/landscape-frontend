@@ -10,10 +10,10 @@ html
     script(src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js")
     script(src="/dist/index.js")
     script.
+      hljs.configure({
+        languages: ['haskell']
+      });
       setTimeout(function() {
-        hljs.configure({
-          languages: ['haskell']
-        });
         document.querySelectorAll('.ql-syntax').forEach((block) => {
           console.log(block);
           hljs.highlightBlock(block);

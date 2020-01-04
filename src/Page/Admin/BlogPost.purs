@@ -87,9 +87,8 @@ component =
               navigate $ R.AdminBlogPost bp.id
             Nothing -> pure unit
         _ -> do
-          updatedBlogPost <- updateBlogPost (BlogPost blogPost)
-          H.modify_ _ { blogPost = updatedBlogPost }
-
+          _ <- updateBlogPost (BlogPost blogPost)
+          pure unit
 
     LoadBlogPost postId -> case postId of
       BlogPostId 0 -> do
@@ -101,7 +100,10 @@ component =
             , content: "{ 'ops': [] }"
             , htmlContent: Nothing
             , featuredImage: Nothing
+            , images: []
+            , published: false
             , publishTime: now
+            , isCover: false
             , createdAt: now
             , updatedAt: Nothing
             }

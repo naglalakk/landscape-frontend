@@ -41,18 +41,25 @@ import Halogen.Media.Data.Media         (Media(..))
 import Halogen.Media.Utils              (filesToFormData)
 import Halogen.Query.EventSource        as HES
 import Quill.API.Delta                  as QDelta
-import Timestamp (Timestamp, nowTimestamp, formatToDateTimeShortStr, defaultTimestamp)
+import Timestamp                        (Timestamp
+                                        ,nowTimestamp
+                                        ,formatToDateTimeShortStr
+                                        ,defaultTimestamp)
 
 
-import Component.Editor as Editor
-import Component.HTML.Utils (css, withLabel)
-import Component.Modal as Modal
-import Data.BlogPost (BlogPost(..), BlogPostId)
-import Data.Image (Image(..), ImageType)
-import Form.Error (FormError(..))
-import Form.Validation (validateStr, validateDateTime)
-import Resource.Media (class ManageMedia)
-import Utils.Record (fromTimestampField)
+import Component.Editor                 as Editor
+import Component.HTML.Utils             (maybeElem, css, withLabel)
+import Component.Media                  as Media
+import Data.BlogPost                    (BlogPost(..)
+                                        ,BlogPostId)
+import Data.Image                       (Image(..)
+                                        ,ImageType
+                                        ,ImageArray)
+import Form.Error                       (FormError(..))
+import Form.Validation                  (validateStr
+                                        ,validateDateTime)
+import Resource.Media                   (class ManageMedia)
+import Utils.Record                     (fromTimestampField)
 
 
 newtype BlogPostForm r f = BlogPostForm (r
@@ -61,7 +68,10 @@ newtype BlogPostForm r f = BlogPostForm (r
   , content         :: f Void       String              String
   , htmlContent     :: f Void       (Maybe String)      (Maybe String)
   , featuredImage   :: f Void       (Maybe Image)       (Maybe Image)
+  , images          :: f Void       ImageArray          ImageArray
+  , published       :: f Void       Boolean             Boolean
   , publishTime     :: f FormError  String              Timestamp
+  , isCover         :: f Void       Boolean             Boolean
   , createdAt       :: f Void       Timestamp           Timestamp
   , updatedAt       :: f Void       (Maybe Timestamp)   (Maybe Timestamp)
   ))
@@ -76,20 +86,25 @@ type Input =
   }
 
 type AddedState = (
-  featuredModalActive :: Boolean
+  featuredImageBrowserActive :: Boolean,
+  imageBrowserActive :: Boolean
 )
 
 data Action
   = Initialize
   | Receive Input
-  | HandleFeaturedBrowserOutput (Browser.Output ImageType)
-  | HandleFeaturedBrowserModal
-  | RemoveFeaturedImage Image
+  | HandleFeaturedImageBrowserOutput (Browser.Output ImageType)
+  | HandleFeaturedImageModal
+  | RemoveFeaturedImage
+  | HandleImageModal
+  | HandleImageBrowserOutput (Browser.Output ImageType)
+  | RemoveImage Image
   | HandleEditorDelta
   | SubmitForm
 
 type ChildSlots = (
-  featuredModal :: H.Slot (Const Void) (Browser.Output ImageType) Unit,
+  imageBrowser :: H.Slot (Const Void) (Browser.Output ImageType) Unit,
+  featuredImageBrowser:: H.Slot (Const Void) (Browser.Output ImageType) Unit,
   editor :: H.Slot Editor.Query Void Unit
 )
 
@@ -139,15 +154,21 @@ component = F.component input F.defaultSpec
           eval $ F.setValidate prx.title blogPost.title
           eval $ F.setValidate prx.content blogPost.content
           eval $ F.setValidate prx.htmlContent blogPost.htmlContent
+          eval $ F.setValidate prx.featuredImage blogPost.featuredImage
+          eval $ F.setValidate prx.images blogPost.images
+          eval $ F.setValidate prx.published blogPost.published
           eval $ F.setValidate prx.publishTime 
                $ formatToDateTimeShortStr blogPost.publishTime
+          eval $ F.setValidate prx.isCover blogPost.isCover
           eval $ F.setValidate prx.createdAt blogPost.createdAt
           eval $ F.setValidate prx.updatedAt blogPost.updatedAt
 
         Nothing -> pure unit
-      H.modify_ _ { featuredModalActive = false }
+      H.modify_ _ { featuredImageBrowserActive = false 
+                  , imageBrowserActive = false
+                  }
 
-    HandleFeaturedBrowserOutput output -> case output of
+    HandleFeaturedImageBrowserOutput output -> case output of
       Browser.InsertedMedia images -> do
         state <- H.get
         let 
@@ -155,23 +176,32 @@ component = F.component input F.defaultSpec
           mainImage = head modImages
         
         eval $ F.setValidate prx.featuredImage mainImage
-        H.modify_ _ { featuredModalActive = false }
+        H.modify_ _ { featuredImageBrowserActive = false }
       _ -> pure unit
-
-    HandleFeaturedBrowserModal -> 
-      H.modify_ _ { featuredModalActive = true }
     
-    RemoveFeaturedImage (Image image) ->
+    HandleFeaturedImageModal -> 
+      H.modify_ _ { featuredImageBrowserActive = true 
+                  , imageBrowserActive = false
+                  }
+    
+    RemoveFeaturedImage ->
       eval $ F.setValidate prx.featuredImage Nothing
+
+    HandleImageModal ->
+      H.modify_ _ { imageBrowserActive = true 
+                  , featuredImageBrowserActive = false
+                  }
     
+    HandleImageBrowserOutput output -> pure unit
+
+    RemoveImage (Image image) -> pure unit
+
     SubmitForm -> do
       handleAction HandleEditorDelta
       eval F.submit
 
     where
       eval act = F.handleAction handleAction handleEvent act
-
-
 
   handleEvent :: F.Event BlogPostForm AddedState
               -> F.HalogenM BlogPostForm AddedState Action ChildSlots BlogPost m Unit
@@ -197,11 +227,15 @@ component = F.component input F.defaultSpec
       , content: F.noValidation
       , htmlContent: F.noValidation
       , featuredImage: F.noValidation
+      , images: F.noValidation
+      , published: F.noValidation
       , publishTime: validateDateTime
+      , isCover: F.noValidation
       , createdAt: F.noValidation
       , updatedAt: F.noValidation
       }
-    , featuredModalActive: false
+    , featuredImageBrowserActive: false
+    , imageBrowserActive: false
     }
 
   render :: F.PublicState BlogPostForm AddedState
@@ -230,6 +264,95 @@ component = F.component input F.defaultSpec
           { content: Just content }
           (\_ -> Nothing)
         ]
+      , HH.div
+        [ css "field-featuredImage" ]
+        [ HH.label
+          [ css "label" ]
+          [ HH.text "Featured Image" ]
+        , HH.a
+          [ css "button" 
+          , HE.onClick \_ -> Just $ F.injAction $ HandleFeaturedImageModal  
+          ]
+          [ HH.text "+ Choose Image" ]
+        , HH.div
+          [ css "image-preview" ]
+          [ maybeElem featuredImage \(Image image) ->
+            HH.div
+              [ css "image-container"]
+              [ HH.div
+                [ css "image-preview" ]
+                [ HH.div
+                  [ css "image-preview-overlay" ]
+                  [ HH.div
+                    [ css "image-preview-remove-icon" ]
+                    [ HH.i
+                      [ css "fas fa-trash" 
+                      , HE.onClick \_ -> Just $ F.injAction $ RemoveFeaturedImage
+                      ]
+                      []
+                    ]
+                  ]
+                , HH.img
+                  [ HP.src image.src 
+                  ]
+                ]
+              ]
+          ]
+        , HH.slot
+          (SProxy :: _ "featuredImageBrowser")
+          unit
+          (Media.component)
+          { isActive: st.featuredImageBrowserActive }
+          (Just <<< F.injAction <<< HandleFeaturedImageBrowserOutput)
+        ]
+      , HH.div
+        [ css "field-images" ]
+        [ HH.label
+          [ css "label" ]
+          [ HH.text "Images in post" ]
+        , HH.a
+          [ css "button"
+          , HE.onClick \_ -> Just $ F.injAction $ HandleImageModal  
+          ]
+          [ HH.text "+ Add Image" ]
+        , HH.div
+          [ css "image-container"]
+          (map (\(Image image) -> 
+            HH.div
+              [ css "image-preview" ]
+              [ HH.div
+                [ css "image-preview-overlay" ]
+                [ HH.div
+                  [ css "image-preview-remove-icon" ]
+                  [ HH.i
+                    [ css "fas fa-trash" 
+                    , HE.onClick \_ -> Just $ F.injAction $ RemoveImage (Image image)
+                    ]
+                    []
+                  ]
+                ]
+              , HH.img
+                [ HP.src image.src 
+                ]
+              ]) images)
+        , HH.slot
+          (SProxy :: _ "imageBrowser")
+          unit
+          (Media.component)
+          { isActive: st.imageBrowserActive }
+          (Just <<< F.injAction <<< HandleImageBrowserOutput)
+        ]
+      , withLabel "Include featuredImage as cover photo" (HH.div
+        []
+        [ HH.div
+          [ css "description" ]
+          [ HH.text "Keep this checked if you want to have the featured image as a cover photo for this post. Cover photos appear in full width and have a parallax effect on scroll" ]
+        , HH.input
+          [ HP.checked $ F.getInput prx.isCover st.form
+          , HP.type_ HP.InputCheckbox
+          , HE.onChecked \_ -> Just $ F.modify prx.isCover not
+          ]
+        ])
       , HH.button
         [ css "button"
         , HE.onClick \_ -> Just $ F.injAction SubmitForm
@@ -238,3 +361,5 @@ component = F.component input F.defaultSpec
       ]
     where
       content = F.getInput prx.content st.form
+      images  = F.getInput prx.images st.form
+      featuredImage = F.getInput prx.featuredImage st.form

@@ -2,28 +2,40 @@ module AppM where
 
 import Prelude
 
-import Api.Endpoint as API
-import Api.Request (RequestMethod(..), mkRequest)
-import Capability.LogMessages (class LogMessages, logMessage)
-import Capability.Navigate (class Navigate)
-import Control.Monad.Reader.Trans (class MonadAsk, ReaderT, ask, asks, runReaderT)
-import Data.Argonaut (encodeJson, decodeJson)
-import Data.BlogPost (BlogPost(..))
-import Data.Either (Either(..))
-import Data.Environment (Environment(..), Env)
-import Data.Log as Log
-import Data.Maybe (Maybe(..))
-import Data.Route as Route
-import Data.URL (BaseURL)
-import Effect.Aff (Aff)
-import Effect.Aff.Class (class MonadAff)
-import Effect.Class (class MonadEffect, liftEffect)
-import Effect.Console as Console
-import Resource.BlogPost (class ManageBlogPost)
-import Resource.Media (class ManageMedia)
-import Routing.Duplex (print)
-import Routing.Hash (setHash)
-import Type.Equality (class TypeEquals, from)
+import Control.Monad.Reader.Trans   (class MonadAsk
+                                    ,ReaderT
+                                    ,ask, asks, runReaderT)
+import Data.Argonaut                (encodeJson, decodeJson)
+import Data.Either                  (Either(..))
+import Data.Environment             (Environment(..), Env)
+import Data.Maybe                   (Maybe(..))
+import Effect.Aff                   (Aff)
+import Effect.Aff.Class             (class MonadAff)
+import Effect.Class                 (class MonadEffect
+                                    ,liftEffect)
+import Effect.Console               as Console
+import Routing.Duplex               (print)
+import Routing.Hash                 (setHash)
+import Type.Equality                (class TypeEquals, from)
+import Web.HTML                     (window)
+import Web.HTML.Window              as Window
+import Web.HTML.Location            (setHref, Location)
+
+import Api.Endpoint                 as API
+import Api.Request                  (RequestMethod(..)
+                                    ,FormDataRequestMethod(..)
+                                    ,mkRequest
+                                    ,mkFormDataRequest)
+import Capability.LogMessages       (class LogMessages
+                                    ,logMessage)
+import Capability.Navigate          (class Navigate)
+import Data.BlogPost                (BlogPost(..))
+import Data.Image                   (decodeImageArray)
+import Data.Log                     as Log
+import Data.Route                   as Route
+import Data.URL                     (BaseURL)
+import Resource.BlogPost            (class ManageBlogPost)
+import Resource.Media               (class ManageMedia)
 
 newtype AppM a = AppM (ReaderT Env Aff a)
 
@@ -51,6 +63,11 @@ instance logMessagesAppM :: LogMessages AppM where
 instance navigateAppM :: Navigate AppM where
   navigate = 
     liftEffect <<< setHash <<< print Route.routeCodec 
+  navigateForm route = do
+    w <- liftEffect window
+    location <- liftEffect $ Window.location w
+    let href = ("?#" <> (print Route.routeCodec route))
+    liftEffect $ setHref href location
 
 instance manageBlogPostAppM :: ManageBlogPost AppM where
   getBlogPosts pagination = do
@@ -117,6 +134,33 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
     pure unit
 
 instance manageMediaAppM :: ManageMedia AppM where
-  getImages   pagination = pure []
-  uploadImage formData   = pure Nothing
+  getImages   pagination = do
+    req <- mkRequest
+      { endpoint: API.Images pagination
+      , method: Get
+      }
+    case req of
+      Just json -> do
+        let images = decodeImageArray json
+        case images of
+          Right i -> pure i
+          Left err -> do
+            logMessage $ Log.Log { message: err }
+            pure []
+      Nothing -> pure []
+
+  uploadImage formData = do
+    req <- mkFormDataRequest
+      { endpoint: API.ImageUpload
+      , method: PostFormData $ Just formData
+      }
+    case req of
+      Just json -> do
+        let img = decodeJson json
+        case img of
+          Right i -> pure $ Just i
+          Left err -> do
+            logMessage $ Log.Log { message: err }
+            pure Nothing
+      Nothing -> pure Nothing
 

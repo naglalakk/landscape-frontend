@@ -49,7 +49,65 @@ ul,li
   border-bottom 1px solid #000
   outline none
 
+input[type="checkbox"]
+  margin-bottom 12.5px
+
+.description
+  display block
+  font-size 12px
+  color rgb(170,179,171)
+  margin-bottom 12.5px
+
 .posts-container
   max-width 1024px
   margin 0 auto
   padding separator
+
+.image-container
+  position relative
+  /*
+  display flex
+  flex-direction row
+  flex-wrap wrap*/
+
+  .image-preview-overlay
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+    opacity 0
+    display flex
+    justify-content center
+    align-items center
+
+    &:hover
+      opacity 1
+      background-color rgba(0,0,0, 0.7)
+
+    .image-preview-remove-icon
+      padding separator
+      border 1px solid #fff
+      color #fff
+      display flex
+      justify-content center
+      align-items center
+
+      &:hover
+        background-color #fff
+        color #000
+
+.image-preview
+  position relative
+  display flex
+  justify-content center
+  align-items center
+  max-width 200px
+  margin-bottom separator
+  margin-right separator
+
+  img
+    width 100%
+
+.field-images
+  margin-bottom separator

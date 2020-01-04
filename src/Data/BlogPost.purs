@@ -19,7 +19,7 @@ import Data.Traversable         (traverse)
 import Formless                 as F
 import Halogen.Media.Data.Media (MediaRow)
 
-import Data.Image               (Image(..))
+import Data.Image               (Image(..), ImageArray)
 import Timestamp                (Timestamp(..)
                                 ,defaultTimestamp)
 
@@ -45,7 +45,10 @@ newtype BlogPost = BlogPost
   , content       :: String
   , htmlContent   :: Maybe String
   , featuredImage :: Maybe Image
+  , images        :: ImageArray
+  , published     :: Boolean
   , publishTime   :: Timestamp
+  , isCover       :: Boolean
   , createdAt     :: Timestamp
   , updatedAt     :: Maybe Timestamp
   }
@@ -67,7 +70,10 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
     content       <- obj .:  "content"
     htmlContent   <- obj .:? "htmlContent"
     featuredImage <- obj .:? "featured_image"
+    images        <- obj .:  "images"
+    published     <- obj .:  "published"
     publishTime   <- obj .:  "publish_time"
+    isCover       <- obj .:  "is_cover"
     createdAt     <- obj .:  "created_at"
     updatedAt     <- obj .:? "updated_at"
     pure $ BlogPost
@@ -76,7 +82,10 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
       , content
       , htmlContent
       , featuredImage
+      , images
+      , published
       , publishTime
+      , isCover
       , createdAt
       , updatedAt
       }
@@ -87,7 +96,10 @@ instance encodeJsonBlogPost :: EncodeJson BlogPost where
     ~> "content"        := blogPost.content
     ~> "htmlContent"    := blogPost.htmlContent
     ~> "featured_image" := blogPost.featuredImage
+    ~> "images"         := blogPost.images
+    ~> "published"      := blogPost.published
     ~> "publish_time"   := blogPost.publishTime
+    ~> "is_cover"       := blogPost.isCover
     ~> "created_at"     := blogPost.createdAt
     ~> "updated_at"     := blogPost.updatedAt
 
