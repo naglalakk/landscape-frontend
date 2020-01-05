@@ -71,6 +71,12 @@ component =
                -> H.HalogenM State Action ChildSlots (Browser.Output ImageType) m Unit
   handleAction = case _ of 
     HandleBrowserAction act -> case act of
+      Browser.TabSwitch tab -> do
+        case tab of
+          Browser.DisplayTab -> do
+            medias <- getImages { page: Just 1, perPage: Just 25 }
+            H.modify_ _ { media = medias }
+          _ -> pure unit
       Browser.Dropped files -> do
         formData <- H.liftEffect $ filesToFormData "image" files
         newImg <- uploadImage formData
