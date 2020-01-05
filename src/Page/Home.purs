@@ -39,6 +39,7 @@ import CSS.Utils                            (backgroundCover)
 import Data.BlogPost                        (BlogPost(..)
                                             ,BlogPostArray)
 import Data.Image                           (Image(..))
+import Foreign.LightGallery                 (loadGallery)
 import Resource.BlogPost                    (class ManageBlogPost
                                             ,getBlogPosts)
 import Timestamp                            (formatToDateStr)
@@ -110,6 +111,8 @@ component =
             case post.htmlContent of
               Just html -> H.liftEffect $ setHTML el html
               Nothing -> pure unit) posts
+
+      H.liftEffect $ loadGallery "lightgallery"
       pure unit
 
     HandleWheel ev -> do
@@ -232,5 +235,19 @@ component =
               , HP.ref (H.RefLabel ("element-" <> (show $ unwrap post.id)))
               ]
               []
+            , case length post.images of
+                0 -> HH.div [] []
+                _ -> 
+                  HH.div
+                    [ css "lightgallery" ]
+                    (map (\(Image image) -> 
+                      HH.a
+                        [ HP.href image.src ]
+                        [ HH.img
+                          [ case image.thumbnail of
+                            Just thumb -> HP.src thumb
+                            Nothing -> HP.src image.src
+                          ]
+                        ]) post.images )
             ]) state.blogPosts )
       ]

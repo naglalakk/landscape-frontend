@@ -3,8 +3,7 @@
 @import "buttons"
 @import "admin"
 @import "constants"
-@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap')
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css")
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap")
 
 
 html
@@ -76,6 +75,9 @@ ul,li
   width 100%
 
   .post
+    margin-top separator
+    margin-bottom separator
+
     .post-content
       line-height 25px
 
@@ -173,3 +175,22 @@ ul,li
 
 .field-images
   margin-bottom separator
+
+.lightgallery
+  width content-width
+  margin 0 auto
+  display flex
+  margin-top separator
+
+  a
+    width 200px
+    height 200px
+    display flex
+    justify-content center
+    align-items center
+    border 1px solid #000
+    margin-right separator
+
+    img
+      max-width 100%
+      height auto
