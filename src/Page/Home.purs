@@ -13,6 +13,7 @@ import Effect.Aff                           as Aff
 import Effect.Aff.Class                     (class MonadAff)
 import Halogen                              as H
 import Halogen.HTML                         as HH
+import Halogen.HTML.CSS                     as HCSS
 import Halogen.HTML.Properties              as HP
 import Halogen.Component.RawHTML            as RawHTML
 import Halogen.Query.EventSource            as ES
@@ -34,8 +35,10 @@ import Web.UIEvent.WheelEvent.EventTypes    as WET
 
 import Component.Utils                      (OpaqueSlot)
 import Component.HTML.Utils                 (css, maybeElem)
+import CSS.Utils                            (backgroundCover)
 import Data.BlogPost                        (BlogPost(..)
                                             ,BlogPostArray)
+import Data.Image                           (Image(..))
 import Resource.BlogPost                    (class ManageBlogPost
                                             ,getBlogPosts)
 import Timestamp                            (formatToDateStr)
@@ -151,23 +154,83 @@ component =
       logShow scrollY
       pure unit
 
+  socialItem :: forall i p. String -> String -> HH.HTML i p
+  socialItem link icon = 
+    HH.li
+      [ css "social-item" ]
+      [ HH.a
+        [ HP.href link ]
+        [ HH.i
+          [ css icon ]
+          []
+        ]
+      ]
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
-    HH.div 
-      [ css "posts-container" ]
-      (map (\(BlogPost post) ->
-        HH.div
-          [ css "post" ]
-          [ HH.h1
-            []
-            [ HH.text post.title ]
-          , HH.div
-            [ css "post-date" ]
-            [ HH.text $ formatToDateStr post.publishTime ]
-          , HH.div
-            [ css "post-content" 
-            , HP.ref (H.RefLabel ("element-" <> (show $ unwrap post.id)))
-            ]
-            []
-          ]) state.blogPosts )
+    HH.div
+      []
+      [ HH.div
+        [ css "header" ]
+        [ HH.div
+          [ css "profile-image" 
+          , HCSS.style $ backgroundCover "img/profile.gif"
+          ]
+          [
+          ]
+        , HH.h2
+          [ css "title" ]
+          [ HH.text "Donna" ]
+        , HH.ul
+          [ css "socials" ]
+          [ socialItem "https://github.com/naglalakk" "fab fa-github"
+          , socialItem "https://soundcloud.com/donnainternational" "fab fa-soundcloud"
+          , socialItem "https://www.pinterest.com/k0ttur/" "fab fa-pinterest"
+          , socialItem "https://twitter.com/naglalakk" "fab fa-twitter"
+          ]
+        , HH.div
+          [ css "line" ]
+          []
+        ]
+      , HH.div 
+        [ css "posts-container" ]
+        (map (\(BlogPost post) ->
+          HH.div
+            [ css $ "post cover-" <> (show post.isCover) ]
+            [ case post.isCover of
+              true ->
+                HH.div
+                  [ css "cover-image" 
+                  , case post.featuredImage of
+                    Just (Image image) -> HCSS.style $ backgroundCover image.src
+                    Nothing -> css "no-cover"
+                  ]
+                  [ HH.div
+                    [ css "title" ]
+                    [ HH.h1
+                      []
+                      [ HH.text post.title ]
+                    , HH.div [ css "title-line" ] []
+                    , HH.div
+                      [ css "post-date" ]
+                      [ HH.text $ formatToDateStr post.publishTime ]
+                    ]
+                  ]
+              false ->
+                HH.div
+                  [ css "title" ]
+                  [ HH.h1
+                    []
+                    [ HH.text post.title ]
+                  , HH.div [ css "title-line" ] []
+                  , HH.div
+                    [ css "post-date" ]
+                    [ HH.text $ formatToDateStr post.publishTime ]
+                  ]
+            , HH.div
+              [ css "post-content" 
+              , HP.ref (H.RefLabel ("element-" <> (show $ unwrap post.id)))
+              ]
+              []
+            ]) state.blogPosts )
+      ]

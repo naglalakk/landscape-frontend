@@ -192,7 +192,14 @@ component = F.component input F.defaultSpec
                   , featuredImageBrowserActive = false
                   }
     
-    HandleImageBrowserOutput output -> pure unit
+    HandleImageBrowserOutput output -> case output of
+      Browser.InsertedMedia images -> do
+        state <- H.get
+        let 
+          modImages = map (\(Media x) -> Image x) images
+        eval $ F.setValidate prx.images modImages
+        H.modify_ _ { imageBrowserActive = false }
+      _ -> pure unit
 
     RemoveImage (Image image) -> pure unit
 
