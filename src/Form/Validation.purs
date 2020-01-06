@@ -21,8 +21,16 @@ import Timestamp                (Timestamp(..)
 import Formless                 as F
 import Routing.Match            (str)
 
+import Data.User                (Username(..))
 import Form.Error               (FormError(..))
 
+
+validateUsername :: forall form m. Monad m
+                 => F.Validation form m FormError String Username
+validateUsername = F.hoistFnE_ \str -> 
+  if null str
+    then Left Required
+    else Right $ Username str
 
 validateStr :: forall form m. Monad m
             => F.Validation form m FormError String String

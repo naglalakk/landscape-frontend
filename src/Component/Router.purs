@@ -21,6 +21,7 @@ import Page.Home                        as Home
 import Page.Admin.Home                  as AdminHome
 import Page.Admin.BlogPosts             as AdminBlogPosts
 import Page.Admin.BlogPost              as AdminBlogPost
+import Page.Login                       as Login
 import Resource.BlogPost                (class ManageBlogPost)
 import Resource.Media                   (class ManageMedia)
 
@@ -35,6 +36,7 @@ data Action
 
 type ChildSlots = 
   ( home :: OpaqueSlot Unit 
+  , login :: OpaqueSlot Unit
   , adminHome :: OpaqueSlot Unit
   , adminBlogPosts :: OpaqueSlot Unit
   , adminBlogPost :: OpaqueSlot Unit
@@ -75,6 +77,8 @@ component = H.mkComponent
   render { route } = case route of
     Just Home -> 
       HH.slot (SProxy :: _ "home") unit Home.component unit absurd
+    Just Login ->
+      HH.slot (SProxy :: _ "login") unit Login.component unit absurd
     -- Admin
     Just AdminHome ->
       HH.slot (SProxy :: _ "adminHome") unit AdminHome.component unit absurd

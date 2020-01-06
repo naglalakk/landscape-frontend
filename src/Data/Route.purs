@@ -12,6 +12,7 @@ import Utils.Route                      (blogPostId)
 
 data Route
   = Home
+  | Login
   -- Admin
   | AdminHome
   | AdminBlogPosts
@@ -27,6 +28,7 @@ instance showRoute :: Show Route where
 routeCodec :: RouteDuplex' Route
 routeCodec = root $ sum
   { "Home": noArgs
+  , "Login" : "login" / noArgs
   -- Admin
   , "AdminHome" : "admin" / noArgs
   , "AdminBlogPosts" : "admin" / "posts" / noArgs
