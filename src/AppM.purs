@@ -22,13 +22,16 @@ import Web.HTML.Window              as Window
 import Web.HTML.Location            (setHref, Location)
 
 import Api.Endpoint                 as API
-import Api.Request                  (RequestMethod(..)
+import Api.Request                  (Authentication(..)
+                                    ,Basic(..)
+                                    ,RequestMethod(..)
                                     ,FormDataRequestMethod(..)
                                     ,mkRequest
                                     ,mkFormDataRequest)
 import Capability.LogMessages       (class LogMessages
                                     ,logMessage)
 import Capability.Navigate          (class Navigate)
+import Config                       (authStr)
 import Data.BlogPost                (BlogPost(..))
 import Data.Image                   (decodeImageArray)
 import Data.Log                     as Log
@@ -74,6 +77,7 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
     req <- mkRequest 
       { endpoint: API.BlogPosts pagination
       , method: Get
+      , auth: Nothing
       }
     case req of
       Just json -> do
@@ -88,6 +92,7 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
     req <- mkRequest
       { endpoint: API.BlogPost postId
       , method: Get
+      , auth: Nothing
       }
     case req of
       Just json -> do
@@ -102,6 +107,7 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
     req <- mkRequest
       { endpoint: API.BlogPostCreate
       , method: Post $ Just $ encodeJson post
+      , auth: Just $ BasicAuth $ Basic authStr
       }
     case req of
       Just json -> do
@@ -116,6 +122,7 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
     req <- mkRequest
       { endpoint: API.BlogPostUpdate post.id
       , method: Post $ Just $ encodeJson $ BlogPost post
+      , auth: Just $ BasicAuth $ Basic authStr
       }
     case req of
       Just json -> do
@@ -130,6 +137,7 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
     req <- mkRequest
       { endpoint: API.BlogPostDelete postId
       , method: Delete
+      , auth: Just $ BasicAuth $ Basic authStr
       }
     pure unit
 
@@ -138,6 +146,7 @@ instance manageMediaAppM :: ManageMedia AppM where
     req <- mkRequest
       { endpoint: API.Images pagination
       , method: Get
+      , auth: Nothing
       }
     case req of
       Just json -> do
@@ -153,6 +162,7 @@ instance manageMediaAppM :: ManageMedia AppM where
     req <- mkFormDataRequest
       { endpoint: API.ImageUpload
       , method: PostFormData $ Just formData
+      , auth: Nothing
       }
     case req of
       Just json -> do
