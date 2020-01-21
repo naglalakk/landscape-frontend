@@ -214,9 +214,12 @@ component =
                       []
                       [ HH.text post.title ]
                     , HH.div [ css "title-line" ] []
-                    , HH.div
-                      [ css "post-date" ]
-                      [ HH.text $ formatToDateStr post.publishTime ]
+                    , case post.showDate of
+                      true -> 
+                        HH.div
+                          [ css "post-date" ]
+                          [ HH.text $ formatToDateStr post.publishTime ]
+                      false -> HH.div [] []
                     ]
                   ]
               false ->
@@ -226,9 +229,12 @@ component =
                     []
                     [ HH.text post.title ]
                   , HH.div [ css "title-line" ] []
-                  , HH.div
-                    [ css "post-date" ]
-                    [ HH.text $ formatToDateStr post.publishTime ]
+                  , case post.showDate of
+                    true -> 
+                      HH.div
+                        [ css "post-date" ]
+                        [ HH.text $ formatToDateStr post.publishTime ]
+                    false -> HH.div [] []
                   ]
             , HH.div
               [ css "post-content" 

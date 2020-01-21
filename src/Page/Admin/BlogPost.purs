@@ -2,30 +2,40 @@ module Page.Admin.BlogPost where
 
 import Prelude
 
-import Api.Endpoint (Pagination)
-import Capability.Navigate (class Navigate, navigate)
-import Component.HTML.Admin (withAdmin)
-import Component.HTML.Utils (css)
-import Component.Table as Table
-import Component.Utils (OpaqueSlot)
-import Control.Monad.Error.Class (class MonadError)
-import Data.BlogPost (BlogPost(..), BlogPostId(..), BlogPostArray)
-import Data.Const (Const)
-import Data.Maybe (Maybe(..))
-import Data.Newtype (unwrap)
-import Data.Route as R
-import Data.Symbol (SProxy(..))
-import Effect.Aff.Class (class MonadAff)
-import Effect.Class (class MonadEffect)
-import Effect.Class.Console (logShow)
-import Foreign as Foreign
-import Form.Admin.BlogPost as BlogPostForm
-import Formless as F
-import Halogen as H
-import Halogen.HTML as HH
-import Resource.BlogPost (class ManageBlogPost, createBlogPost, getBlogPost, updateBlogPost)
-import Resource.Media (class ManageMedia)
-import Timestamp (nowTimestamp, formatToDateStr)
+import Control.Monad.Error.Class        (class MonadError)
+import Data.Const                       (Const)
+import Data.Maybe                       (Maybe(..))
+import Data.Newtype                     (unwrap)
+import Data.Symbol                      (SProxy(..))
+import Effect.Aff.Class                 (class MonadAff)
+import Effect.Class                     (class MonadEffect)
+import Effect.Class.Console             (logShow)
+import Foreign                          as Foreign
+import Formless                         as F
+import Halogen                          as H
+import Halogen.HTML                     as HH
+import Timestamp                        (nowTimestamp
+                                        ,formatToDateStr)
+
+
+import Api.Endpoint                     (Pagination)
+import Capability.Navigate              (class Navigate
+                                        ,navigate)
+import Component.HTML.Admin             (withAdmin)
+import Component.HTML.Utils             (css)
+import Component.Table                  as Table
+import Component.Utils                  (OpaqueSlot)
+import Data.BlogPost                    (BlogPost(..)
+                                        ,BlogPostId(..)
+                                        ,BlogPostArray
+                                        ,defaultBlogPost)
+import Data.Route                       as R
+import Form.Admin.BlogPost              as BlogPostForm
+import Resource.BlogPost                (class ManageBlogPost
+                                        ,createBlogPost
+                                        ,getBlogPost
+                                        ,updateBlogPost)
+import Resource.Media                   (class ManageMedia)
 
 type Input = 
   { blogPostId :: BlogPostId
@@ -93,21 +103,8 @@ component =
     LoadBlogPost postId -> case postId of
       BlogPostId 0 -> do
         now <- H.liftEffect nowTimestamp
-        let 
-          defaultBlogPost = BlogPost
-            { id: (BlogPostId 0)
-            , title: ""
-            , content: "{ 'ops': [] }"
-            , htmlContent: Nothing
-            , featuredImage: Nothing
-            , images: []
-            , published: false
-            , publishTime: now
-            , isCover: false
-            , createdAt: now
-            , updatedAt: Nothing
-            }
-        H.modify_ _ { blogPost = Just defaultBlogPost }
+        blogPost <- H.liftEffect defaultBlogPost
+        H.modify_ _ { blogPost = Just blogPost }
       _ -> do
         post <- getBlogPost postId
         H.modify_ _ { blogPost = post }

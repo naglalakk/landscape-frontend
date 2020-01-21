@@ -16,12 +16,14 @@ import Data.Generic.Rep.Show    (genericShow)
 import Data.Maybe               (Maybe(..))
 import Data.Newtype             (class Newtype)
 import Data.Traversable         (traverse)
+import Effect                   (Effect)
 import Formless                 as F
 import Halogen.Media.Data.Media (MediaRow)
 
 import Data.Image               (Image(..), ImageArray)
 import Timestamp                (Timestamp(..)
-                                ,defaultTimestamp)
+                                ,defaultTimestamp
+                                ,nowTimestamp)
 
 newtype BlogPostId = BlogPostId Int
 
@@ -48,6 +50,7 @@ newtype BlogPost = BlogPost
   , images        :: ImageArray
   , published     :: Boolean
   , publishTime   :: Timestamp
+  , showDate      :: Boolean
   , isCover       :: Boolean
   , createdAt     :: Timestamp
   , updatedAt     :: Maybe Timestamp
@@ -73,6 +76,7 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
     images        <- obj .:  "images"
     published     <- obj .:  "published"
     publishTime   <- obj .:  "publish_time"
+    showDate      <- obj .:  "show_date"
     isCover       <- obj .:  "is_cover"
     createdAt     <- obj .:  "created_at"
     updatedAt     <- obj .:? "updated_at"
@@ -85,6 +89,7 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
       , images
       , published
       , publishTime
+      , showDate
       , isCover
       , createdAt
       , updatedAt
@@ -99,9 +104,28 @@ instance encodeJsonBlogPost :: EncodeJson BlogPost where
     ~> "images"         := blogPost.images
     ~> "published"      := blogPost.published
     ~> "publish_time"   := blogPost.publishTime
+    ~> "show_date"      := blogPost.showDate
     ~> "is_cover"       := blogPost.isCover
     ~> "created_at"     := blogPost.createdAt
     ~> "updated_at"     := blogPost.updatedAt
 
 decodeBlogPostArray :: Json -> Either String BlogPostArray
 decodeBlogPostArray json = decodeJson json >>= traverse decodeJson
+
+defaultBlogPost :: Effect BlogPost
+defaultBlogPost = do
+  now <- nowTimestamp
+  pure $ BlogPost
+    { id: (BlogPostId 0)
+    , title: ""
+    , content: "{ 'ops': [] }"
+    , htmlContent: Nothing
+    , featuredImage: Nothing
+    , images: []
+    , published: false
+    , publishTime: now
+    , showDate: true
+    , isCover: false
+    , createdAt: now
+    , updatedAt: Nothing
+    }

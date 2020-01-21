@@ -71,6 +71,7 @@ newtype BlogPostForm r f = BlogPostForm (r
   , images          :: f Void       ImageArray          ImageArray
   , published       :: f Void       Boolean             Boolean
   , publishTime     :: f FormError  String              Timestamp
+  , showDate        :: f Void       Boolean             Boolean
   , isCover         :: f Void       Boolean             Boolean
   , createdAt       :: f Void       Timestamp           Timestamp
   , updatedAt       :: f Void       (Maybe Timestamp)   (Maybe Timestamp)
@@ -159,6 +160,7 @@ component = F.component input F.defaultSpec
           eval $ F.setValidate prx.published blogPost.published
           eval $ F.setValidate prx.publishTime 
                $ formatToDateTimeShortStr blogPost.publishTime
+          eval $ F.setValidate prx.showDate blogPost.showDate
           eval $ F.setValidate prx.isCover blogPost.isCover
           eval $ F.setValidate prx.createdAt blogPost.createdAt
           eval $ F.setValidate prx.updatedAt blogPost.updatedAt
@@ -237,6 +239,7 @@ component = F.component input F.defaultSpec
       , images: F.noValidation
       , published: F.noValidation
       , publishTime: validateDateTime
+      , showDate: F.noValidation
       , isCover: F.noValidation
       , createdAt: F.noValidation
       , updatedAt: F.noValidation
@@ -258,6 +261,17 @@ component = F.component input F.defaultSpec
         [ css "text-input" 
         , HP.value $ F.getInput prx.publishTime st.form
         , HE.onValueInput $ Just <<< F.setValidate prx.publishTime
+        ])
+      , withLabel "Show publish time" (HH.div
+        []
+        [ HH.div
+          [ css "description" ]
+          [ HH.text "Uncheck this if you don't want to show the date below the header title." ]
+        , HH.input
+          [ HP.checked $ F.getInput prx.showDate st.form
+          , HP.type_ HP.InputCheckbox
+          , HE.onChecked \_ -> Just $ F.modify prx.showDate not
+          ]
         ])
       , HH.div
         [ css "editor" ]
