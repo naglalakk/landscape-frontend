@@ -1,14 +1,26 @@
 @import "constants"
 
+@import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap')
+
 .admin-container
+  font-family 'Montserrat', sans-serif
   max-width content-width
+  min-height 100vh
   margin 0 auto
   display flex
+  justify-content center
+  align-items center
+  
 
   .admin-menu
+    height 100%
     padding-right separator
     padding-top separator
     border-right 1px solid #000
+
+    ul
+      li 
+        line-height 1.5em
 
   .content
     width 100%

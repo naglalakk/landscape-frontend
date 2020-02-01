@@ -16,7 +16,7 @@ import Web.Storage.Storage      (getItem
                                 ,removeItem
                                 ,setItem)
 
-import Config                   (apiUser, apiPass)
+import Config                   (apiKey)
 import Data.User                (Username)
 
 newtype Password = Password String
@@ -33,7 +33,7 @@ data APIAuth
 
 -- Default API Auth credentials
 apiAuth :: APIAuth 
-apiAuth = Basic $ base64encode apiUser apiPass
+apiAuth = Basic apiKey
 
 newtype UserAuth = UserAuth 
   { username :: Username
