@@ -6,7 +6,8 @@ import Data.Maybe                   (Maybe(..))
 import Data.Newtype                 (class Newtype)
 import Effect.Aff.Class             (class MonadAff)
 import Form.Error                   (FormError(..))
-import Form.Validation              (validateUsername, validateStr)
+import Form.Validation              (validateUsername
+                                    ,validatePassword)
 import Formless                     as F
 import Halogen                      as H
 import Halogen.HTML                 as HH
@@ -14,11 +15,12 @@ import Halogen.HTML.Events          as HE
 import Halogen.HTML.Properties      as HP
 
 import Component.HTML.Utils         (withLabel, css)
-import Data.User                    (Auth(..), Username(..))
+import Data.Auth                    (UserAuth(..), Password(..))
+import Data.User                    (Username(..))
 
 newtype LoginForm r f = LoginForm (r
   ( username :: f FormError String Username
-  , password :: f FormError String String
+  , password :: f FormError String Password
   ))
 
 derive instance newtypeLoginForm :: Newtype (LoginForm r f) _
@@ -28,7 +30,7 @@ prx = F.mkSProxies (F.FormProxy :: F.FormProxy LoginForm)
 
 type Input      = Unit
 type Query      = Const Void
-type Output     = Auth
+type Output     = UserAuth
 type ChildSlots = ()
 
 
@@ -47,16 +49,17 @@ component = F.component (const input) F.defaultSpec
     { initialInputs: Nothing
     , validators: LoginForm
       { username: validateUsername
-      , password: validateStr
+      , password: validatePassword
       }
     }
 
   handleEvent = case _ of
-    F.Submitted outputs -> H.raise $ Auth $ F.unwrapOutputFields outputs
+    F.Submitted outputs -> H.raise $ UserAuth $ F.unwrapOutputFields outputs
     _ -> pure unit
 
   render st = 
-    HH.form_ 
+    HH.form
+      [ css "login-form" ]
       [ withLabel "Username*" (HH.input
         [ css "text-input"
         , HE.onValueInput $ Just <<< F.setValidate prx.username
@@ -66,4 +69,9 @@ component = F.component (const input) F.defaultSpec
         , HE.onValueInput $ Just <<< F.setValidate prx.password
         , HP.type_ HP.InputPassword
         ])
+      , HH.button
+        [ css "button" 
+        , HE.onClick \_ -> Just F.submit
+        ]
+        [ HH.text "Login" ]
       ]

@@ -1,3 +1,4 @@
 exports.apiURL      = process.env.API_URL     || ""
 exports.environment = process.env.ENVIRONMENT || ""
-exports.authStr     = process.env.AUTH_STR    || ""
+exports.apiUser     = process.env.API_USER    || ""
+exports.apiPass     = process.env.API_PASS    || ""

@@ -1,12 +1,16 @@
 module Component.Router where
 
 import Prelude
-
 import Control.Monad.Error.Class        (class MonadError)
+import Control.Monad.Reader             (class MonadAsk, asks)
 import Data.Either                      (hush)
-import Data.Maybe                       (fromMaybe, Maybe(..))
+import Data.Foldable                    (elem)
+import Data.Maybe                       (Maybe(..)
+                                        ,fromMaybe
+                                        ,isJust)
 import Data.Symbol                      (SProxy(..))
 import Effect.Aff.Class                 (class MonadAff)
+import Effect.Ref                       as Ref
 import Foreign                          as Foreign
 import Halogen                          (liftEffect)
 import Halogen                          as H
@@ -15,8 +19,10 @@ import Routing.Duplex                   as RD
 import Routing.Hash                     (getHash)
 
 import Capability.Navigate              (class Navigate, navigate)
-import Component.Utils                  (OpaqueSlot)
+import Component.Utils                  (OpaqueSlot, busEventSource)
+import Data.Environment                 (UserEnv(..))
 import Data.Route                       (Route(..), routeCodec)
+import Data.User                        (User(..))
 import Page.Home                        as Home
 import Page.Admin.Home                  as AdminHome
 import Page.Admin.BlogPosts             as AdminBlogPosts
@@ -24,15 +30,19 @@ import Page.Admin.BlogPost              as AdminBlogPost
 import Page.Login                       as Login
 import Resource.BlogPost                (class ManageBlogPost)
 import Resource.Media                   (class ManageMedia)
+import Resource.User                    (class ManageUser)
 
 type State = 
-  { route :: Maybe Route }
+  { route :: Maybe Route 
+  , currentUser :: Maybe User
+  }
 
 data Query a
   = Navigate Route a 
 
 data Action 
   = Initialize
+  | HandleUserBus (Maybe User)
 
 type ChildSlots = 
   ( home :: OpaqueSlot Unit 
@@ -43,14 +53,16 @@ type ChildSlots =
   )
 
 component
-  :: forall m 
+  :: forall m r
    . MonadAff m
-  => ManageMedia m
-  => Navigate m
+  => MonadAsk { userEnv :: UserEnv | r } m
   => ManageBlogPost m
+  => ManageMedia m
+  => ManageUser m
+  => Navigate m
   => H.Component HH.HTML Query Unit Void m 
 component = H.mkComponent 
-  { initialState: \_ -> { route: Nothing }
+  { initialState: \_ -> { route: Nothing, currentUser: Nothing}
   , render
   , eval: H.mkEval $ H.defaultEval
       { handleQuery = handleQuery
@@ -63,28 +75,48 @@ component = H.mkComponent
   handleAction = case _ of
     Initialize -> do
       initialRoute <- hush <<< (RD.parse routeCodec) <$> liftEffect getHash
+
+      { currentUser, userBus } <- asks _.userEnv
+      _ <- H.subscribe (HandleUserBus <$> busEventSource userBus)
+      mbUser <- H.liftEffect $ Ref.read currentUser
+      H.modify_ _ { currentUser = mbUser }
+
       navigate $ fromMaybe Home initialRoute
+
+    HandleUserBus user -> H.modify_ _ { currentUser = user }
 
   handleQuery :: forall a. Query a -> H.HalogenM State Action ChildSlots Void m (Maybe a)
   handleQuery = case _ of
     Navigate dest a -> do
-      { route } <- H.get
+      { route, currentUser } <- H.get 
       when (route /= Just dest) do
-         H.modify_ _ { route = Just dest }
+        case (isJust currentUser && dest `elem` [ Login ]) of
+          false -> H.modify_ _ { route = Just dest }
+          _ -> pure unit
       pure (Just a)
+
+  authorize :: Maybe User -> H.ComponentHTML Action ChildSlots m -> H.ComponentHTML Action ChildSlots m
+  authorize mbUser html = case mbUser of
+    Nothing ->
+      HH.slot (SProxy :: _ "login") unit Login.component { redirect: false } absurd
+    Just _ ->
+      html
   
   render :: State -> H.ComponentHTML Action ChildSlots m
-  render { route } = case route of
+  render { route, currentUser } = case route of
     Just Home -> 
       HH.slot (SProxy :: _ "home") unit Home.component unit absurd
     Just Login ->
-      HH.slot (SProxy :: _ "login") unit Login.component unit absurd
+      HH.slot (SProxy :: _ "login") unit Login.component { redirect: true } absurd
     -- Admin
     Just AdminHome ->
       HH.slot (SProxy :: _ "adminHome") unit AdminHome.component unit absurd
+        # authorize currentUser
     Just AdminBlogPosts ->
       HH.slot (SProxy :: _ "adminBlogPosts") unit AdminBlogPosts.component unit absurd
+        # authorize currentUser
     Just (AdminBlogPost blogPostId) -> 
       HH.slot (SProxy :: _ "adminBlogPost") unit AdminBlogPost.component { blogPostId } absurd
+        # authorize currentUser
     Nothing ->
       HH.div_ [ HH.text "Oh no! That page wasn't found." ]

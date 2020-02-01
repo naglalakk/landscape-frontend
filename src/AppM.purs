@@ -22,23 +22,27 @@ import Web.HTML.Window              as Window
 import Web.HTML.Location            (setHref, Location)
 
 import Api.Endpoint                 as API
-import Api.Request                  (Authentication(..)
-                                    ,Basic(..)
-                                    ,RequestMethod(..)
+import Api.Request                  (RequestMethod(..)
                                     ,FormDataRequestMethod(..)
                                     ,mkRequest
                                     ,mkFormDataRequest)
 import Capability.LogMessages       (class LogMessages
                                     ,logMessage)
 import Capability.Navigate          (class Navigate)
-import Config                       (authStr)
+import Data.Auth                    (APIAuth(..)
+                                    ,Password(..)
+                                    ,apiAuth
+                                    ,base64encodeUserAuth)
 import Data.BlogPost                (BlogPost(..))
 import Data.Image                   (decodeImageArray)
 import Data.Log                     as Log
 import Data.Route                   as Route
+import Data.User                    (Username(..))
 import Data.URL                     (BaseURL)
 import Resource.BlogPost            (class ManageBlogPost)
 import Resource.Media               (class ManageMedia)
+import Resource.User                (class ManageUser)
+
 
 newtype AppM a = AppM (ReaderT Env Aff a)
 
@@ -103,11 +107,12 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
             logMessage $ Log.Log { message: err }
             pure Nothing
       Nothing -> pure Nothing
+
   createBlogPost post = do
     req <- mkRequest
       { endpoint: API.BlogPostCreate
       , method: Post $ Just $ encodeJson post
-      , auth: Just $ BasicAuth $ Basic authStr
+      , auth: Just apiAuth
       }
     case req of
       Just json -> do
@@ -118,11 +123,12 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
             logMessage $ Log.Log { message: err }
             pure Nothing
       Nothing -> pure Nothing
+
   updateBlogPost (BlogPost post) = do
     req <- mkRequest
       { endpoint: API.BlogPostUpdate post.id
       , method: Post $ Just $ encodeJson $ BlogPost post
-      , auth: Just $ BasicAuth $ Basic authStr
+      , auth: Just apiAuth
       }
     case req of
       Just json -> do
@@ -137,7 +143,7 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
     req <- mkRequest
       { endpoint: API.BlogPostDelete postId
       , method: Delete
-      , auth: Just $ BasicAuth $ Basic authStr
+      , auth: Just apiAuth
       }
     pure unit
 
@@ -174,3 +180,19 @@ instance manageMediaAppM :: ManageMedia AppM where
             pure Nothing
       Nothing -> pure Nothing
 
+instance manageUserAppM :: ManageUser AppM where
+  loginUser auth = do
+    req <- mkRequest 
+      { endpoint: API.UserLogin
+      , method: Get
+      , auth: Just $ Basic $ base64encodeUserAuth auth
+      }
+    case req of
+      Just json -> do
+        let user = decodeJson json
+        case user of
+          Right u -> pure $ Just u
+          Left err -> do
+            logMessage $ Log.Log { message: err }
+            pure Nothing
+      Nothing -> pure Nothing

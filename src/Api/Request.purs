@@ -21,36 +21,10 @@ import Data.Newtype                 (class Newtype)
 import Routing.Duplex               (print)
 import Web.XHR.FormData             (FormData)
   
-import Api.Endpoint                 (Endpoint)
-import Data.URL                     (BaseURL(..))
 import Api.Endpoint                 (Endpoint(..)
                                     ,endpointCodec)
-
-newtype Token = Token String
-
-derive instance eqToken  :: Eq Token
-derive instance ordToken :: Ord Token
-
-instance showToken :: Show Token where
-  show (Token _) = "Token {- token -}"
-
-
-
-newtype Basic = Basic String
-
-derive instance newtypeBasic :: Newtype Basic _
-derive instance genericBasic :: Generic Basic _
-derive instance eqBasic :: Eq Basic
-derive instance ordBasic :: Ord Basic
-
-derive newtype instance encodeJsonBasic :: EncodeJson Basic
-derive newtype instance decodeJsonBasic :: DecodeJson Basic
-
-instance showBasic :: Show Basic where
-  show = genericShow
-
-
-data Authentication = TokenAuth Token | BasicAuth Basic
+import Data.Auth                    (APIAuth(..))
+import Data.URL                     (BaseURL(..))
 
 data RequestMethod
   = Get
@@ -64,14 +38,15 @@ data FormDataRequestMethod
 type RequestOptions =
   { endpoint :: Endpoint
   , method   :: RequestMethod
-  , auth     :: Maybe Authentication
+  , auth     :: Maybe APIAuth
   }
 
 type FormDataOptions =
   { endpoint :: Endpoint
   , method   :: FormDataRequestMethod
-  , auth     :: Maybe Authentication
+  , auth     :: Maybe APIAuth
   }
+
 
 defaultRequest :: BaseURL        ->
                   RequestOptions ->
@@ -80,8 +55,10 @@ defaultRequest (BaseURL baseURL) { endpoint, method, auth} =
   { method: Left method
   , url: baseURL <> print endpointCodec endpoint
   , headers: case auth of
-      Just (BasicAuth (Basic key)) -> [ RequestHeader "Authorization" $ "Basic " <> key ]
-      Just _ -> []
+      Just (Basic token) -> do
+        [ RequestHeader "Authorization" $ "Basic " <> token ]
+      Just (Token token) -> 
+        [ RequestHeader "Authorization" $ "Bearer " <> token ]
       Nothing        -> []
   , content: RB.json <$> body
   , username: Nothing
@@ -103,7 +80,8 @@ formDataRequest (BaseURL baseURL) { endpoint, method, auth} =
   { method: Left method
   , url: baseURL <> print endpointCodec endpoint
   , headers: case auth of
-      Just (BasicAuth (Basic key)) -> [ RequestHeader "Authorization" $ "Basic " <> key ]
+      Just (Basic token) -> 
+        [ RequestHeader "Authorization" $ "Basic " <> token ]
       Just      _          -> []
       Nothing              -> []
   , content: RB.formData <$> body

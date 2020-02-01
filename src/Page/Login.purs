@@ -1,39 +1,55 @@
 module Page.Login where
 
 import Prelude
+import Control.Monad.Reader         (class MonadAsk, asks)
 import Data.Const                   (Const)
 import Data.Maybe                   (Maybe(..))
+import Data.Newtype                 (unwrap)
 import Data.Symbol                  (SProxy(..))
 import Effect.Aff.Class             (class MonadAff)
 import Halogen                      as H
 import Halogen.HTML                 as HH
 import Formless                     as F
 
+import Api.Utils                    (authenticate)
+import Capability.Navigate          (class Navigate
+                                    ,navigate)
 import Component.Utils              (OpaqueSlot)
 import Component.HTML.Utils         (css)
-import Data.User                    (Auth)
+import Data.Auth                    (APIAuth(..)
+                                    ,UserAuth(..)
+                                    ,base64encode
+                                    ,writeToken)
+import Data.Environment             (UserEnv(..))
+import Data.Route                   as R
 import Form.Login                   as LoginForm
+import Resource.User                (class ManageUser
+                                    ,loginUser)
 
-type State = {}
+type State =
+  { redirect :: Boolean }
+
+type Input =
+  { redirect :: Boolean }
 
 data Action 
-  = HandleLoginForm Auth
+  = HandleLoginForm UserAuth
 
 type ChildSlots = (
-  loginForm :: H.Slot (F.Query LoginForm.LoginForm LoginForm.Query LoginForm.ChildSlots) Auth Unit
+  loginForm :: H.Slot (F.Query LoginForm.LoginForm LoginForm.Query LoginForm.ChildSlots) UserAuth Unit
 )
 type Query = Const Void
 
-initialState :: State
-initialState = {}
-
-component :: forall m
+component :: forall m r
            . Monad m
           => MonadAff m
-          => H.Component HH.HTML Query Unit Void m
+          => MonadAsk { userEnv :: UserEnv | r } m
+          => ManageUser m
+          => Navigate m
+          => H.Component HH.HTML Query Input Void m
 component =
   H.mkComponent
-    { initialState: \_ -> initialState
+    { initialState: identity
     , render
     , eval: H.mkEval H.defaultEval
       { handleAction = handleAction
@@ -41,7 +57,12 @@ component =
     }
   where
   handleAction = case _ of
-    HandleLoginForm auth -> pure unit
+    HandleLoginForm auth -> do
+      env <- asks _.userEnv
+      currentUser <- authenticate env auth
+      case currentUser of
+        Just user -> navigate $ R.AdminHome
+        Nothing   -> pure unit
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =

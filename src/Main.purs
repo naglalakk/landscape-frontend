@@ -1,11 +1,18 @@
 module Main where
 
 import Prelude
+import Affjax                       (request)
 import Control.Monad.Error.Class    (class MonadError)
+import Data.Argonaut                (encodeJson, decodeJson)
+import Data.Bifunctor               (bimap)
+import Data.Either                  (Either(..), hush)
+import Data.Foldable                (traverse_)
 import Data.Maybe                   (Maybe(..))
 import Effect                       (Effect)
 import Effect.Aff                   (Aff, launchAff_)
 import Effect.Aff.Class             (class MonadAff)
+import Effect.Aff.Bus               as Bus
+import Effect.Ref                   as Ref
 import Foreign                      as Foreign
 import Halogen                      as H
 import Halogen.Aff                  as HA
@@ -15,24 +22,59 @@ import Routing.Duplex               (parse)
 import Routing.Hash                 (matchesWith)
 
 import AppM                         (runAppM)
+import Api.Request                  (RequestMethod(..)
+                                    ,defaultRequest)
+import Api.Endpoint                 as API
 import Component.Router             as Router
 import Config                       (environment, apiURL)
-import Data.Environment             (Env, toEnvironment)
+import Data.Auth                    (APIAuth(..)
+                                    ,readToken)
+import Data.Environment             (Env
+                                    ,UserEnv
+                                    ,toEnvironment)
 import Data.Route                   (routeCodec)
+import Data.User                    (User)
 import Data.URL                     (BaseURL(..))
 
 main :: Effect Unit
 main = HA.runHalogenAff do
   body <- HA.awaitBody
+  
+  currentUser <- H.liftEffect $ Ref.new Nothing
+  userBus <- H.liftEffect Bus.make
+
+  H.liftEffect readToken >>= traverse_ \token -> do
+    let 
+      requestOptions = 
+        { endpoint: API.UserLogin
+        , method: Get 
+        , auth: Just $ Basic token
+        }
+    res <- H.liftAff $ request $ defaultRequest (BaseURL apiURL) requestOptions
+
+    case (hush res.body) of
+      Just json -> do
+        let 
+          user = (decodeJson json) :: Either String User
+        case user of
+          Right u -> H.liftEffect $ Ref.write (Just u) currentUser
+          Left err -> pure unit
+      Nothing -> pure unit
 
   let 
     environ = toEnvironment environment
     url     = BaseURL apiURL
+    
 
     env :: Env
-    env = { environment: environ
-          , apiURL: url
-          }
+    env = 
+      { environment: environ
+      , apiURL: url
+      , userEnv: userEnv
+      }
+      where
+        userEnv :: UserEnv
+        userEnv = { currentUser, userBus }
 
     rootComponent :: H.Component HH.HTML Router.Query Unit Void Aff
     rootComponent = H.hoist (runAppM env) Router.component

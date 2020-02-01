@@ -29,7 +29,7 @@ data Endpoint
   | BlogPostDelete BP.BlogPostId
   | Images Pagination
   | ImageUpload  
-
+  | UserLogin
 
 derive instance genericEndpoint :: Generic Endpoint _
 
@@ -51,4 +51,5 @@ endpointCodec = root $ sum
     , perPage: optional <<< int
     }
   , "ImageUpload" : "media" / "images" / "upload" / noArgs
+  , "UserLogin" : "users" / "authenticate" / noArgs
   }

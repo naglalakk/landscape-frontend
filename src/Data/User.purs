@@ -1,30 +1,22 @@
 module Data.User where
 
 import Prelude
+import Data.Argonaut            (Json
+                                ,decodeJson
+                                ,encodeJson
+                                ,(~>), (~>?)
+                                ,(:=), (:=?)
+                                ,(.:), (.:?))
 import Data.Argonaut.Encode     (class EncodeJson)
 import Data.Argonaut.Decode     (class DecodeJson)
 import Data.Generic.Rep         (class Generic)
 import Data.Generic.Rep.Show    (genericShow)
+import Data.Maybe               (Maybe(..))
 import Data.Newtype             (class Newtype)
 import Formless                 as F
+import Timestamp                (Timestamp(..))
 
 import Data.Email               (Email)
-
-newtype Auth = Auth 
-  { username :: Username
-  , password :: String
-  }
-
-derive instance newtypeAuth :: Newtype Auth _
-derive instance genericAuth :: Generic Auth _
-derive instance eqAuth :: Eq Auth
-derive instance ordAuth :: Ord Auth
-
-derive newtype instance encodeJsonAuth :: EncodeJson Auth
-derive newtype instance decodeJsonAuth :: DecodeJson Auth
-
-instance showAuth :: Show Auth where
-  show = genericShow
 
 newtype UserId = UserId Int
 
@@ -62,8 +54,10 @@ instance showUsername :: Show Username where
 newtype User = User 
   { id       :: UserId
   , username :: Username
-  , email    :: Email
-  , admin    :: Boolean
+  , email    :: Maybe Email
+  , isAdmin  :: Boolean
+  , createdAt :: Timestamp
+  , updatedAt :: Maybe Timestamp
   }
 
 derive instance newtypeUser :: Newtype User _
@@ -71,8 +65,33 @@ derive instance genericUser :: Generic User _
 derive instance eqUser :: Eq User
 derive instance ordUser :: Ord User
 
-derive newtype instance encodeJsonUser :: EncodeJson User
-derive newtype instance decodeJsonUser :: DecodeJson User
+instance encodeJsonUser :: EncodeJson User where
+  encodeJson (User user)
+    =  "username"    := user.username
+    ~> "email"      := user.email
+    ~> "is_admin"   := user.isAdmin
+    ~> "created_at" := user.createdAt
+    ~> "updated_at" := user.updatedAt
+
+instance decodeJsonUser :: DecodeJson User where
+  decodeJson json = do
+    obj <- decodeJson json
+    id <- obj .: "id"
+    let 
+      userId = UserId id
+    username <- obj .: "username"
+    email    <- obj .:? "email"
+    isAdmin  <- obj .: "is_admin"
+    createdAt <- obj .: "created_at"
+    updatedAt <- obj .:? "updated_at"
+    pure $ User 
+      { id: userId
+      , username: username
+      , email: email
+      , isAdmin: isAdmin
+      , createdAt: createdAt
+      , updatedAt: updatedAt
+      }
 
 instance showUser :: Show User where
   show = genericShow
