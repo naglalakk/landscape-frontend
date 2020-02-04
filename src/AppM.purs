@@ -168,7 +168,7 @@ instance manageMediaAppM :: ManageMedia AppM where
     req <- mkFormDataRequest
       { endpoint: API.ImageUpload
       , method: PostFormData $ Just formData
-      , auth: Nothing
+      , auth: Just apiAuth
       }
     case req of
       Just json -> do
