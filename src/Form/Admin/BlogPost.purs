@@ -55,6 +55,7 @@ import Data.BlogPost                    (BlogPost(..)
 import Data.Image                       (Image(..)
                                         ,ImageType
                                         ,ImageArray)
+import Foreign.Flatpickr                (loadFlatpickr)
 import Form.Error                       (FormError(..))
 import Form.Validation                  (validateStr
                                         ,validateDateTime)
@@ -93,6 +94,7 @@ type AddedState = (
 
 data Action
   = Initialize
+  | AutoSave
   | Receive Input
   | HandleFeaturedImageBrowserOutput (Browser.Output ImageType)
   | HandleFeaturedImageModal
@@ -127,7 +129,15 @@ component = F.component input F.defaultSpec
   handleAction :: Action
                -> F.HalogenM BlogPostForm AddedState Action ChildSlots BlogPost m Unit
   handleAction = case _ of
-    Initialize -> pure unit
+    Initialize -> do
+      H.liftEffect $ loadFlatpickr ".datetime"
+      void $ H.fork $ handleAction AutoSave
+
+    AutoSave -> do
+      -- Autosave every 3 seconds
+      H.liftAff $ Aff.delay $ Aff.Milliseconds 3000.0
+      handleAction SubmitForm
+      handleAction AutoSave
 
     HandleEditorDelta -> do
 
@@ -145,8 +155,6 @@ component = F.component input F.defaultSpec
           eval $ F.setValidate prx.htmlContent 
                $ Just hContent
         Nothing -> pure unit
-
-      -- handleAction HandleEditorDelta
 
     Receive inp -> do
       case inp.blogPost of
@@ -258,7 +266,7 @@ component = F.component input F.defaultSpec
         , HE.onValueInput $ Just <<< F.setValidate prx.title
         ])
       , withLabel "Publish time" (HH.input
-        [ css "text-input" 
+        [ css "text-input datetime" 
         , HP.value $ F.getInput prx.publishTime st.form
         , HE.onValueInput $ Just <<< F.setValidate prx.publishTime
         ])
