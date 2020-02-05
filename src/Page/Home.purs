@@ -3,6 +3,7 @@ module Page.Home where
 import Prelude
 import Data.Array                           (length)
 import Data.Const                           (Const)
+import Data.Int                             (floor)
 import Data.Maybe                           (Maybe(..))
 import Data.Newtype                         (unwrap)
 import Data.Symbol                          (SProxy(..))
@@ -22,7 +23,10 @@ import Web.Event.Event                      as EV
 import Web.HTML                             (HTMLDocument)
 import Web.HTML (window)                    as Web
 import Web.HTML.HTMLDocument                as HTMLDocument
+import Web.HTML.HTMLElement                 as HTMLElement
 import Web.HTML.Window                      as Web
+import Web.DOM.Element                      as Element
+import Web.DOM.ParentNode                   as PN
 import Web.TouchEvent.EventTypes            as TET
 import Web.TouchEvent.Touch                 as Touch
 import Web.TouchEvent.TouchEvent            as TE
@@ -118,46 +122,59 @@ component =
       pure unit
 
     HandleWheel ev -> do
-      state <- H.get
-      win <- H.liftEffect Web.window
-      height <- H.liftEffect $ Web.innerHeight win
-      scrollY <- H.liftEffect $ Web.scrollY win
-      let
-        atBottom = ((height - 250) - scrollY) <= 0
-      case (atBottom && state.scroll) of
-        true -> do
-          let
-            newCurrentPage = state.currentPage + 1
-          blogPosts <- getBlogPosts { page: Just newCurrentPage
-                                     , perPage: Just 5 
-                                     }
-          case length blogPosts == 0 of
-            true -> H.modify_ _ { scroll = false }
-            false -> do
-              let allBlogPosts = state.blogPosts <> blogPosts
-              H.modify_ _ { currentPage = newCurrentPage 
-                          , blogPosts = allBlogPosts
-                          }
-              _ <- traverse (\(BlogPost post) -> do
-                let label = "element-" <> (show $ unwrap post.id)
-                H.getHTMLElementRef (H.RefLabel label) >>= case _ of
-                  Nothing -> pure unit
-                  Just el -> do
-                    case post.htmlContent of
-                      Just html -> H.liftEffect $ setHTML el html
-                      Nothing -> pure unit) blogPosts
+      state       <- H.get
+      win         <- H.liftEffect Web.window
+      scrollY     <- H.liftEffect $ Web.scrollY win
+      innerHeight <- H.liftEffect $ Web.innerHeight win
+      document    <- H.liftEffect $ Web.document win
+      container   <- H.liftEffect $ 
+                     PN.querySelector 
+                     (PN.QuerySelector "body") 
+                     (HTMLDocument.toParentNode document)
 
-              -- Check if number of posts is less than
-              -- 5. If so we stop checking for more posts
-              case length blogPosts < 5 of
-                true -> H.modify_ _ { scroll = false }
+      case container of
+        Just body -> do
+          let htmlElement = HTMLElement.fromElement body
+          case htmlElement of
+            Just hel -> do
+              scrollHeight <- H.liftEffect $ Element.scrollHeight body
+              let 
+                contentHeight = scrollY + innerHeight
+                atBottom = contentHeight >= (floor scrollHeight)
+              case (atBottom && state.scroll) of
+                true -> do
+                  let
+                    newCurrentPage = state.currentPage + 1
+                  blogPosts <- getBlogPosts { page: Just newCurrentPage
+                                             , perPage: Just 5 
+                                             }
+                  case length blogPosts == 0 of
+                    true -> H.modify_ _ { scroll = false }
+                    false -> do
+                      let allBlogPosts = state.blogPosts <> blogPosts
+                      H.modify_ _ { currentPage = newCurrentPage 
+                                  , blogPosts = allBlogPosts
+                                  }
+                      _ <- traverse (\(BlogPost post) -> do
+                        let label = "element-" <> (show $ unwrap post.id)
+                        H.getHTMLElementRef (H.RefLabel label) >>= case _ of
+                          Nothing -> pure unit
+                          Just el -> do
+                            case post.htmlContent of
+                              Just html -> H.liftEffect $ setHTML el html
+                              Nothing -> pure unit) blogPosts
+
+                      -- Check if number of posts is less than
+                      -- 5. If so we stop checking for more posts
+                      case length blogPosts < 5 of
+                        true -> H.modify_ _ { scroll = false }
+                        false -> pure unit
                 false -> pure unit
-        false -> do
-          pure unit
+            Nothing  -> pure unit
+        Nothing   -> pure unit
 
       -- TODO: Use updated debounce func in halogen-formless
       H.liftAff $ Aff.delay $ Aff.Milliseconds 500.0
-      pure unit
 
     HandleScroll ev -> do
       win <- H.liftEffect Web.window
