@@ -52,6 +52,7 @@ import Utils.DOM                            (setHTML)
 type State = 
   { blogPosts :: BlogPostArray
   , currentPage :: Int
+  , scroll :: Boolean
   }
 
 data Action 
@@ -65,6 +66,7 @@ initialState :: State
 initialState = 
   { blogPosts: []
   , currentPage: 1
+  , scroll: true
   }
 
 component :: forall m
@@ -116,20 +118,22 @@ component =
       pure unit
 
     HandleWheel ev -> do
+      state <- H.get
       win <- H.liftEffect Web.window
       height <- H.liftEffect $ Web.innerHeight win
       scrollY <- H.liftEffect $ Web.scrollY win
-      case ((height - 250) - scrollY <= 0) of
+      let
+        atBottom = ((height - 250) - scrollY) <= 0
+      case (atBottom && state.scroll) of
         true -> do
-          state <- H.get
           let
             newCurrentPage = state.currentPage + 1
           blogPosts <- getBlogPosts { page: Just newCurrentPage
                                      , perPage: Just 5 
                                      }
-          case length blogPosts of
-            0 -> pure unit
-            _ -> do
+          case length blogPosts == 0 of
+            true -> H.modify_ _ { scroll = false }
+            false -> do
               let allBlogPosts = state.blogPosts <> blogPosts
               H.modify_ _ { currentPage = newCurrentPage 
                           , blogPosts = allBlogPosts
@@ -142,19 +146,23 @@ component =
                     case post.htmlContent of
                       Just html -> H.liftEffect $ setHTML el html
                       Nothing -> pure unit) blogPosts
-              pure unit
-        false -> pure unit
+
+              -- Check if number of posts is less than
+              -- 5. If so we stop checking for more posts
+              case length blogPosts < 5 of
+                true -> H.modify_ _ { scroll = false }
+                false -> pure unit
+        false -> do
+          pure unit
+
+      -- TODO: Use updated debounce func in halogen-formless
       H.liftAff $ Aff.delay $ Aff.Milliseconds 500.0
-      logShow height
-      logShow scrollY
       pure unit
 
     HandleScroll ev -> do
       win <- H.liftEffect Web.window
       height <- H.liftEffect $ Web.innerHeight win
       scrollY <- H.liftEffect $ Web.scrollY win
-      logShow height
-      logShow scrollY
       pure unit
 
   socialItem :: forall i p. String -> String -> HH.HTML i p

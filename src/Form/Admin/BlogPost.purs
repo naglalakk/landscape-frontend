@@ -131,7 +131,7 @@ component = F.component input F.defaultSpec
   handleAction = case _ of
     Initialize -> do
       H.liftEffect $ loadFlatpickr ".datetime"
-      void $ H.fork $ handleAction AutoSave
+      -- void $ H.fork $ handleAction AutoSave
 
     AutoSave -> do
       -- Autosave every 3 seconds
