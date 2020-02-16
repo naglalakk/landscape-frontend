@@ -165,7 +165,7 @@ component =
                               Nothing -> pure unit) blogPosts
 
                       -- Check if number of posts is less than
-                      -- 5. If so we stop checking for more posts
+                      -- perPage. If so we stop checking for more posts
                       case length blogPosts < 5 of
                         true -> H.modify_ _ { scroll = false }
                         false -> pure unit

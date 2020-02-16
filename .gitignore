@@ -15,3 +15,7 @@
 build/
 dist/
 .DS_Store
+
+.spago2nix
+
+result
