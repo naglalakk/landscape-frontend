@@ -8,7 +8,7 @@ docs:
 	purs docs '.spago/*/*/src/**/*.purs' 'src/*.purs' --format html
 
 server:
-	make bundle && make browser && spago bundle-app --main Server --to server.js && node server.js
+	make bundle && make browser && spago bundle-app --main Server --to server.js && npm start
 
 test:
 	spago test
