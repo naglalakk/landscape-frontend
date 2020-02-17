@@ -1,4 +1,4 @@
-{}:
+{ yarn2nixPath ? /Users/Donna/Code/K0TT/github/yarn2nix }:
   let
     pkgs = import ./packages.nix {};
     spagoPkgs = import ./spago-packages.nix { inherit pkgs; };
@@ -9,7 +9,7 @@
       sha256 = "0lmkppidmhnayv0919990ifdd61f9d23dzjzr8amz7hjgc74yxs0";
     }) { inherit pkgs; };
     
-    yarn2nix = import /Users/Donna/Code/K0TT/github/yarn2nix { inherit pkgs; };
+    yarn2nix = import yarn2nixPath { inherit pkgs; };
     npm = yarn2nix.mkYarnPackage {
       name = "frontend-npm";
       src = ./.;
