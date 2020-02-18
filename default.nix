@@ -8,6 +8,10 @@
       rev = "refs/heads/master";
       sha256 = "0lmkppidmhnayv0919990ifdd61f9d23dzjzr8amz7hjgc74yxs0";
     }) { inherit pkgs; };
+
+     removeHashBang = drv: drv.overrideAttrs (oldAttrs: {
+       buildCommand = builtins.replaceStrings ["#!/usr/bin/env"] [""] oldAttrs.buildCommand;
+     });
     
     yarn2nix = import yarn2nixPath { inherit pkgs; };
     npm = yarn2nix.mkYarnPackage {
@@ -25,7 +29,7 @@
         easy-ps.purs easy-ps.spago npm pkgs.nodejs-12_x
       ];
       buildPhase = ''
-        ${spagoPkgs.installSpagoStyle}
+        ${removeHashBang spagoPkgs.installSpagoStyle}
         mkdir -p $out
         purs compile "$src/**/*.purs" ${builtins.toString
           (builtins.map
