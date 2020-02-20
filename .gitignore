@@ -19,3 +19,4 @@ dist/
 .spago2nix
 
 result
+server.js
