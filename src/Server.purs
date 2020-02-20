@@ -19,6 +19,7 @@ import Node.Process                     (lookupEnv)
 newtype EnvConfig = EnvConfig 
   { environment :: String
   , port        :: String
+  , staticPath  :: String
   }
 
 app :: EnvConfig -> App
@@ -34,13 +35,16 @@ main = launchAff_ do
   liftEffect do
     port <- lookupEnv "PORTNR"
     environ <- lookupEnv "ENVIRONMENT"
+    staticPath <- lookupEnv "STATIC_PATH"
     -- Port defaults to 8080
     let 
       p   = fromMaybe "8080" port
       env = fromMaybe "development" environ
+      staticP = fromMaybe "" staticPath
       envConfig = EnvConfig 
         { environment: env
         , port: p 
+        , staticPath: staticP
         }
     listenHttp (app envConfig) (fromMaybe 8080 $ fromString p) \_ ->
       log $ "Listening on "  <> p

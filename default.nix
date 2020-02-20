@@ -42,7 +42,6 @@
 
       installPhase = ''
         mkdir -p $out/output/donnabot
-
         cd $out && spago bundle-app --main Server --no-install --no-build --to $out/output/donnabot/server.js
 
         echo "#!/usr/bin/env bash" >> $out/run.sh

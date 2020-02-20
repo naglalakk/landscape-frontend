@@ -1,18 +1,14 @@
 doctype html
 html
   head
-    - var prefix = ""
-    if environment != "development"
-      - prefix = "/static"
-
     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css")
     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/solarized-dark.min.css")
-    link(rel="stylesheet", href=prefix + "/style/dist/style.css")
+    link(rel="stylesheet", href=staticPath + "/style/dist/style.css")
   body
     script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/haskell.min.js")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js")
-    script(src=prefix + "/dist/index.js")
+    script(src=staticPath + "/dist/index.js")
     script.
       hljs.configure({
         languages: ['haskell']
