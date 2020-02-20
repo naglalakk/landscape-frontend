@@ -16,36 +16,21 @@ import Node.Express.Response            (render)
 import Node.Express.Middleware.Static   (static)
 import Node.Process                     (lookupEnv)
 
-newtype EnvConfig = EnvConfig 
-  { environment :: String
-  , port        :: String
-  , staticPath  :: String
-  }
-
-app :: EnvConfig -> App
-app envConf = do
+app :: App
+app = do
     setProp "views" "static/views"
     setProp "view engine" "pug"
     use (static "static")
-    get "/" $ render "index" envConf
+    get "/" $ render "index" ""
 
 main :: Effect Unit
 main = launchAff_ do
   _ <- Dotenv.loadFile
   liftEffect do
     port <- lookupEnv "PORTNR"
-    environ <- lookupEnv "ENVIRONMENT"
-    staticPath <- lookupEnv "STATIC_PATH"
     -- Port defaults to 8080
     let 
       p   = fromMaybe "8080" port
-      env = fromMaybe "development" environ
-      staticP = fromMaybe "" staticPath
-      envConfig = EnvConfig 
-        { environment: env
-        , port: p 
-        , staticPath: staticP
-        }
-    listenHttp (app envConfig) (fromMaybe 8080 $ fromString p) \_ ->
+    listenHttp app (fromMaybe 8080 $ fromString p) \_ ->
       log $ "Listening on "  <> p
 
