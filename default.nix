@@ -6,7 +6,7 @@
       owner = "justinwoo";
       repo = "easy-purescript-nix";
       rev = "refs/heads/master";
-      sha256 = "0lmkppidmhnayv0919990ifdd61f9d23dzjzr8amz7hjgc74yxs0";
+      sha256 = "1q2ciwd3193kig1paidzrgxl60y4rb39bsi97lk7m6ff8mis6z6i";
     }) { inherit pkgs; };
 
      removeHashBang = drv: drv.overrideAttrs (oldAttrs: {
