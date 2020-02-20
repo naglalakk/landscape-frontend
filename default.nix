@@ -21,6 +21,7 @@
       yarnLock  = ./yarn.lock;
     };
 
+    nodejs = pkgs.nodejs-12_x;
   in
     pkgs.stdenv.mkDerivation {
       name = "donnabot.dev-frontend";
@@ -45,7 +46,7 @@
         cd $out && spago bundle-app --main Server --no-install --no-build --to $out/output/donnabot/server.js
 
         echo "#!/usr/bin/env bash" >> $out/run.sh
-        echo "node $out/output/donnabot/server.js" >> $out/run.sh
+        echo "${nodejs}/bin/node $out/output/donnabot/server.js" >> $out/run.sh
         chmod +x $out/run.sh
         echo "Build Done"
       '';
