@@ -42,6 +42,20 @@
 
       installPhase = ''
         mkdir -p $out/output/donnabot
+        mkdir -p $out/static
+
+        # Copy static files
+        cp -r $src/static/img $out/static
+        cp -r $src/static/style $out/static
+        cp -r $src/static/views $out/static
+
+        # Make bundle
+        cd $out && spago bundle-app --no-install --no-build --to $out/static/build/index.js
+
+        # Browserify bundle
+        cd $out && ${npm}/libexec/blog/node_modules/parcel/bin/cli.js build $out/static/build/index.js -d $out/static/dist
+
+        # Bundle Server
         cd $out && spago bundle-app --main Server --no-install --no-build --to $out/output/donnabot/server.js
 
         echo "#!/usr/bin/env bash" >> $out/run.sh
