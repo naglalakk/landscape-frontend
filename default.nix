@@ -49,6 +49,8 @@
         cp -r $src/static/style $out/static
         cp -r $src/static/views $out/static
 
+        cp $src/.env  $out/.env
+
         # Make bundle
         cd $out && spago bundle-app --no-install --no-build --to $out/static/build/index.js
 
