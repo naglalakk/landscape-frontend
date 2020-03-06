@@ -1,5 +1,4 @@
-{ yarn2nixPath ? /Users/Donna/Code/K0TT/github/yarn2nix 
-, port ? "8080"
+{ port ? "8080"
 , apiURL ? ""
 , apiKey ? ""
 }:
@@ -25,7 +24,15 @@
     };
     inherit (import gitignoreSrc { inherit (pkgs) lib; }) gitignoreSource;
     
-    yarn2nix = import yarn2nixPath { inherit pkgs; };
+    yarn = pkgs.fetchFromGitHub {
+      owner = "moretea";
+      repo  = "yarn2nix";
+      rev = "9e7279edde2a4e0f5ec04c53f5cd64440a27a1ae";
+      sha256 = "sha256:0zz2lrwn3y3rb8gzaiwxgz02dvy3s552zc70zvfqc0zh5dhydgn7";
+    };
+
+    yarn2nix = import yarn { inherit pkgs; };
+
     npm = yarn2nix.mkYarnPackage {
       name = "frontend-npm";
       src = ./.;
