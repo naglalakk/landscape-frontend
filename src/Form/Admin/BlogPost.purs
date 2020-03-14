@@ -41,6 +41,7 @@ import Halogen.Media.Data.Media         (Media(..))
 import Halogen.Media.Utils              (filesToFormData)
 import Halogen.Query.EventSource        as HES
 import Quill.API.Delta                  as QDelta
+import Slug                             as Slug
 import Timestamp                        (Timestamp
                                         ,nowTimestamp
                                         ,formatToDateTimeShortStr
@@ -66,6 +67,7 @@ import Utils.Record                     (fromTimestampField)
 newtype BlogPostForm r f = BlogPostForm (r
   ( id              :: f Void       BlogPostId          BlogPostId
   , title           :: f FormError  String              String
+  , slug            :: f Void       (Maybe Slug.Slug)   (Maybe Slug.Slug) 
   , content         :: f Void       String              String
   , htmlContent     :: f Void       (Maybe String)      (Maybe String)
   , featuredImage   :: f Void       (Maybe Image)       (Maybe Image)
@@ -140,7 +142,6 @@ component = F.component input F.defaultSpec
       handleAction AutoSave
 
     HandleEditorDelta -> do
-
       -- Fetch latest delta as Text
       query <- H.query (SProxy :: SProxy "editor") unit (H.request Editor.GetText)
       case query of
@@ -161,6 +162,7 @@ component = F.component input F.defaultSpec
         Just (BlogPost blogPost) -> do
           eval $ F.setValidate prx.id blogPost.id
           eval $ F.setValidate prx.title blogPost.title
+          eval $ F.setValidate prx.slug blogPost.slug
           eval $ F.setValidate prx.content blogPost.content
           eval $ F.setValidate prx.htmlContent blogPost.htmlContent
           eval $ F.setValidate prx.featuredImage blogPost.featuredImage
@@ -226,7 +228,12 @@ component = F.component input F.defaultSpec
     F.Submitted form -> do
       let 
         fields = F.unwrapOutputFields form
-      H.raise $ BlogPost fields
+      let 
+        slug = Slug.generate fields.title
+        finalFields = case fields.slug == slug of
+          true -> fields
+          false -> fields { slug = slug }
+      H.raise $ BlogPost finalFields
     _ -> pure unit
 
   input :: Input -> F.Input BlogPostForm AddedState m
@@ -241,6 +248,7 @@ component = F.component input F.defaultSpec
     , validators: BlogPostForm
       { id: F.noValidation
       , title: validateStr
+      , slug: F.noValidation
       , content: F.noValidation
       , htmlContent: F.noValidation
       , featuredImage: F.noValidation

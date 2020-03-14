@@ -141,9 +141,6 @@ component =
               let 
                 contentHeight = scrollY + innerHeight
                 atBottom = contentHeight >= ((floor scrollHeight) - 50)
-              logShow contentHeight
-              logShow scrollHeight
-              logShow atBottom
               case (atBottom && state.scroll) of
                 true -> do
                   let

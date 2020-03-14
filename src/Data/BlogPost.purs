@@ -19,6 +19,7 @@ import Data.Traversable         (traverse)
 import Effect                   (Effect)
 import Formless                 as F
 import Halogen.Media.Data.Media (MediaRow)
+import Slug                     as Slug
 
 import Data.Image               (Image(..), ImageArray)
 import Timestamp                (Timestamp(..)
@@ -44,6 +45,7 @@ instance initialBlogPostId :: F.Initial BlogPostId where
 newtype BlogPost = BlogPost
   { id            :: BlogPostId
   , title         :: String
+  , slug          :: Maybe Slug.Slug
   , content       :: String
   , htmlContent   :: Maybe String
   , featuredImage :: Maybe Image
@@ -70,6 +72,8 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
     obj           <- decodeJson json
     id            <- obj .:  "id"
     title         <- obj .:  "title"
+    slugStr       <- obj .:  "slug"
+    let slug      = Slug.generate slugStr
     content       <- obj .:  "content"
     htmlContent   <- obj .:? "htmlContent"
     featuredImage <- obj .:? "featured_image"
@@ -83,6 +87,7 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
     pure $ BlogPost
       { id
       , title
+      , slug
       , content
       , htmlContent
       , featuredImage
@@ -98,6 +103,7 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
 instance encodeJsonBlogPost :: EncodeJson BlogPost where
   encodeJson (BlogPost blogPost) 
     =  "title"          := blogPost.title
+    ~> "slug"           := blogPost.slug
     ~> "content"        := blogPost.content
     ~> "htmlContent"    := blogPost.htmlContent
     ~> "featured_image" := blogPost.featuredImage
@@ -118,6 +124,7 @@ defaultBlogPost = do
   pure $ BlogPost
     { id: (BlogPostId 0)
     , title: ""
+    , slug: Nothing
     , content: "{ 'ops': [] }"
     , htmlContent: Nothing
     , featuredImage: Nothing

@@ -205,6 +205,11 @@ let additions =
       ]
       "https://github.com/natefaubion/purescript-routing-duplex"
       "master"
+  , slug = 
+      mkPackage
+      [ "unicode" ]
+      "https://github.com/thomashoneyman/purescript-slug"
+      "master"
   , timestamp =
       mkPackage
       ["argonaut"
