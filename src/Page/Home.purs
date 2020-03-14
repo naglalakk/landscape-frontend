@@ -140,21 +140,26 @@ component =
               scrollHeight <- H.liftEffect $ Element.scrollHeight body
               let 
                 contentHeight = scrollY + innerHeight
-                atBottom = contentHeight >= (floor scrollHeight)
+                atBottom = contentHeight >= ((floor scrollHeight) - 50)
+              logShow contentHeight
+              logShow scrollHeight
+              logShow atBottom
               case (atBottom && state.scroll) of
                 true -> do
                   let
                     newCurrentPage = state.currentPage + 1
-                  blogPosts <- getBlogPosts { page: Just newCurrentPage
-                                             , perPage: Just 5 
-                                             }
+                  blogPosts <- getBlogPosts 
+                    { page: Just newCurrentPage
+                    , perPage: Just 5 
+                    }
                   case length blogPosts == 0 of
                     true -> H.modify_ _ { scroll = false }
                     false -> do
                       let allBlogPosts = state.blogPosts <> blogPosts
-                      H.modify_ _ { currentPage = newCurrentPage 
-                                  , blogPosts = allBlogPosts
-                                  }
+                      H.modify_ _ 
+                        { currentPage = newCurrentPage 
+                        , blogPosts = allBlogPosts
+                        }
                       _ <- traverse (\(BlogPost post) -> do
                         let label = "element-" <> (show $ unwrap post.id)
                         H.getHTMLElementRef (H.RefLabel label) >>= case _ of
@@ -173,7 +178,6 @@ component =
             Nothing  -> pure unit
         Nothing   -> pure unit
 
-      -- TODO: Use updated debounce func in halogen-formless
       H.liftAff $ Aff.delay $ Aff.Milliseconds 500.0
 
     HandleScroll ev -> do
