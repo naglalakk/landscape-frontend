@@ -10,9 +10,11 @@ import Routing.Duplex                   (RouteDuplex'
                                         ,root, segment)
 import Routing.Duplex.Generic           (sum, noArgs)
 import Routing.Duplex.Generic.Syntax    ((/), (?))
+import Slug                             (Slug)
 
 import Data.BlogPost                    as BP
-import Utils.Route                      (blogPostId)
+import Utils.Route                      (blogPostId
+                                        ,slug)
 
 type PaginationRep =
   ( page :: Maybe Int
@@ -24,6 +26,7 @@ type Pagination = { | PaginationRep }
 data Endpoint 
   = BlogPosts Pagination
   | BlogPost BP.BlogPostId
+  | BlogPostBySlug String
   | BlogPostCreate
   | BlogPostUpdate BP.BlogPostId
   | BlogPostDelete BP.BlogPostId
@@ -43,6 +46,7 @@ endpointCodec = root $ sum
     , perPage: optional <<< int
     }
   , "BlogPost" : "posts" / blogPostId
+  , "BlogPostBySlug" : "posts" / slug
   , "BlogPostCreate" : "posts" / noArgs
   , "BlogPostUpdate" : "posts" / blogPostId / "update"
   , "BlogPostDelete" : "posts" / blogPostId / "delete"

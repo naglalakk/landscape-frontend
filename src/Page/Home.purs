@@ -18,6 +18,7 @@ import Halogen.HTML.CSS                     as HCSS
 import Halogen.HTML.Properties              as HP
 import Halogen.Component.RawHTML            as RawHTML
 import Halogen.Query.EventSource            as ES
+import Timestamp                            (formatToDateStr)
 import Web.Event.CustomEvent                as CEV
 import Web.Event.Event                      as EV
 import Web.HTML                             (HTMLDocument)
@@ -38,6 +39,8 @@ import Web.UIEvent.WheelEvent               as WE
 import Web.UIEvent.WheelEvent.EventTypes    as WET
 
 import Component.Utils                      (OpaqueSlot)
+import Component.HTML.BlogPost              (renderBlogPost)
+import Component.HTML.Header                (header)
 import Component.HTML.Utils                 (css, maybeElem)
 import CSS.Utils                            (backgroundCover)
 import Data.BlogPost                        (BlogPost(..)
@@ -46,11 +49,8 @@ import Data.Image                           (Image(..))
 import Foreign.LightGallery                 (loadGallery)
 import Resource.BlogPost                    (class ManageBlogPost
                                             ,getBlogPosts)
-import Timestamp                            (formatToDateStr)
 import Utils.EventTypes                     (onscroll)
 import Utils.DOM                            (setHTML)
-
-
 
 
 type State = 
@@ -183,103 +183,13 @@ component =
       scrollY <- H.liftEffect $ Web.scrollY win
       pure unit
 
-  socialItem :: forall i p. String -> String -> HH.HTML i p
-  socialItem link icon = 
-    HH.li
-      [ css "social-item" ]
-      [ HH.a
-        [ HP.href link ]
-        [ HH.i
-          [ css icon ]
-          []
-        ]
-      ]
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
     HH.div
       []
-      [ HH.div
-        [ css "header" ]
-        [ HH.div
-          [ css "profile-image" 
-          , HCSS.style $ backgroundCover "img/profile.gif"
-          ]
-          [
-          ]
-        , HH.h2
-          [ css "title" ]
-          [ HH.text "Donna" ]
-        , HH.ul
-          [ css "socials" ]
-          [ socialItem "https://github.com/naglalakk" "fab fa-github"
-          , socialItem "https://soundcloud.com/donnainternational" "fab fa-soundcloud"
-          , socialItem "https://www.pinterest.com/k0ttur/" "fab fa-pinterest"
-          , socialItem "https://twitter.com/naglalakk" "fab fa-twitter"
-          ]
-        , HH.div
-          [ css "line" ]
-          []
-        ]
+      [ header
       , HH.div 
         [ css "posts-container" ]
-        (map (\(BlogPost post) ->
-          HH.div
-            [ css $ "post cover-" <> (show post.isCover) ]
-            [ case post.isCover of
-              true ->
-                HH.div
-                  [ css "cover-image" 
-                  , case post.featuredImage of
-                    Just (Image image) -> HCSS.style $ backgroundCover image.src
-                    Nothing -> css "no-cover"
-                  ]
-                  [ HH.div
-                    [ css "title" ]
-                    [ HH.h1
-                      []
-                      [ HH.text post.title ]
-                    , HH.div [ css "title-line" ] []
-                    , case post.showDate of
-                      true -> 
-                        HH.div
-                          [ css "post-date" ]
-                          [ HH.text $ formatToDateStr post.publishTime ]
-                      false -> HH.div [] []
-                    ]
-                  ]
-              false ->
-                HH.div
-                  [ css "title" ]
-                  [ HH.h1
-                    []
-                    [ HH.text post.title ]
-                  , HH.div [ css "title-line" ] []
-                  , case post.showDate of
-                    true -> 
-                      HH.div
-                        [ css "post-date" ]
-                        [ HH.text $ formatToDateStr post.publishTime ]
-                    false -> HH.div [] []
-                  ]
-            , HH.div
-              [ css "post-content" 
-              , HP.ref (H.RefLabel ("element-" <> (show $ unwrap post.id)))
-              ]
-              []
-            , case length post.images of
-                0 -> HH.div [] []
-                _ -> 
-                  HH.div
-                    [ css "lightgallery" ]
-                    (map (\(Image image) -> 
-                      HH.a
-                        [ HP.href image.src ]
-                        [ HH.img
-                          [ case image.thumbnail of
-                            Just thumb -> HP.src thumb
-                            Nothing -> HP.src image.src
-                          ]
-                        ]) post.images )
-            ]) state.blogPosts )
+        (map renderBlogPost state.blogPosts)
       ]

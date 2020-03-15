@@ -17,6 +17,7 @@ import Halogen                          as H
 import Halogen.HTML                     as HH
 import Routing.Duplex                   as RD
 import Routing.Hash                     (getHash)
+import Slug                             as Slug
 
 import Capability.Navigate              (class Navigate, navigate)
 import Component.Utils                  (OpaqueSlot, busEventSource)
@@ -24,6 +25,7 @@ import Data.Environment                 (UserEnv(..))
 import Data.Route                       (Route(..), routeCodec)
 import Data.User                        (User(..))
 import Page.Home                        as Home
+import Page.BlogPost                    as BlogPost
 import Page.Admin.Home                  as AdminHome
 import Page.Admin.BlogPosts             as AdminBlogPosts
 import Page.Admin.BlogPost              as AdminBlogPost
@@ -47,6 +49,7 @@ data Action
 type ChildSlots = 
   ( home :: OpaqueSlot Unit 
   , login :: OpaqueSlot Unit
+  , blogPost :: OpaqueSlot Unit
   , adminHome :: OpaqueSlot Unit
   , adminBlogPosts :: OpaqueSlot Unit
   , adminBlogPost :: OpaqueSlot Unit
@@ -106,6 +109,8 @@ component = H.mkComponent
   render { route, currentUser } = case route of
     Just Home -> 
       HH.slot (SProxy :: _ "home") unit Home.component unit absurd
+    Just (BlogPost slug) ->
+      HH.slot (SProxy :: _ "blogPost") unit BlogPost.component { slug: (Slug.generate slug) } absurd
     Just Login ->
       HH.slot (SProxy :: _ "login") unit Login.component { redirect: true } absurd
     -- Admin

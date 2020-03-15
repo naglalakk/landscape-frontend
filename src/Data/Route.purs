@@ -6,12 +6,14 @@ import Data.Generic.Rep.Show            (genericShow)
 import Routing.Duplex                   (RouteDuplex', root)
 import Routing.Duplex.Generic           (noArgs, sum)
 import Routing.Duplex.Generic.Syntax    ((/))
+import Slug                             (Slug)
 
 import Data.BlogPost                    (BlogPostId)
-import Utils.Route                      (blogPostId)
+import Utils.Route                      (blogPostId, slug)
 
 data Route
   = Home
+  | BlogPost String
   | Login
   -- Admin
   | AdminHome
@@ -28,6 +30,7 @@ instance showRoute :: Show Route where
 routeCodec :: RouteDuplex' Route
 routeCodec = root $ sum
   { "Home": noArgs
+  , "BlogPost" : "posts" / slug
   , "Login" : "login" / noArgs
   -- Admin
   , "AdminHome" : "admin" / noArgs

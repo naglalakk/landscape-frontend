@@ -20,6 +20,7 @@ import Type.Equality                (class TypeEquals, from)
 import Web.HTML                     (window)
 import Web.HTML.Window              as Window
 import Web.HTML.Location            (setHref, Location)
+import Slug                         as Slug
 
 import Api.Endpoint                 as API
 import Api.Request                  (RequestMethod(..)
@@ -92,9 +93,26 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
             logMessage $ Log.Log { message: err }
             pure []
       Nothing -> pure []
+
   getBlogPost postId = do
     req <- mkRequest
       { endpoint: API.BlogPost postId
+      , method: Get
+      , auth: Nothing
+      }
+    case req of
+      Just json -> do
+        let blogPost = decodeJson json
+        case blogPost of
+          Right bps -> pure $ Just bps
+          Left err -> do
+            logMessage $ Log.Log { message: err }
+            pure Nothing
+      Nothing -> pure Nothing
+
+  getBlogPostBySlug slug = do
+    req <- mkRequest
+      { endpoint: API.BlogPostBySlug $ Slug.toString slug
       , method: Get
       , auth: Nothing
       }
