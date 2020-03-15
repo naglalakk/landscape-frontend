@@ -1,0 +1,20 @@
+// Responsive queries
+sm = 512px
+md = 992px
+lg = 1200px
+
+mobile()
+  @media (max-width: sm - 1)
+    {block}
+
+tablet()
+  @media (min-width: sm) and (max-width: md - 1)
+    {block}
+
+desktop()
+  @media screen and (min-width: md) and (max-width: lg - 1)
+    {block}
+
+desktop-wide()
+  @media screen and (min-width: lg)
+    {block}

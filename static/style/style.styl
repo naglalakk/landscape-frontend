@@ -4,6 +4,7 @@
 @import "admin"
 @import "constants"
 @import "fonts"
+@import "queries"
 
 
 html
@@ -34,6 +35,11 @@ ul,li
   margin 0 auto
   text-align center
   padding-top 80px
+
+  +tablet()
+    width 100%
+  +mobile()
+    width 100%
 
   h2
     font-weight lighter
@@ -82,6 +88,12 @@ ul,li
 
     .title
       max-width 300px
+
+      +tablet()
+        width 100%
+      +mobile()
+        width 100%
+
       .title-line
         width 100%
         height 1px
@@ -94,12 +106,32 @@ ul,li
       .post-date
         font-weight bold
 
+    .post-content
+      width content-width
+      margin 0 auto
+      color #000
+
+      +tablet()
+        width 100%
+      +mobile()
+        width 100%
+
     &.cover-true
       width 100%
+
+      .post-content
+        p
+          padding separator
 
       .cover-image
         position relative
         height 100vh
+
+        +tablet()
+          height 460px
+
+        +mobile()
+          height 300px
 
         .title
           color #fff
@@ -115,16 +147,17 @@ ul,li
       padding separator
       margin 0 auto
 
+      +tablet()
+        width 100%
+      +mobile()
+        width 100%
+
       .title
         color #000
           
         .title-line
           background-color #000
 
-    .post-content
-      width content-width
-      margin 0 auto
-      color #000
 
 .image-container
   position relative
