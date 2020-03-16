@@ -1301,6 +1301,18 @@ let
         installPhase = "ln -s $src $out";
       };
 
+    "slug" = pkgs.stdenv.mkDerivation {
+        name = "slug";
+        version = "";
+        src = pkgs.fetchgit {
+          url = "https://github.com/thomashoneyman/purescript-slug";
+          rev = "a97735d47be7398f181085e0b117499462ba7a11";
+          sha256 = "07qpxr5lc9lfysif08mddqq2bnkvnxj9xhlrjzgl18g355hix7k1";
+        };
+        phases = "installPhase";
+        installPhase = "ln -s $src $out";
+      };
+
     "spec" = pkgs.stdenv.mkDerivation {
         name = "spec";
         version = "v4.0.0";
