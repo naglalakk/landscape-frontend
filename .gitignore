@@ -15,6 +15,7 @@
 build/
 dist/
 !static/style/dist
+!static/style/dist/style.css
 .DS_Store
 
 .spago2nix
