@@ -25,7 +25,7 @@ header =
     , HH.ul
       [ css "socials" ]
       [ socialItem "https://github.com/naglalakk" "fab fa-github"
-      , socialItem "https://soundcloud.com/donnainternational" "fab fa-soundcloud"
+      , socialItem "https://soundcloud.com/donnabotmusic" "fab fa-soundcloud"
       , socialItem "https://www.pinterest.com/k0ttur/" "fab fa-pinterest"
       , socialItem "https://twitter.com/naglalakk" "fab fa-twitter"
       ]
