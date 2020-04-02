@@ -80,6 +80,7 @@ ul,li
   width 100%
 
   .post
+    box-sizing border-box
     margin-top separator
     margin-bottom separator
     
@@ -213,15 +214,23 @@ ul,li
   margin 0 auto
   display flex
   margin-top separator
+  display flex
+  flex-wrap wrap
+
+  +mobile()
+    width 100%
 
   a
-    width 200px
-    height 200px
     display flex
+    flex: 1 0 21%;
     justify-content center
     align-items center
     border 1px solid #000
     margin-right separator
+    margin-bottom separator
+
+    +mobile()
+      flex 1 0 100%
 
     img
       max-width 100%

@@ -160,6 +160,7 @@ li {
   width: 100%;
 }
 .posts-container .post {
+  box-sizing: border-box;
   margin-top: 25px;
   margin-bottom: 25px;
 }
@@ -310,15 +311,27 @@ li {
   margin: 0 auto;
   display: flex;
   margin-top: 25px;
+  display: flex;
+  flex-wrap: wrap;
+}
+@media (max-width: 511px) {
+  .lightgallery {
+    width: 100%;
+  }
 }
 .lightgallery a {
-  width: 200px;
-  height: 200px;
   display: flex;
+  flex: 1 0 21%;
   justify-content: center;
   align-items: center;
   border: 1px solid #000;
   margin-right: 25px;
+  margin-bottom: 25px;
+}
+@media (max-width: 511px) {
+  .lightgallery a {
+    flex: 1 0 100%;
+  }
 }
 .lightgallery a img {
   max-width: 100%;
