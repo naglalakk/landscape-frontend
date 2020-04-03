@@ -210,8 +210,9 @@ li {
 .posts-container .post.cover-true {
   width: 100%;
 }
-.posts-container .post.cover-true .post-content p {
+.posts-container .post.cover-true .post-content {
   padding: 25px;
+  box-sizing: border-box;
 }
 .posts-container .post.cover-true .cover-image {
   position: relative;

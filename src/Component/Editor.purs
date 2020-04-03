@@ -50,6 +50,7 @@ editorConfig = fold
     , QConfig.allow QFormats.color
     , QConfig.allow QFormats.code
     , QConfig.allow QFormats.codeBlock
+    , QConfig.allow QFormats.link
     ]
   ]
 
