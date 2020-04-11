@@ -233,6 +233,9 @@ component = F.component input F.defaultSpec
         finalFields = case fields.slug == slug of
           true -> fields
           false -> fields { slug = slug }
+      H.modify_ _ { imageBrowserActive = false
+                  , featuredImageBrowserActive = false 
+                  }
       H.raise $ BlogPost finalFields
     _ -> pure unit
 

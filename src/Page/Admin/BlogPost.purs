@@ -93,7 +93,6 @@ component =
           newBlogPost <- createBlogPost (BlogPost blogPost)
           case newBlogPost of
             Just (BlogPost bp) -> do
-              H.modify_ _ { blogPost = newBlogPost }
               navigate $ R.AdminBlogPost bp.id
             Nothing -> pure unit
         _ -> do

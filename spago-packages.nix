@@ -646,8 +646,8 @@ let
         version = "";
         src = pkgs.fetchgit {
           url = "https://github.com/naglalakk/purescript-halogen-media";
-          rev = "1b9d1a7a963537dbcc672f2d154606752998ddf7";
-          sha256 = "16amfqbcg58g4arn9m7snmnd7p95ckbz6j4dxby1h8lqr1qvz702";
+          rev = "b9d07ebb8de18f146f33de45efdc4c0c50b6195e";
+          sha256 = "072nyavl27rg9x65ay1v9wawcb7gg9wjphlwkascvia7nabwswp4";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";

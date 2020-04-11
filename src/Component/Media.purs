@@ -30,7 +30,7 @@ import Resource.Media                   (class ManageMedia
 type Query = Const Void
 
 type ChildSlots = (
-  mediaModal :: H.Slot Modal.Query (Browser.Output ImageType) Unit
+  mediaModal :: H.Slot (Modal.Query ImageType) (Browser.Output ImageType) Unit
 )
 
 data Action
