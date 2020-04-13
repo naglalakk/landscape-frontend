@@ -89,6 +89,7 @@ ul,li
 
     .title
       max-width 300px
+      margin-bottom separator
 
       +tablet()
         width 100%
@@ -248,3 +249,14 @@ ul,li
 
 .space-top
   padding-top separator
+
+
+// Overloading quill style
+.ql-video
+  //margin-top separator
+  width 100%
+  height 640px
+
+  +mobile()
+    width 100%
+    height 100%

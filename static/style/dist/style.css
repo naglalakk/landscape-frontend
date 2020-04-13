@@ -169,6 +169,7 @@ li {
 }
 .posts-container .post .title {
   max-width: 300px;
+  margin-bottom: 25px;
 }
 @media (min-width: 512px) and (max-width: 991px) {
   .posts-container .post .title {
@@ -350,4 +351,14 @@ li {
 }
 .space-top {
   padding-top: 25px;
+}
+.ql-video {
+  width: 100%;
+  height: 640px;
+}
+@media (max-width: 511px) {
+  .ql-video {
+    width: 100%;
+    height: 100%;
+  }
 }
