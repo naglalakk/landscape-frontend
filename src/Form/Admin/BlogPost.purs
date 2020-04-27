@@ -144,6 +144,7 @@ component = F.component input F.defaultSpec
     HandleEditorDelta -> do
       -- Fetch latest delta as Text
       query <- H.query (SProxy :: SProxy "editor") unit (H.request Editor.GetText)
+      logShow query
       case query of
         Just content -> do
           eval $ F.setValidate prx.content content

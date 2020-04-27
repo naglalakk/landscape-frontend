@@ -43,24 +43,6 @@ main = HA.runHalogenAff do
   currentUser <- H.liftEffect $ Ref.new Nothing
   userBus <- H.liftEffect Bus.make
 
-  H.liftEffect readToken >>= traverse_ \token -> do
-    let 
-      requestOptions = 
-        { endpoint: API.UserLogin
-        , method: Get 
-        , auth: Just $ Basic token
-        }
-    res <- H.liftAff $ request $ defaultRequest (BaseURL apiURL) requestOptions
-
-    case (hush res.body) of
-      Just json -> do
-        let 
-          user = (decodeJson json) :: Either String User
-        case user of
-          Right u -> H.liftEffect $ Ref.write (Just u) currentUser
-          Left err -> pure unit
-      Nothing -> pure unit
-
   let 
     environ = toEnvironment environment
     url     = BaseURL apiURL

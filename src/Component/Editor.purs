@@ -28,6 +28,7 @@ import Quill.API.Delta              as QDelta
 import Quill.API.Events             as QEvents
 import Quill.API.Formats            as QFormats
 import Quill.API.Range              (Range)
+import Quill.API.Embed              as QEmbed
 import Quill.Editor                 as QEditor
 import Quill.API.Source             as QSource
 import Quill.API.HTML               as QHTML
@@ -51,8 +52,6 @@ editorConfig = fold
     , QConfig.allow QFormats.code
     , QConfig.allow QFormats.codeBlock
     , QConfig.allow QFormats.link
-    , QConfig.allow QFormats.video
-    , QConfig.allow QFormats.image
     ]
   ]
 
