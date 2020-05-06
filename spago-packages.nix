@@ -1210,8 +1210,8 @@ let
         version = "";
         src = pkgs.fetchgit {
           url = "https://github.com/naglalakk/purescript-quill";
-          rev = "611436a9923ce54254ce51942aee36040a8b771c";
-          sha256 = "1xymgg8ygwka6ldnsqfbxrklh7ndp1qrgsw1wchfcbpr9yx6zl1m";
+          rev = "850664f0b6cb746e0aadc806e3bea71365ac43e1";
+          sha256 = "01fjw55nz6n6j3wrf7dwnwy11kv5hyrw2949k18zrl79qfsprid7";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";

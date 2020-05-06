@@ -52,6 +52,8 @@ editorConfig = fold
     , QConfig.allow QFormats.code
     , QConfig.allow QFormats.codeBlock
     , QConfig.allow QFormats.link
+    , QConfig.allow QFormats.video
+    , QConfig.allow QFormats.image
     ]
   ]
 
