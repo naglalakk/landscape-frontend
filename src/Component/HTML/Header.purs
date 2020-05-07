@@ -15,9 +15,21 @@ header =
     [ css "header" ]
     [ HH.div
       [ css "profile-image" 
-      , HCSS.style $ backgroundCover "img/profile.gif"
       ]
-      [
+      [ HH.video
+        [ HH.attr (HH.AttrName "autoplay") "true"
+        , HH.attr (HH.AttrName "loop") "true"
+        , HH.attr (HH.AttrName "muted") "true"
+        ]
+        [ HH.source
+          [ HP.src "img/profile.mp4" 
+          , HH.attr (HH.AttrName "type") "video/mp4"
+          ]
+        , HH.source
+          [ HP.src "img/profile.webm" 
+          , HH.attr (HH.AttrName "type") "video/webm"
+          ]
+        ]
       ]
     , HH.h2
       [ css "title" ]
