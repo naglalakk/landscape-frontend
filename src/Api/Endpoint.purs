@@ -13,7 +13,9 @@ import Routing.Duplex.Generic.Syntax    ((/), (?))
 import Slug                             (Slug)
 
 import Data.BlogPost                    as BP
+import Data.Image                       (ImageId)
 import Utils.Route                      (blogPostId
+                                        ,imageId
                                         ,slug)
 
 type PaginationRep =
@@ -31,6 +33,7 @@ data Endpoint
   | BlogPostUpdate BP.BlogPostId
   | BlogPostDelete BP.BlogPostId
   | Images Pagination
+  | ImageDelete ImageId
   | ImageUpload  
   | UserLogin
 
@@ -54,6 +57,7 @@ endpointCodec = root $ sum
     { page: optional <<< int
     , perPage: optional <<< int
     }
+  , "ImageDelete" : "media" / "images" / imageId / "delete"
   , "ImageUpload" : "media" / "images" / "upload" / noArgs
   , "UserLogin" : "users" / "authenticate" / noArgs
   }

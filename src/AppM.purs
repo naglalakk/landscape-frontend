@@ -182,6 +182,14 @@ instance manageMediaAppM :: ManageMedia AppM where
             pure []
       Nothing -> pure []
 
+  deleteImage imageId = do
+    req <- mkRequest
+      { endpoint: API.ImageDelete imageId
+      , method: Delete
+      , auth: Just apiAuth
+      }
+    pure unit
+
   uploadImage formData = do
     req <- mkFormDataRequest
       { endpoint: API.ImageUpload

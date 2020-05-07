@@ -7,10 +7,14 @@ import Routing.Duplex                   (RouteDuplex'
 import Slug                             as Slug
 
 import Data.BlogPost                    (BlogPostId)
+import Data.Image                       (ImageId)
 
 
 blogPostId :: RouteDuplex' BlogPostId
 blogPostId = _Newtype (int segment)
+
+imageId :: RouteDuplex' ImageId
+imageId = _Newtype (int segment)
 
 slug :: RouteDuplex' String
 slug = string segment

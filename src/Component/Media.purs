@@ -22,9 +22,13 @@ import Halogen.Media.Data.File          (ExtendedFile(..))
 import Formless                         as F
 
 import Component.HTML.Utils             (css)
-import Data.Image                       (Image(..), ImageArray, ImageType)
+import Data.Image                       (Image(..)
+                                        ,ImageId(..)
+                                        ,ImageArray
+                                        ,ImageType)
 import Resource.Media                   (class ManageMedia
                                         ,getImages
+                                        ,deleteImage
                                         ,uploadImage)
 
 type Query = Const Void
@@ -83,6 +87,15 @@ component =
         _ <- traverse (\(ExtendedFile f uuid t) -> do
           H.query (SProxy :: SProxy "mediaModal") unit (H.tell (Modal.SetUploadStatus uuid true))) files
         H.raise act
+      Browser.Removed (Media media) -> do
+        deleteImage media.id
+
+        -- TODO: We should handle this in terms of pagination
+        medias <- getImages 
+          { page: Just 1
+          , perPage: Just 25 
+          }
+        H.modify_ _ { media = medias }
       _ -> H.raise act
     Receive inp -> do
       state <- H.get
