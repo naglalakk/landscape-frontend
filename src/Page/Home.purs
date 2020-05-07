@@ -46,6 +46,7 @@ import CSS.Utils                            (backgroundCover)
 import Data.BlogPost                        (BlogPost(..)
                                             ,BlogPostArray)
 import Data.Image                           (Image(..))
+import Foreign.LazyLoad                     as LZ
 import Foreign.LightGallery                 (loadGallery)
 import Resource.BlogPost                    (class ManageBlogPost
                                             ,getBlogPosts)
@@ -108,6 +109,8 @@ component =
       posts <- getBlogPosts { page: Just 1
                             , perPage: Just 5 }
       H.modify_ _ { blogPosts = posts }
+      
+      H.liftEffect $ LZ.lazyLoad ".lazy"
 
       _ <- traverse (\(BlogPost post) -> do
         let label = "element-" <> (show $ unwrap post.id)

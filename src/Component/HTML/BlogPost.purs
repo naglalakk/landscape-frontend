@@ -23,9 +23,11 @@ renderBlogPost (BlogPost post) =
     [ case post.isCover of
       true ->
         HH.div
-          [ css "cover-image" 
+          [ css "cover-image lazy" 
           , case post.featuredImage of
-            Just (Image image) -> HCSS.style $ backgroundCover image.src
+            Just (Image image) -> 
+              HH.attr (HH.AttrName "data-bg") image.src
+              -- HCSS.style $ backgroundCover image.src
             Nothing -> css "no-cover"
           ]
           [ HH.div
@@ -70,9 +72,12 @@ renderBlogPost (BlogPost post) =
               HH.a
                 [ HP.href image.src ]
                 [ HH.img
-                  [ case image.thumbnail of
-                    Just thumb -> HP.src thumb
-                    Nothing -> HP.src image.src
+                  [ css "lazy"
+                  , case image.thumbnail of
+                    Just thumb -> 
+                      HH.attr (HH.AttrName "data-src") thumb
+                    Nothing -> 
+                      HH.attr (HH.AttrName "data-src") image.src
                   ]
                 ]) post.images )
     ]

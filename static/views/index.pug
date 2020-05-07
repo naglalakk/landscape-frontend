@@ -6,6 +6,7 @@ html
     link(rel="stylesheet", href="/style/dist/style.css")
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
   body
+    script(src='https://cdn.jsdelivr.net/npm/vanilla-lazyload@15.1.1/dist/lazyload.min.js')
     script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/haskell.min.js")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js")
@@ -14,9 +15,9 @@ html
       hljs.configure({
         languages: ['haskell']
       });
+
       setTimeout(function() {
         document.querySelectorAll('.ql-syntax').forEach((block) => {
-          console.log(block);
           hljs.highlightBlock(block);
         });
       }, 1500)
