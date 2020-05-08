@@ -8,14 +8,16 @@ import Data.Maybe                   (Maybe(..))
 import Data.Newtype                 (unwrap)
 import Effect.Aff.Class             (class MonadAff)
 import Effect.Class                 (class MonadEffect)
+import Foreign.LazyLoad             as LZ
 import Halogen                      as H
 import Halogen.HTML                 as HH
 import Slug                         as Slug
 
 import Component.HTML.BlogPost      (renderBlogPost)
 import Component.HTML.Header        (header)
-import Component.HTML.Utils         (css)
+import Component.HTML.Utils         (css, safeHref)
 import Data.BlogPost                (BlogPost(..))
+import Data.Route                   as R
 import Resource.BlogPost            (class ManageBlogPost
                                     ,getBlogPostBySlug)
 import Utils.DOM                    (setHTML)
@@ -67,6 +69,7 @@ component =
       Just s -> do
         blogPost <- getBlogPostBySlug s
         H.modify_ _ { blogPost = blogPost }
+        H.liftEffect $ LZ.lazyLoad ".lazy"
         case blogPost of
           Just (BlogPost post) -> do
             let label = "element-" <> (show $ unwrap post.id)
@@ -74,7 +77,9 @@ component =
               Nothing -> pure unit
               Just el -> do
                 case post.htmlContent of
-                  Just html -> H.liftEffect $ setHTML el html
+                  Just html -> do
+                    H.liftEffect $ setHTML el html
+                    -- Update og meta info
                   Nothing -> pure unit
           Nothing -> pure unit
       Nothing -> pure unit
@@ -84,12 +89,17 @@ component =
   render state = 
     HH.div 
       [] 
-      [ header
-      , case state.blogPost of 
+      [ case state.blogPost of 
         Just post -> 
           HH.div
-            [ css "posts-container" ]
-            [ renderBlogPost post   ]
+            [ css "posts-container post-single" ]
+            [ renderBlogPost post   
+            , HH.a
+              [ safeHref R.Home
+              , css "navigation-back text-center" 
+              ]
+              [ HH.text "Back to site" ]
+            ]
         Nothing -> 
           HH.div 
             [] 

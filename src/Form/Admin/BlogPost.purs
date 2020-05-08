@@ -14,7 +14,7 @@ import Data.Const                       (Const(..))
 import Data.Either                      (Either(..))
 import Data.Maybe                       (Maybe(..)
                                         ,fromMaybe)
-import Data.Newtype                     (class Newtype)
+import Data.Newtype                     (class Newtype, unwrap)
 import Data.Number.Format               as Number
 import Data.String.Utils                (startsWith)
 import Data.Symbol                      (SProxy(..))
@@ -49,13 +49,17 @@ import Timestamp                        (Timestamp
 
 
 import Component.Editor                 as Editor
-import Component.HTML.Utils             (maybeElem, css, withLabel)
+import Component.HTML.Utils             (css
+                                        ,maybeElem
+                                        ,safeHref
+                                        ,withLabel)
 import Component.Media                  as Media
 import Data.BlogPost                    (BlogPost(..)
                                         ,BlogPostId)
 import Data.Image                       (Image(..)
                                         ,ImageType
                                         ,ImageArray)
+import Data.Route                       as R
 import Foreign.Flatpickr                (loadFlatpickr)
 import Form.Error                       (FormError(..))
 import Form.Validation                  (validateStr
@@ -394,6 +398,16 @@ component = F.component input F.defaultSpec
           , HE.onChecked \_ -> Just $ F.modify prx.isCover not
           ]
         ])
+      , maybeElem slug \s ->
+        HH.div
+        [ css "post-url" ]
+        [ HH.span
+          []
+          [ HH.text "Post URL: " ]
+        , HH.a
+          [ safeHref $ R.BlogPost $ Slug.toString s ]
+          [ HH.text $ "/#/" <> Slug.toString s ]
+        ]
       , HH.button
         [ css "button"
         , HE.onClick \_ -> Just $ F.injAction SubmitForm
@@ -401,6 +415,7 @@ component = F.component input F.defaultSpec
         [ HH.text "Save" ]
       ]
     where
+      slug    = F.getInput prx.slug st.form
       content = F.getInput prx.content st.form
       images  = F.getInput prx.images st.form
       featuredImage = F.getInput prx.featuredImage st.form

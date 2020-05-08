@@ -270,6 +270,14 @@ li {
 .posts-container .post.cover-false .title .title-line {
   background-color: #000;
 }
+.post-single .post {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.post-url {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
 .image-container {
   position: relative;
   display: flex;
@@ -376,4 +384,9 @@ li {
   .ql-video {
     height: 300px;
   }
+}
+.navigation-back {
+  display: block;
+  margin-top: 25px;
+  margin-bottom: 25px;
 }
