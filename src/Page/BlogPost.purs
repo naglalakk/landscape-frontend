@@ -4,7 +4,7 @@ module Page.BlogPost where
 
 import Prelude
 import Data.Const                   (Const)
-import Data.Maybe                   (Maybe(..))
+import Data.Maybe                   (Maybe(..), fromMaybe)
 import Data.Newtype                 (unwrap)
 import Effect.Aff.Class             (class MonadAff)
 import Effect.Class                 (class MonadEffect)
@@ -28,6 +28,7 @@ import Data.Route                   as R
 import Resource.BlogPost            (class ManageBlogPost
                                     ,getBlogPostBySlug)
 import Utils.DOM                    (setHTML)
+import Utils.Site                   (siteURL)
 
 data Action
   = Initialize
@@ -83,8 +84,9 @@ component =
             -- TODO: Maybe put this into a util function?
             document <- H.liftEffect $ window >>= Window.document
             metas <- H.liftEffect $ DOC.getElementsByTagName "meta" $ HTMLDoc.toDocument document
-            titleMeta <- H.liftEffect $ HTMLCollection.namedItem "og:title" metas
-            imageMeta <- H.liftEffect $ HTMLCollection.namedItem "og:image" metas
+            titleMeta <- H.liftEffect $ HTMLCollection.namedItem "og_title" metas
+            imageMeta <- H.liftEffect $ HTMLCollection.namedItem "og_image" metas
+            urlMeta <- H.liftEffect $ HTMLCollection.namedItem "og_url" metas
             case titleMeta of
               Just tMeta ->
                 H.liftEffect $ DOM.setAttribute "content" post.title tMeta
@@ -96,6 +98,11 @@ component =
                     Just thumb -> H.liftEffect $ DOM.setAttribute "content" thumb iMeta
                     Nothing -> H.liftEffect $ DOM.setAttribute "content" img.src iMeta
                   Nothing -> pure unit
+              Nothing -> pure unit
+            case urlMeta of
+              Just uMeta -> case post.slug of
+                Just slug -> H.liftEffect $ DOM.setAttribute "content" (siteURL <> "/#/" <> Slug.toString slug) uMeta
+                Nothing -> pure unit
               Nothing -> pure unit
             let label = "element-" <> (show $ unwrap post.id)
             H.getHTMLElementRef (H.RefLabel label) >>= case _ of

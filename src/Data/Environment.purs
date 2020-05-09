@@ -10,6 +10,7 @@ import Data.User        (User)
 
 data Environment 
   = Development
+  | Staging
   | Production
 
 derive instance eqEnvironment :: Eq Environment
@@ -27,6 +28,11 @@ type UserEnv =
   }
 
 toEnvironment :: String -> Environment
-toEnvironment = case _ of
-  "Production" -> Production
-  _            -> Development
+toEnvironment "Production"  = Production
+toEnvironment "Staging"     = Staging
+toEnvironment _             = Development
+
+getSiteURL :: Environment -> String
+getSiteURL Production   = "https://donnabot.dev"
+getSiteURL Staging      = "https://staging.donnabot.dev"
+getSiteURL _            = "https://donnabot.dev"

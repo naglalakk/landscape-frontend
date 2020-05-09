@@ -1,6 +1,7 @@
 { port ? "8080"
 , apiURL ? ""
 , apiKey ? ""
+, environment ? "Production"
 }:
   let
     pkgs = import ./packages.nix {};
@@ -71,6 +72,7 @@
         echo PORTNR=${port} >> $out/.env
         echo API_URL=${apiURL} >> $out/.env
         echo API_KEY=${apiKey} >> $out/.env
+        echo ENVIRONMENT=${environment} >> $out/.env
 
         # Make bundle
         cd $out && spago bundle-app --no-install --no-build --to $out/static/build/index.js
