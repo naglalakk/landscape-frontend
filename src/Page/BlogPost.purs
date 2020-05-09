@@ -86,6 +86,7 @@ component =
             metas <- H.liftEffect $ DOC.getElementsByTagName "meta" $ HTMLDoc.toDocument document
             titleMeta <- H.liftEffect $ HTMLCollection.namedItem "og_title" metas
             imageMeta <- H.liftEffect $ HTMLCollection.namedItem "og_image" metas
+            urlMeta <- H.liftEffect $ HTMLCollection.namedItem "og_url" metas
             case titleMeta of
               Just tMeta ->
                 H.liftEffect $ DOM.setAttribute "content" post.title tMeta
@@ -97,6 +98,11 @@ component =
                     Just thumb -> H.liftEffect $ DOM.setAttribute "content" thumb iMeta
                     Nothing -> H.liftEffect $ DOM.setAttribute "content" img.src iMeta
                   Nothing -> pure unit
+              Nothing -> pure unit
+            case urlMeta of
+              Just uMeta -> case post.slug of
+                Just slug -> H.liftEffect $ DOM.setAttribute "content" (siteURL <> "/#/posts/" <> Slug.toString slug) uMeta
+                Nothing -> pure unit
               Nothing -> pure unit
             let label = "element-" <> (show $ unwrap post.id)
             H.getHTMLElementRef (H.RefLabel label) >>= case _ of

@@ -8,6 +8,7 @@ html
     link(rel="stylesheet", href="/style/dist/style.css")
     meta(charset="UTF-8")
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    meta(id="og_url" property="og:url" content="https://donnabot.dev")
     meta(id="og_title" property='og:title' content='donnabot.dev')
     meta(id="og_type" property='og:type' content='blog')
     meta(id="og_image" property='og:image' content='https://donnabot.dev/img/donnabot.jpg')
@@ -30,12 +31,6 @@ html
     script(src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js")
     script(src="/dist/index.js")
     script.
-      /* Add og meta url dynamically */
-      var link = document.createElement('meta');
-      link.setAttribute('property', 'og:url');
-      link.content = document.location;
-      document.getElementsByTagName('head')[0].appendChild(link);
-
       /* enable highlightjs */
       hljs.configure({
         languages: ['haskell']
