@@ -73,13 +73,21 @@ instance logMessagesAppM :: LogMessages AppM where
 
 instance navigateAppM :: Navigate AppM where
   navigate route = do
+    -- Get our PushStateInterface instance from env
     env <- ask
-    w <- liftEffect window
-    location <- liftEffect $ Window.location w
-    p <- liftEffect $ pathname location
-    let currentPath = drop 1 p
-    let href = (print Route.routeCodec route)
-    liftEffect $ env.pushInterface.pushState (write { old: currentPath }) href
+    win <- liftEffect window
+    location <- liftEffect $ Window.location win
+    pathName <- liftEffect $ pathname location
+    let 
+      -- drop the first slash / of pathname
+      currentPath = drop 1 pathName
+      href = (print Route.routeCodec route)
+    -- pushState and preserve the current path
+    -- to compare in our listener
+    liftEffect $ 
+      env.pushInterface.pushState 
+      (write { old: currentPath }) 
+      href
 
   -- TODO: remove
   navigateForm route = do

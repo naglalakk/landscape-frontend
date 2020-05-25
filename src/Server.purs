@@ -21,6 +21,7 @@ app = do
     setProp "views" "static/views"
     setProp "view engine" "pug"
     use (static "static")
+    -- route all requests to the same template
     get "*" $ render "index" ""
 
 main :: Effect Unit

@@ -83,11 +83,12 @@ component = H.mkComponent
   handleAction :: Action -> H.HalogenM State Action ChildSlots Void m Unit
   handleAction = case _ of
     Initialize -> do
-      w <- liftEffect window
+      w <- H.liftEffect window
       location <- liftEffect $ Window.location w
       p <- H.liftEffect $ Location.pathname location
-      let finalPath = drop 1 p
-      let initialRoute = hush $ (RD.parse routeCodec finalPath)
+      let 
+        finalPath = drop 1 p
+        initialRoute = hush $ (RD.parse routeCodec finalPath)
       { currentUser, userBus } <- asks _.userEnv
       _ <- H.subscribe (HandleUserBus <$> busEventSource userBus)
       mbUser <- H.liftEffect $ Ref.read currentUser

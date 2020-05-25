@@ -228,7 +228,6 @@ li {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  background-attachment: fixed;
 }
 @media (min-width: 512px) and (max-width: 991px) {
   .posts-container .post.cover-true .cover-image {
