@@ -134,10 +134,7 @@ component =
         Nothing -> 
           HH.div 
             [] 
-            [ HH.h1
-              [ css "space-top text-center" ]
-              [ HH.text "Not found" ]
-            , HH.p 
+            [ HH.p 
               [ css "text-center" ]
               [ HH.text "..." ]
             ]
