@@ -12,7 +12,7 @@ import Node.Express.App                 (App
                                         ,use
                                         ,listenHttp
                                         ,setProp, get)
-import Node.Express.Response            (render)
+import Node.Express.Response            (render, sendFile)
 import Node.Express.Middleware.Static   (static)
 import Node.Process                     (lookupEnv)
 
@@ -21,7 +21,7 @@ app = do
     setProp "views" "static/views"
     setProp "view engine" "pug"
     use (static "static")
-    get "/" $ render "index" ""
+    get "*" $ render "index" ""
 
 main :: Effect Unit
 main = launchAff_ do

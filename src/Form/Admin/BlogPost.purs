@@ -275,7 +275,7 @@ component = F.component input F.defaultSpec
   render :: F.PublicState BlogPostForm AddedState
          -> F.ComponentHTML BlogPostForm Action ChildSlots m
   render st =
-    HH.form_
+    HH.div_
       [ withLabel "Title" (HH.input
         [ css "text-input"
         , HP.value $ F.getInput prx.title st.form

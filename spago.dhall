@@ -29,6 +29,7 @@ You can edit this file as you like.
     , "psci-support"
     , "routing"
     , "routing-duplex"
+    , "simple-json"
     , "slug"
     , "strings"
     , "stringutils"

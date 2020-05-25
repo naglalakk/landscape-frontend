@@ -8,7 +8,9 @@ import Data.Bifunctor               (bimap)
 import Data.Either                  (Either(..), hush)
 import Data.Foldable                (traverse_)
 import Data.Maybe                   (Maybe(..))
+import Data.String                  (drop)
 import Effect                       (Effect)
+import Effect.Class.Console         (logShow)
 import Effect.Aff                   (Aff, launchAff_)
 import Effect.Aff.Class             (class MonadAff)
 import Effect.Aff.Bus               as Bus
@@ -19,7 +21,8 @@ import Halogen.Aff                  as HA
 import Halogen.HTML                 as HH
 import Halogen.VDom.Driver          (runUI)
 import Routing.Duplex               (parse)
-import Routing.Hash                 (matchesWith)
+import Routing.PushState            (makeInterface, matchesWith)
+import Simple.JSON                  (read_)
 
 import AppM                         (runAppM)
 import Api.Request                  (RequestMethod(..)
@@ -42,6 +45,7 @@ main = HA.runHalogenAff do
   
   currentUser <- H.liftEffect $ Ref.new Nothing
   userBus <- H.liftEffect Bus.make
+  interface <- H.liftEffect makeInterface 
 
   H.liftEffect readToken >>= traverse_ \token -> do
     let 
@@ -64,13 +68,12 @@ main = HA.runHalogenAff do
   let 
     environ = toEnvironment environment
     url     = BaseURL apiURL
-    
-
     env :: Env
     env = 
       { environment: environ
       , apiURL: url
       , userEnv: userEnv
+      , pushInterface: interface
       }
       where
         userEnv :: UserEnv
@@ -81,8 +84,17 @@ main = HA.runHalogenAff do
 
   halogenIO <- runUI rootComponent unit body
 
-  void $ H.liftEffect $ matchesWith (parse routeCodec) \old new ->
-    when (old /= Just new) do
-      launchAff_ $ halogenIO.query $ H.tell $ Router.Navigate new
-  
+  void $ H.liftEffect $ interface.listen \location -> do
+    let 
+      state = (read_ location.state) :: (Maybe { old :: String })
+    case state of 
+      Just st -> do
+        let
+          new  = hush $ parse routeCodec $ drop 1 location.pathname
+          old  = hush $ parse routeCodec $ st.old
+        when (old /= new) do
+          case new of
+            Just r -> launchAff_ $ halogenIO.query $ H.tell $ Router.Navigate r
+            Nothing -> pure unit
+      Nothing -> pure unit
   pure unit

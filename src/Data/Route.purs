@@ -28,7 +28,7 @@ instance showRoute :: Show Route where
   show = genericShow
 
 routeCodec :: RouteDuplex' Route
-routeCodec = root $ sum
+routeCodec = sum
   { "Home": noArgs
   , "BlogPost" : "posts" / slug
   , "Login" : "login" / noArgs

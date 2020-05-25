@@ -9,17 +9,20 @@ import Data.Argonaut                (encodeJson, decodeJson)
 import Data.Either                  (Either(..))
 import Data.Environment             (Environment(..), Env)
 import Data.Maybe                   (Maybe(..))
+import Data.String                  (drop)
 import Effect.Aff                   (Aff)
 import Effect.Aff.Class             (class MonadAff)
 import Effect.Class                 (class MonadEffect
                                     ,liftEffect)
+import Effect.Class.Console         (logShow)
 import Effect.Console               as Console
 import Routing.Duplex               (print)
 import Routing.Hash                 (setHash)
+import Simple.JSON                  (write)
 import Type.Equality                (class TypeEquals, from)
 import Web.HTML                     (window)
 import Web.HTML.Window              as Window
-import Web.HTML.Location            (setHref, Location)
+import Web.HTML.Location            (pathname, setHref, Location)
 import Slug                         as Slug
 
 import Api.Endpoint                 as API
@@ -69,8 +72,16 @@ instance logMessagesAppM :: LogMessages AppM where
       _ -> Console.log $ Log.message log
 
 instance navigateAppM :: Navigate AppM where
-  navigate = 
-    liftEffect <<< setHash <<< print Route.routeCodec 
+  navigate route = do
+    env <- ask
+    w <- liftEffect window
+    location <- liftEffect $ Window.location w
+    p <- liftEffect $ pathname location
+    let currentPath = drop 1 p
+    let href = (print Route.routeCodec route)
+    liftEffect $ env.pushInterface.pushState (write { old: currentPath }) href
+
+  -- TODO: remove
   navigateForm route = do
     w <- liftEffect window
     location <- liftEffect $ Window.location w

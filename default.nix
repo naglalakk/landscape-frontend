@@ -50,8 +50,8 @@
         easy-ps.purs easy-ps.spago npm pkgs.nodejs-12_x
       ];
       buildPhase = ''
-        ${removeHashBang spagoPkgs.installSpagoStyle}
         mkdir -p $out
+        ${spagoPkgs.installSpagoStyle}/bin/install-spago-style
         purs compile "$src/**/*.purs" ${builtins.toString
           (builtins.map
             (x: ''"${x.outPath}/src/**/*.purs"'')

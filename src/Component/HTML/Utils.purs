@@ -20,7 +20,7 @@ classes_ = HP.classes <<< map HH.ClassName
 type Part = { before :: String, after :: String }
 
 safeHref :: forall r i. Route -> HH.IProp ( href :: String | r) i
-safeHref = HP.href <<< append "#" <<< print routeCodec
+safeHref = HP.href <<< append "/" <<< print routeCodec
 
 maybeElem :: forall p i a. Maybe a -> (a -> HH.HTML p i) -> HH.HTML p i
 maybeElem (Just x) f = f x

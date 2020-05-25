@@ -1,6 +1,6 @@
 {
   "name": "donnabot.dev",
-  "version": "0.14.4",
+  "version": "0.15.0",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
@@ -19,7 +19,8 @@
   "devDependencies": {
     "express": "^4.16.4",
     "parcel": "^1.12.4",
-    "parcel-plugin-bundle-visualiser": "^1.2.0"
+    "parcel-plugin-bundle-visualiser": "^1.2.0",
+    "parcel-plugin-prerender": "^1.4.1"
   },
   "scripts": {
     "start": "node server.js"

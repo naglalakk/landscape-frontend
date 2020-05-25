@@ -58,7 +58,7 @@ component = F.component (const input) F.defaultSpec
     _ -> pure unit
 
   render st = 
-    HH.form
+    HH.div
       [ css "login-form" ]
       [ withLabel "Username*" (HH.input
         [ css "text-input"

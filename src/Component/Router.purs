@@ -8,8 +8,10 @@ import Data.Foldable                    (elem)
 import Data.Maybe                       (Maybe(..)
                                         ,fromMaybe
                                         ,isJust)
+import Data.String                      (drop)
 import Data.Symbol                      (SProxy(..))
 import Effect.Aff.Class                 (class MonadAff)
+import Effect.Class.Console             (logShow)
 import Effect.Ref                       as Ref
 import Foreign                          as Foreign
 import Halogen                          (liftEffect)
@@ -18,6 +20,10 @@ import Halogen.HTML                     as HH
 import Routing.Duplex                   as RD
 import Routing.Hash                     (getHash)
 import Slug                             as Slug
+import Web.HTML                         (window)
+import Web.HTML.Window                  as Window
+import Web.HTML.Location                as Location
+
 
 import Capability.Navigate              (class Navigate, navigate)
 import Component.Utils                  (OpaqueSlot, busEventSource)
@@ -77,14 +83,17 @@ component = H.mkComponent
   handleAction :: Action -> H.HalogenM State Action ChildSlots Void m Unit
   handleAction = case _ of
     Initialize -> do
-      initialRoute <- hush <<< (RD.parse routeCodec) <$> liftEffect getHash
-
+      w <- liftEffect window
+      location <- liftEffect $ Window.location w
+      p <- H.liftEffect $ Location.pathname location
+      let finalPath = drop 1 p
+      let initialRoute = hush $ (RD.parse routeCodec finalPath)
       { currentUser, userBus } <- asks _.userEnv
       _ <- H.subscribe (HandleUserBus <$> busEventSource userBus)
       mbUser <- H.liftEffect $ Ref.read currentUser
-      H.modify_ _ { currentUser = mbUser }
-
-      navigate $ fromMaybe Home initialRoute
+      H.modify_ _ { currentUser = mbUser 
+                  , route = Just $ fromMaybe Home initialRoute
+                  }
 
     HandleUserBus user -> H.modify_ _ { currentUser = user }
 

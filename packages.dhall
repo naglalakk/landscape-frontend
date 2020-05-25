@@ -140,7 +140,7 @@ let additions =
       , "aff"
       ]
       "https://github.com/nkly/purescript-express"
-      "master"
+      "b0d3d31703a02a7dddc48fa23669bebe6de85e90"
   , halogen-formless = 
       mkPackage 
       [ "halogen-renderless"
@@ -149,19 +149,19 @@ let additions =
       , "generics-rep"
       ]
       "https://github.com/thomashoneyman/purescript-halogen-formless.git"
-      "master"
+      "b42d54ec9a74be9b99d45aed273c68bac3fdbfda"
   , halogen-media =
       mkPackage
       [ "dom-filereader" 
       , "uuid"
       ]
       "https://github.com/naglalakk/purescript-halogen-media"
-      "master"
+      "b9d07ebb8de18f146f33de45efdc4c0c50b6195e"
   , halogen-rawhtml =
     mkPackage
     ["halogen"]
     "https://github.com/naglalakk/purescript-halogen-rawhtml"
-    "master"
+    "2b38c6cfb71ebb1ab75bf3724886f70dd05de651"
   , halogen-select = 
       mkPackage
       ["halogen", "record"]
@@ -171,7 +171,7 @@ let additions =
       mkPackage
       ["control"]
       "https://github.com/thomashoneyman/purescript-halogen-renderless"
-      "master"
+      "83278eaa735001803a751a82472f2caa9c2c9c70"
   , precise-datetime =
       mkPackage
       [ "arrays"
@@ -193,7 +193,7 @@ let additions =
       , "decimals"
       ]
       "https://github.com/awakesecurity/purescript-precise-datetime"
-      "master"
+      "2355b3471b758e16d17078e09bb79ee26d82b90a"
   , routing-duplex = 
       mkPackage
       [ "typelevel-prelude"
@@ -204,24 +204,24 @@ let additions =
       , "profunctor"
       ]
       "https://github.com/natefaubion/purescript-routing-duplex"
-      "master"
+      "150d92bab24e0f8ad23f84e4a3e24c6c9ebc5ac6"
   , slug = 
       mkPackage
       [ "unicode" ]
       "https://github.com/thomashoneyman/purescript-slug"
-      "master"
+      "a97735d47be7398f181085e0b117499462ba7a11"
   , timestamp =
       mkPackage
       ["argonaut"
       ,"formatters"
       ,"precise-datetime"]
       "https://github.com/naglalakk/purescript-timestamp"
-      "master"
+      "c308b43655ba1c100e53a15ce8146916c4b90e63"
   , quill = 
       mkPackage
       ["colors"]
       "https://github.com/naglalakk/purescript-quill"
-      "master"
+      "850664f0b6cb746e0aadc806e3bea71365ac43e1"
   }
 
 in  upstream ⫽ overrides ⫽ additions
