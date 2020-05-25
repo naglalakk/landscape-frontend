@@ -139,6 +139,6 @@ component =
               [ HH.text "Not found" ]
             , HH.p 
               [ css "text-center" ]
-              [ HH.text "Whoops this blog post was not found. Verify that the url you entered is correct." ]
+              [ HH.text "..." ]
             ]
       ]
