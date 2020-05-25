@@ -101,7 +101,7 @@ component =
               Nothing -> pure unit
             case urlMeta of
               Just uMeta -> case post.slug of
-                Just slug -> H.liftEffect $ DOM.setAttribute "content" (siteURL <> "/#/posts/" <> Slug.toString slug) uMeta
+                Just slug -> H.liftEffect $ DOM.setAttribute "content" (siteURL <> "/posts/" <> Slug.toString slug) uMeta
                 Nothing -> pure unit
               Nothing -> pure unit
             let label = "element-" <> (show $ unwrap post.id)
