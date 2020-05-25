@@ -20,10 +20,7 @@ html
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'UA-165853160-1', {
-        /* We need this for hash based routing */
-        'page_path': window.location.pathname + window.location.hash
-      });
+      gtag('config', 'UA-165853160-1');
 
   body
     script(src='https://cdn.jsdelivr.net/npm/vanilla-lazyload@15.1.1/dist/lazyload.min.js')
