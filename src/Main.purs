@@ -85,16 +85,9 @@ main = HA.runHalogenAff do
   halogenIO <- runUI rootComponent unit body
 
   void $ H.liftEffect $ interface.listen \location -> do
-    let 
-      state = (read_ location.state) :: (Maybe { old :: String })
-    case state of 
-      Just st -> do
-        let
-          new  = hush $ parse routeCodec $ drop 1 location.pathname
-          old  = hush $ parse routeCodec $ st.old
-        when (old /= new) do
-          case new of
-            Just r -> launchAff_ $ halogenIO.query $ H.tell $ Router.Navigate r
-            Nothing -> pure unit
+    let
+      new  = hush $ parse routeCodec $ drop 1 location.pathname
+    case new of
+      Just r -> launchAff_ $ halogenIO.query $ H.tell $ Router.Navigate r
       Nothing -> pure unit
   pure unit
