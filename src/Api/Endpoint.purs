@@ -29,6 +29,7 @@ data Endpoint
   = BlogPosts Pagination
   | BlogPost BP.BlogPostId
   | BlogPostBySlug String
+  | BlogPostSearch
   | BlogPostCreate
   | BlogPostUpdate BP.BlogPostId
   | BlogPostDelete BP.BlogPostId
@@ -50,6 +51,7 @@ endpointCodec = root $ sum
     }
   , "BlogPost" : "posts" / blogPostId
   , "BlogPostBySlug" : "posts" / slug
+  , "BlogPostSearch" : "posts" / "search" / noArgs
   , "BlogPostCreate" : "posts" / noArgs
   , "BlogPostUpdate" : "posts" / blogPostId / "update"
   , "BlogPostDelete" : "posts" / blogPostId / "delete"

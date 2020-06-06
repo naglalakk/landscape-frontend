@@ -16,6 +16,7 @@ You can edit this file as you like.
     , "datetime"
     , "dotenv"
     , "effect"
+    , "elasticsearch"
     , "encoding"
     , "express"
     , "formatters"

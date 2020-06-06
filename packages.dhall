@@ -131,7 +131,12 @@ let overrides =
   }
 
 let additions = 
-  { express  = 
+  { elasticsearch = 
+      mkPackage
+      ([] : List Text)
+      "https://github.com/naglalakk/purescript-elasticsearch"
+      "master"
+  , express  = 
       mkPackage 
       [ "foreign"
       , "foreign-generic"

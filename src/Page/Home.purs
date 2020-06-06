@@ -12,6 +12,7 @@ import Effect.Class                         (class MonadEffect)
 import Effect.Class.Console                 (logShow)
 import Effect.Aff                           as Aff
 import Effect.Aff.Class                     (class MonadAff)
+import Elasticsearch.Client                 (SearchResponse(..), SearchHit(..))
 import Halogen                              as H
 import Halogen.HTML                         as HH
 import Halogen.HTML.CSS                     as HCSS
@@ -46,10 +47,11 @@ import CSS.Utils                            (backgroundCover)
 import Data.BlogPost                        (BlogPost(..)
                                             ,BlogPostArray)
 import Data.Image                           (Image(..))
+import Data.Search                          (SearchQuery(..))
 import Foreign.LazyLoad                     as LZ
 import Foreign.LightGallery                 (loadGallery)
 import Resource.BlogPost                    (class ManageBlogPost
-                                            ,getBlogPosts)
+                                            ,searchBlogPost)
 import Utils.EventTypes                     (onscroll)
 import Utils.DOM                            (setHTML)
 
@@ -106,8 +108,12 @@ component =
         (map HandleWheel <<< WE.fromEvent)
 
       -- get initial posts
-      posts <- getBlogPosts { page: Just 1
-                            , perPage: Just 5 }
+      let 
+        query = SearchQuery
+          { queries: []
+          , page: Just 1
+          , perPage: Just 5 }
+      posts <- searchBlogPost query
       H.modify_ _ { blogPosts = posts }
       
       H.liftEffect $ LZ.lazyLoad ".lazy"
@@ -148,8 +154,9 @@ component =
                 true -> do
                   let
                     newCurrentPage = state.currentPage + 1
-                  blogPosts <- getBlogPosts 
-                    { page: Just newCurrentPage
+                  blogPosts <- searchBlogPost $ SearchQuery
+                    { queries: []
+                    , page: Just newCurrentPage
                     , perPage: Just 5 
                     }
                   case length blogPosts == 0 of

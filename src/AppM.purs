@@ -16,6 +16,7 @@ import Effect.Class                 (class MonadEffect
                                     ,liftEffect)
 import Effect.Class.Console         (logShow)
 import Effect.Console               as Console
+import Elasticsearch.Client         (SearchResponse(..), SearchHit(..))
 import Routing.Duplex               (print)
 import Routing.Hash                 (setHash)
 import Simple.JSON                  (write)
@@ -138,6 +139,26 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
             logMessage $ Log.Log { message: err }
             pure Nothing
       Nothing -> pure Nothing
+
+  searchBlogPost query = do
+    req <- mkRequest
+      { endpoint: API.BlogPostSearch
+      , method: Post $ Just $ encodeJson query
+      , auth: Nothing
+      }
+    case req of
+      Just json -> do
+        let 
+          result = decodeJson json :: Either String (SearchResponse BlogPost)
+        case result of
+          Right (SearchResponse res) -> do
+            let
+              posts = map (\(SearchHit r) -> r.source) res.hits
+            pure posts
+          Left err -> do
+            logMessage $ Log.Log { message: err }
+            pure []
+      Nothing -> pure []
 
   createBlogPost post = do
     req <- mkRequest

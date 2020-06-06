@@ -761,6 +761,18 @@ let
         installPhase = "ln -s $src $out";
       };
 
+    "elasticsearch" = pkgs.stdenv.mkDerivation {
+        name = "elasticsearch";
+        version = "";
+        src = pkgs.fetchgit {
+          url = "https://github.com/naglalakk/purescript-elasticsearch";
+          rev = "0acab0b6405fdf73e9690a2d3805cd6a1992210c";
+          sha256 = "1pa40k80dbl25lryp11kjvaz1z66rwgblz6n1m8786y4bynb76v2";
+        };
+        phases = "installPhase";
+        installPhase = "ln -s $src $out";
+      };
+
     "email-validate" = pkgs.stdenv.mkDerivation {
         name = "email-validate";
         version = "v5.0.0";
@@ -2921,6 +2933,19 @@ let
         installPhase = "ln -s $src $out";
       };
 
+    /*
+    "simple-timestamp" = pkgs.stdenv.mkDerivation {
+        name = "simple-timestamp";
+        version = "v1.3.0";
+        src = pkgs.fetchgit {
+          url = "https://github.com/reactormonk/purescript-simple-timestamp.git";
+          rev = "8e219b4b57a8679885d645050057b5a567685fad";
+          sha256 = "0p2w88mkvsy9yfn4vgm4s6hzpc9lxsyq6qna3n3b7v3jm1n7gpdz";
+        };
+        phases = "installPhase";
+        installPhase = "ln -s $src $out";
+      };*/
+
     "sized-vectors" = pkgs.stdenv.mkDerivation {
         name = "sized-vectors";
         version = "v3.1.0";
@@ -3184,6 +3209,19 @@ let
         phases = "installPhase";
         installPhase = "ln -s $src $out";
       };
+
+    /*
+    "text-encoding" = pkgs.stdenv.mkDerivation {
+        name = "text-encoding";
+        version = "v0.0.9";
+        src = pkgs.fetchgit {
+          url = "https://github.com/AlexaDeWit/purescript-text-encoding.git";
+          rev = "46d809d5806ed9bb725192a7a0cf0d679911aa39";
+          sha256 = "0zb4cs2wcn2lcfc80gghanclbxy9rgz836dgqs4finj3yg872p47";
+        };
+        phases = "installPhase";
+        installPhase = "ln -s $src $out";
+      };*/
 
     "these" = pkgs.stdenv.mkDerivation {
         name = "these";
