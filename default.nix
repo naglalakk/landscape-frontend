@@ -13,10 +13,6 @@
       sha256 = "1q2ciwd3193kig1paidzrgxl60y4rb39bsi97lk7m6ff8mis6z6i";
     }) { inherit pkgs; };
 
-     removeHashBang = drv: drv.overrideAttrs (oldAttrs: {
-       buildCommand = builtins.replaceStrings ["#!/usr/bin/env"] [""] oldAttrs.buildCommand;
-     });
-
     gitignoreSrc = pkgs.fetchFromGitHub { 
       owner = "hercules-ci";
       repo = "gitignore.nix";
@@ -36,7 +32,7 @@
 
     npm = yarn2nix.mkYarnPackage {
       name = "frontend-npm";
-      src = ./.;
+      src = gitignoreSource ./.;
       packageJSON = ./package.json;
       yarnLock  = ./yarn.lock;
     };
@@ -78,7 +74,7 @@
         cd $out && spago bundle-app --no-install --no-build --to $out/static/build/index.js
 
         # Browserify bundle
-        cd $out && ${npm}/libexec/donnabot.dev/node_modules/parcel/bin/cli.js build $out/static/build/index.js -d $out/static/dist
+        $out/node_modules/parcel/bin/cli.js build $out/static/build/index.js -d $out/static/dist
 
         # Bundle Server
         cd $out && spago bundle-app --main Server --no-install --no-build --to $out/output/donnabot/server.js
@@ -88,5 +84,4 @@
         chmod +x $out/run.sh
         echo "Build Done"
       '';
-
     }
