@@ -21,13 +21,11 @@ import Data.Environment                 (Environment(..)
 
 app :: Environment -> App
 app env = do
-    setProp "views" "static/views"
-    setProp "view engine" "pug"
     case env of
       Development -> useAt "/static" (static "static")
       _ -> pure unit
     -- route all requests to the same template
-    get "*" $ render "index" ""
+    get "*" $ sendFile "static/views/index.html"
 
 main :: Effect Unit
 main = launchAff_ do
