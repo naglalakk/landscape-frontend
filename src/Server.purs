@@ -16,11 +16,16 @@ import Node.Express.Response            (render, sendFile)
 import Node.Express.Middleware.Static   (static)
 import Node.Process                     (lookupEnv)
 
-app :: App
-app = do
+import Data.Environment                 (Environment(..)
+                                        ,toEnvironment)
+
+app :: Environment -> App
+app env = do
     setProp "views" "static/views"
     setProp "view engine" "pug"
-    useAt "/static" (static "static")
+    case env of
+      Development -> useAt "/static" (static "static")
+      _ -> pure unit
     -- route all requests to the same template
     get "*" $ render "index" ""
 
@@ -29,9 +34,11 @@ main = launchAff_ do
   _ <- Dotenv.loadFile
   liftEffect do
     port <- lookupEnv "PORTNR"
+    env  <- lookupEnv "ENVIRONMENT"
     -- Port defaults to 8080
     let 
       p   = fromMaybe "8080" port
-    listenHttp app (fromMaybe 8080 $ fromString p) \_ ->
+      envStr = fromMaybe "Development" env
+    listenHttp (app $ toEnvironment envStr) (fromMaybe 8080 $ fromString p) \_ ->
       log $ "Listening on "  <> p
 
