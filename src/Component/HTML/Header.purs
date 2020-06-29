@@ -22,11 +22,11 @@ header =
         , HH.attr (HH.AttrName "muted") "true"
         ]
         [ HH.source
-          [ HP.src "img/profile.mp4" 
+          [ HP.src "/static/img/profile.mp4" 
           , HH.attr (HH.AttrName "type") "video/mp4"
           ]
         , HH.source
-          [ HP.src "img/profile.webm" 
+          [ HP.src "/static/img/profile.webm" 
           , HH.attr (HH.AttrName "type") "video/webm"
           ]
         ]

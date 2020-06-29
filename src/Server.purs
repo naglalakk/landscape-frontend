@@ -9,7 +9,7 @@ import Effect.Aff                       (launchAff_)
 import Effect.Class                     (liftEffect)
 import Effect.Console                   (log)
 import Node.Express.App                 (App
-                                        ,use
+                                        ,useAt
                                         ,listenHttp
                                         ,setProp, get)
 import Node.Express.Response            (render, sendFile)
@@ -20,7 +20,7 @@ app :: App
 app = do
     setProp "views" "static/views"
     setProp "view engine" "pug"
-    use (static "static")
+    useAt "/static" (static "static")
     -- route all requests to the same template
     get "*" $ render "index" ""
 
