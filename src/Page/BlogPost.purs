@@ -78,7 +78,6 @@ component =
       Just s -> do
         blogPost <- getBlogPostBySlug s
         H.modify_ _ { blogPost = blogPost }
-        H.liftEffect $ loadGallery "lightgallery"
         H.liftEffect $ LZ.lazyLoad ".lazy"
         case blogPost of
           Just (BlogPost post) -> do
@@ -115,6 +114,7 @@ component =
                     H.liftEffect $ setHTML el html
                   Nothing -> pure unit
           Nothing -> pure unit
+        H.liftEffect $ loadGallery "lightgallery"
       Nothing -> pure unit
 
 
