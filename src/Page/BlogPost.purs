@@ -25,6 +25,7 @@ import Component.HTML.Utils         (css, safeHref)
 import Data.BlogPost                (BlogPost(..))
 import Data.Image                   (Image(..))
 import Data.Route                   as R
+import Foreign.LightGallery         (loadGallery)
 import Resource.BlogPost            (class ManageBlogPost
                                     ,getBlogPostBySlug)
 import Utils.DOM                    (setHTML)
@@ -77,6 +78,7 @@ component =
       Just s -> do
         blogPost <- getBlogPostBySlug s
         H.modify_ _ { blogPost = blogPost }
+        H.liftEffect $ loadGallery "lightgallery"
         H.liftEffect $ LZ.lazyLoad ".lazy"
         case blogPost of
           Just (BlogPost post) -> do
