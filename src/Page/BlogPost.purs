@@ -74,14 +74,13 @@ component =
     Initialize -> do
       state <- H.get
       handleAction $ LoadBlogPost state.slug
-      H.liftAff $ Aff.delay $ Aff.Milliseconds 800.0
+      H.liftEffect $ LZ.lazyLoad ".lazy"
       H.liftEffect $ loadGallery "lightgallery"
 
     LoadBlogPost slug -> case slug of
       Just s -> do
         blogPost <- getBlogPostBySlug s
         H.modify_ _ { blogPost = blogPost }
-        H.liftEffect $ LZ.lazyLoad ".lazy"
         case blogPost of
           Just (BlogPost post) -> do
             -- Update og meta info
