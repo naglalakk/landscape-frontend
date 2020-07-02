@@ -6,6 +6,7 @@ import Prelude
 import Data.Const                   (Const)
 import Data.Maybe                   (Maybe(..), fromMaybe)
 import Data.Newtype                 (unwrap)
+import Effect.Aff                   as Aff
 import Effect.Aff.Class             (class MonadAff)
 import Effect.Class                 (class MonadEffect)
 import Foreign.LazyLoad             as LZ
@@ -79,6 +80,8 @@ component =
         blogPost <- getBlogPostBySlug s
         H.modify_ _ { blogPost = blogPost }
         H.liftEffect $ LZ.lazyLoad ".lazy"
+        H.liftAff $ Aff.delay $ Aff.Milliseconds 500.0
+        H.liftEffect $ loadGallery "lightgallery"
         case blogPost of
           Just (BlogPost post) -> do
             -- Update og meta info
@@ -114,7 +117,6 @@ component =
                     H.liftEffect $ setHTML el html
                   Nothing -> pure unit
           Nothing -> pure unit
-        H.liftEffect $ loadGallery "lightgallery"
       Nothing -> pure unit
 
 

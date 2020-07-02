@@ -1,6 +1,6 @@
 {
   "name": "donnabot.dev",
-  "version": "0.16.8",
+  "version": "0.16.9",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
