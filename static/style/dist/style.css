@@ -23,6 +23,13 @@
   font-size: 14px;
   margin-bottom: separator;
 }
+.button:link {
+/* 
+     * If button is a link
+     * hide underline
+     */
+  text-decoration: none;
+}
 .button:hover {
   background-color: #000;
   color: #fff;
@@ -396,9 +403,7 @@ li {
   }
 }
 .navigation-back {
-  display: block;
-  margin-top: 25px;
-  margin-bottom: 25px;
+  margin: 0 auto;
 }
 .hljs {
   font-size: 17px;

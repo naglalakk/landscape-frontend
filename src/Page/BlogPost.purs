@@ -130,7 +130,7 @@ component =
             [ renderBlogPost post   
             , HH.a
               [ safeHref R.Home
-              , css "navigation-back text-center" 
+              , css "button navigation-back text-center" 
               ]
               [ HH.text "Back to site" ]
             ]
