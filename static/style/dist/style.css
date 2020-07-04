@@ -404,6 +404,7 @@ li {
 }
 .navigation-back {
   margin: 0 auto;
+  margin-bottom: 25px;
 }
 .hljs {
   font-size: 17px;
