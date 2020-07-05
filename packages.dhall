@@ -135,7 +135,7 @@ let additions =
       mkPackage
       ([] : List Text)
       "https://github.com/naglalakk/purescript-elasticsearch"
-      "master"
+      "0acab0b6405fdf73e9690a2d3805cd6a1992210c"
   , express  = 
       mkPackage 
       [ "foreign"
@@ -161,7 +161,7 @@ let additions =
       , "uuid"
       ]
       "https://github.com/naglalakk/purescript-halogen-media"
-      "b9d07ebb8de18f146f33de45efdc4c0c50b6195e"
+      "37bd8cd606f85f0ebd37cf47e8975ba723566de6"
   , halogen-rawhtml =
     mkPackage
     ["halogen"]

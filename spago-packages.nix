@@ -763,7 +763,7 @@ let
 
     "elasticsearch" = pkgs.stdenv.mkDerivation {
         name = "elasticsearch";
-        version = "";
+        version = "0acab0b6405fdf73e9690a2d3805cd6a1992210c";
         src = pkgs.fetchgit {
           url = "https://github.com/naglalakk/purescript-elasticsearch";
           rev = "0acab0b6405fdf73e9690a2d3805cd6a1992210c";
@@ -1315,11 +1315,11 @@ let
 
     "halogen-media" = pkgs.stdenv.mkDerivation {
         name = "halogen-media";
-        version = "b9d07ebb8de18f146f33de45efdc4c0c50b6195e";
+        version = "37bd8cd606f85f0ebd37cf47e8975ba723566de6";
         src = pkgs.fetchgit {
           url = "https://github.com/naglalakk/purescript-halogen-media";
-          rev = "b9d07ebb8de18f146f33de45efdc4c0c50b6195e";
-          sha256 = "072nyavl27rg9x65ay1v9wawcb7gg9wjphlwkascvia7nabwswp4";
+          rev = "37bd8cd606f85f0ebd37cf47e8975ba723566de6";
+          sha256 = "0m5wn4gwp2h5w74w6zqff1vc4c5ckjq6pskxvda35j9w5kllm7ig";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";

@@ -16,7 +16,7 @@ import Halogen.Media.Component.Browser  as Browser
 import Halogen.Media.Component.Modal    as Modal
 import Halogen.Media.Data.Media         (Media(..)
                                         ,MediaArray)
-import Halogen.Media.Utils              (filesToFormData)
+import Halogen.Media.Utils              (fileToFormData)
 
 import Halogen.Media.Data.File          (ExtendedFile(..))
 import Formless                         as F
@@ -82,10 +82,11 @@ component =
             H.modify_ _ { media = medias }
           _ -> pure unit
       Browser.Dropped files -> do
-        formData <- H.liftEffect $ filesToFormData "image" files
-        newImg <- uploadImage formData
-        _ <- traverse (\(ExtendedFile f uuid t) -> do
-          H.query (SProxy :: SProxy "mediaModal") unit (H.tell (Modal.SetUploadStatus uuid true))) files
+        _ <- traverse  (\(ExtendedFile f uuid t) -> do
+          formData <- H.liftEffect $ fileToFormData "image" (ExtendedFile f uuid t)
+          newImg <- uploadImage formData
+          H.query (SProxy :: SProxy "mediaModal") unit (H.tell (Modal.SetUploadStatus uuid true))
+        ) files
         H.raise act
       Browser.Removed (Media media) -> do
         deleteImage media.id

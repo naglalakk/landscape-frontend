@@ -38,7 +38,6 @@ import Halogen.HTML.Properties          as HP
 import Halogen.Media.Component.Browser  as Browser
 import Halogen.Media.Component.Upload   as Upload
 import Halogen.Media.Data.Media         (Media(..))
-import Halogen.Media.Utils              (filesToFormData)
 import Halogen.Query.EventSource        as HES
 import Quill.API.Delta                  as QDelta
 import Slug                             as Slug
