@@ -127,9 +127,6 @@ component =
       lazyLoad <- H.liftEffect $ LZ.createLazyLoad ".lazy"
       H.modify_ _ { lazyLoad = Just lazyLoad }
 
-      -- Highlight code blocks
-      H.liftEffect Highlight.highlightBlock
-
       _ <- traverse (\(BlogPost post) -> do
         let label = "element-" <> (show $ unwrap post.id)
         H.getHTMLElementRef (H.RefLabel label) >>= case _ of
@@ -140,6 +137,9 @@ component =
               Nothing -> pure unit) posts
 
       H.liftEffect $ loadGallery "lightgallery"
+      H.liftAff $ Aff.delay $ Aff.Milliseconds 500.0
+      -- Highlight code blocks
+      H.liftEffect Highlight.highlightBlock
       pure unit
 
     HandleWheel ev -> do

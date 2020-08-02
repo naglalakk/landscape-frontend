@@ -75,8 +75,9 @@ component =
     Initialize -> do
       state <- H.get
       handleAction $ LoadBlogPost state.slug
-      _ <- H.liftEffect $ LZ.createLazyLoad ".lazy"
       H.liftEffect $ loadGallery "lightgallery"
+      _ <- H.liftEffect $ LZ.createLazyLoad ".lazy"
+      H.liftAff $ Aff.delay $ Aff.Milliseconds 500.0
       H.liftEffect Highlight.highlightBlock
 
     LoadBlogPost slug -> case slug of
