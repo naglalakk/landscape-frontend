@@ -21,6 +21,9 @@ body
   width 100%
   overflow-x hidden
 
+.wrapper
+  height 100%
+
 h1
   padding-top 0
   margin-top 0
@@ -36,9 +39,11 @@ ul,li
 
 .header
   width content-width
+  height 80px
   margin 0 auto
-  text-align center
-  padding-top 80px
+  display flex
+  justify-content space-between
+  align-items center
 
   +tablet()
     width 100%
@@ -61,24 +66,32 @@ ul,li
       height 100%
       border-radius 80px
 
-  .socials
-    margin 0
-    padding 0
+  .menu
     display flex
-    justify-content center
-    margin-bottom 12.5px
-
-    .social-item
+    .dark-mode-toggle
       display block
       padding-left 16px
       padding-right 16px
       font-size 26px
 
-      a
-        color #000
-        text-decoration none
-        &:visited 
+
+    .socials
+      margin 0
+      padding 0
+      display flex
+      justify-content center
+
+      .social-item
+        display block
+        padding-left 16px
+        padding-right 16px
+        font-size 26px
+
+        a
           color #000
+          text-decoration none
+          &:visited 
+            color #000
 
 .line
   width 50%
@@ -164,7 +177,6 @@ ul,li
 
     &.cover-false
       width content-width
-      padding separator
       margin 0 auto
 
       +tablet()
@@ -295,3 +307,39 @@ ul,li
 
 .hljs
   font-size 17px
+
+
+// Dark mode
+.dark-mode-false
+  background-color #fff
+  color #000
+
+  transition: background-color .5s;
+  -webkit-transition: background-color .5s;
+  -o-transition: background-color .5s;
+  -moz-transition: background-color .5s;
+
+.dark-mode-true
+
+  background-color #000
+  color #fff
+
+  transition: background-color .5s;
+  -webkit-transition: background-color .5s;
+  -o-transition: background-color .5s;
+  -moz-transition: background-color .5s;
+  
+  .posts-container 
+    .post
+      .title
+        color #fff
+      .post-content
+        color #fff
+      .lightgallery
+        a
+          border 1px solid #fff
+  .header .menu .socials .social-item 
+    a 
+      color #fff
+      &:visited
+        color #fff

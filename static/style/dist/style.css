@@ -102,6 +102,9 @@ body {
   width: 100%;
   overflow-x: hidden;
 }
+.wrapper {
+  height: 100%;
+}
 h1 {
   padding-top: 0;
   margin-top: 0;
@@ -119,9 +122,11 @@ li {
 }
 .header {
   width: 1100px;
+  height: 80px;
   margin: 0 auto;
-  text-align: center;
-  padding-top: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 @media (min-width: 512px) and (max-width: 991px) {
   .header {
@@ -149,24 +154,32 @@ li {
   height: 100%;
   border-radius: 80px;
 }
-.header .socials {
-  margin: 0;
-  padding: 0;
+.header .menu {
   display: flex;
-  justify-content: center;
-  margin-bottom: 12.5px;
 }
-.header .socials .social-item {
+.header .menu .dark-mode-toggle {
   display: block;
   padding-left: 16px;
   padding-right: 16px;
   font-size: 26px;
 }
-.header .socials .social-item a {
+.header .menu .socials {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+.header .menu .socials .social-item {
+  display: block;
+  padding-left: 16px;
+  padding-right: 16px;
+  font-size: 26px;
+}
+.header .menu .socials .social-item a {
   color: #000;
   text-decoration: none;
 }
-.header .socials .social-item a:visited {
+.header .menu .socials .social-item a:visited {
   color: #000;
 }
 .line {
@@ -268,7 +281,6 @@ li {
 }
 .posts-container .post.cover-false {
   width: 1100px;
-  padding: 25px;
   margin: 0 auto;
 }
 @media (min-width: 512px) and (max-width: 991px) {
@@ -408,4 +420,35 @@ li {
 }
 .hljs {
   font-size: 17px;
+}
+.dark-mode-false {
+  background-color: #fff;
+  color: #000;
+  transition: background-color 0.5s;
+  -webkit-transition: background-color 0.5s;
+  -o-transition: background-color 0.5s;
+  -moz-transition: background-color 0.5s;
+}
+.dark-mode-true {
+  background-color: #000;
+  color: #fff;
+  transition: background-color 0.5s;
+  -webkit-transition: background-color 0.5s;
+  -o-transition: background-color 0.5s;
+  -moz-transition: background-color 0.5s;
+}
+.dark-mode-true .posts-container .post .title {
+  color: #fff;
+}
+.dark-mode-true .posts-container .post .post-content {
+  color: #fff;
+}
+.dark-mode-true .posts-container .post .lightgallery a {
+  border: 1px solid #fff;
+}
+.dark-mode-true .header .menu .socials .social-item a {
+  color: #fff;
+}
+.dark-mode-true .header .menu .socials .social-item a:visited {
+  color: #fff;
 }

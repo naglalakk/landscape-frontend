@@ -63,12 +63,13 @@ type State =
   , currentPage :: Int
   , scroll :: Boolean
   , lazyLoad :: Maybe LZ.LazyLoad
+  , darkMode :: Boolean
   }
 
 data Action 
   = Initialize
   | HandleWheel WE.WheelEvent
-  | HandleScroll CEV.CustomEvent
+  | DarkModeToggle
 
 type ChildSlots = ( html :: H.Slot (Const Void) Void Unit )
 
@@ -78,6 +79,7 @@ initialState =
   , currentPage: 1
   , scroll: true
   , lazyLoad: Nothing
+  , darkMode: false
   }
 
 component :: forall m
@@ -99,12 +101,6 @@ component =
     Initialize -> do
       document <- H.liftEffect $ Web.document =<< Web.window
       -- Subscribe to eventListeners
-      H.subscribe' \sid ->
-        ES.eventListenerEventSource
-        onscroll
-        (HTMLDocument.toEventTarget document)
-        (map HandleScroll <<< CEV.fromEvent)
-
       H.subscribe' \sid ->
         ES.eventListenerEventSource
         WET.wheel
@@ -141,6 +137,10 @@ component =
       -- Highlight code blocks
       H.liftEffect Highlight.highlightBlock
       pure unit
+
+    DarkModeToggle -> do
+      state <- H.get
+      H.modify_ _ { darkMode = not state.darkMode }
 
     HandleWheel ev -> do
       state       <- H.get
@@ -206,21 +206,15 @@ component =
 
       H.liftAff $ Aff.delay $ Aff.Milliseconds 500.0
 
-    HandleScroll ev -> do
-      win <- H.liftEffect Web.window
-      height <- H.liftEffect $ Web.innerHeight win
-      scrollY <- H.liftEffect $ Web.scrollY win
-      pure unit
-
-
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
     HH.div
-      [ HP.attr (HH.AttrName "data-aos") "fade-up"
+      [ css $ "wrapper dark-mode-" <> (show state.darkMode)
       ]
-      [ header
+      [ header DarkModeToggle
       , HH.div 
         [ css "posts-container" 
+        , HP.attr (HH.AttrName "data-aos") "fade-up"
         ]
         (map renderBlogPost state.blogPosts)
       ]
