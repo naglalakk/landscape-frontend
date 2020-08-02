@@ -440,6 +440,9 @@ li {
 .dark-mode-true .posts-container .post .title {
   color: #fff;
 }
+.dark-mode-true .posts-container .post .title .title-line {
+  background-color: #fff;
+}
 .dark-mode-true .posts-container .post .post-content {
   color: #fff;
 }
