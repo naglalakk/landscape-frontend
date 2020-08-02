@@ -48,6 +48,8 @@ import Data.BlogPost                        (BlogPost(..)
                                             ,BlogPostArray)
 import Data.Image                           (Image(..))
 import Data.Search                          (SearchQuery(..))
+import Foreign.AOS                          (loadAOS)
+import Foreign.Highlight                    as Highlight
 import Foreign.LazyLoad                     as LZ
 import Foreign.LightGallery                 (loadGallery)
 import Resource.BlogPost                    (class ManageBlogPost
@@ -60,6 +62,7 @@ type State =
   { blogPosts :: BlogPostArray
   , currentPage :: Int
   , scroll :: Boolean
+  , lazyLoad :: Maybe LZ.LazyLoad
   }
 
 data Action 
@@ -74,6 +77,7 @@ initialState =
   { blogPosts: []
   , currentPage: 1
   , scroll: true
+  , lazyLoad: Nothing
   }
 
 component :: forall m
@@ -116,7 +120,15 @@ component =
       posts <- searchBlogPost query
       H.modify_ _ { blogPosts = posts }
       
-      H.liftEffect $ LZ.lazyLoad ".lazy"
+      -- init AOS effects
+      H.liftEffect $ loadAOS
+
+      -- init lazy load
+      lazyLoad <- H.liftEffect $ LZ.createLazyLoad ".lazy"
+      H.modify_ _ { lazyLoad = Just lazyLoad }
+
+      -- Highlight code blocks
+      H.liftEffect Highlight.highlightBlock
 
       _ <- traverse (\(BlogPost post) -> do
         let label = "element-" <> (show $ unwrap post.id)
@@ -175,6 +187,13 @@ component =
                             case post.htmlContent of
                               Just html -> H.liftEffect $ setHTML el html
                               Nothing -> pure unit) blogPosts
+                      -- update lazyLoad
+                      case state.lazyLoad of
+                        Just lz -> H.liftEffect $ LZ.updateLazyLoad lz
+                        Nothing -> pure unit
+
+                      -- highlight blocks
+                      H.liftEffect Highlight.highlightBlock
 
                       -- Check if number of posts is less than
                       -- perPage. If so we stop checking for more posts
@@ -197,9 +216,11 @@ component =
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
     HH.div
-      []
+      [ HP.attr (HH.AttrName "data-aos") "fade-up"
+      ]
       [ header
       , HH.div 
-        [ css "posts-container" ]
+        [ css "posts-container" 
+        ]
         (map renderBlogPost state.blogPosts)
       ]

@@ -1,17 +1,17 @@
 'use strict';
 
-var lazyLoadInstance;
-
-exports.lazyLoad = function(className) {
+exports.createLazyLoad = function(className) {
     return function() {
         var lz = require('vanilla-lazyload');
-        lazyLoadInstance = new lz({
+        return new lz({
             elements_selector: className
         });
     }
 }
 
-exports.lazyLoadUpdate = function() {
-    lazyLoadInstance.update();
+exports.updateLazyLoad = function(instance) {
+    return function() {
+        instance.update();
+    }
 }
 

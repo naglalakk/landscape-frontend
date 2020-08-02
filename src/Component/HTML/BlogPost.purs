@@ -19,7 +19,8 @@ import Data.Image                           (Image(..))
 renderBlogPost :: forall i p. BlogPost -> HH.HTML i p 
 renderBlogPost (BlogPost post) = 
   HH.div
-    [ css $ "post cover-" <> (show post.isCover) ]
+    [ css $ "post cover-" <> (show post.isCover) 
+    ]
     [ case post.isCover of
       true ->
         HH.div

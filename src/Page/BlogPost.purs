@@ -26,6 +26,7 @@ import Component.HTML.Utils         (css, safeHref)
 import Data.BlogPost                (BlogPost(..))
 import Data.Image                   (Image(..))
 import Data.Route                   as R
+import Foreign.Highlight            as Highlight
 import Foreign.LightGallery         (loadGallery)
 import Resource.BlogPost            (class ManageBlogPost
                                     ,getBlogPostBySlug)
@@ -74,8 +75,9 @@ component =
     Initialize -> do
       state <- H.get
       handleAction $ LoadBlogPost state.slug
-      H.liftEffect $ LZ.lazyLoad ".lazy"
+      _ <- H.liftEffect $ LZ.createLazyLoad ".lazy"
       H.liftEffect $ loadGallery "lightgallery"
+      H.liftEffect Highlight.highlightBlock
 
     LoadBlogPost slug -> case slug of
       Just s -> do
