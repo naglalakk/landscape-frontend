@@ -136,8 +136,10 @@ ul,li
           font-size 12px
 
     .post-content
-      width content-width
       margin 0 auto
+      margin-top separator
+      margin-bottom separator
+      width content-width
       color #000
 
       +tablet()
@@ -149,7 +151,6 @@ ul,li
       width 100%
 
       .post-content
-        padding separator
         box-sizing border-box
 
       .cover-image
@@ -369,6 +370,8 @@ ul,li
   display none
 
 .post-tags
+  max-width content-width
+  margin 0 auto
   margin-top separator
   margin-bottom separator
 

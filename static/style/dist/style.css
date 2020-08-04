@@ -282,8 +282,10 @@ li {
   }
 }
 .posts-container .post .post-content {
-  width: 1100px;
   margin: 0 auto;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  width: 1100px;
   color: #000;
 }
 @media (min-width: 512px) and (max-width: 991px) {
@@ -300,7 +302,6 @@ li {
   width: 100%;
 }
 .posts-container .post.cover-true .post-content {
-  padding: 25px;
   box-sizing: border-box;
 }
 .posts-container .post.cover-true .cover-image {
@@ -528,6 +529,8 @@ li {
   display: none;
 }
 .post-tags {
+  max-width: 1100px;
+  margin: 0 auto;
   margin-top: 25px;
   margin-bottom: 25px;
 }

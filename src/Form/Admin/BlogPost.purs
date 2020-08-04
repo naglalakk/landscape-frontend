@@ -427,7 +427,7 @@ component = F.component input F.defaultSpec
           ]
         ])
       , withLabel "Tags" (HH.div
-        [ css "post-tags" ]
+        [ css "admin-post-tags" ]
         [ HH.input
           [ HP.id_ "tags"
           ]
