@@ -156,6 +156,16 @@ body {
 .wrapper {
   height: 100%;
 }
+@media (min-width: 512px) and (max-width: 991px) {
+  .wrapper {
+    padding: 25px;
+  }
+}
+@media (max-width: 511px) {
+  .wrapper {
+    padding: 25px;
+  }
+}
 h1 {
   padding-top: 0;
   margin-top: 0;
