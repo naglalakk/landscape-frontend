@@ -18,3 +18,6 @@ imageId = _Newtype (int segment)
 
 slug :: RouteDuplex' String
 slug = string segment
+
+tag :: RouteDuplex' String
+tag = string segment

@@ -15,6 +15,7 @@ import CSS.Utils                            (backgroundCover)
 import Data.BlogPost                        (BlogPost(..)
                                             ,BlogPostArray)
 import Data.Image                           (Image(..))
+import Data.Tag                             (Tag(..))
 
 renderBlogPost :: forall i p. BlogPost -> HH.HTML i p 
 renderBlogPost (BlogPost post) = 
@@ -81,4 +82,22 @@ renderBlogPost (BlogPost post) =
                       HH.attr (HH.AttrName "data-src") image.src
                   ]
                 ]) post.images )
+    , case length post.tags of
+        0 -> HH.div [] []
+        _ -> 
+          HH.div
+            [ css "post-tags" ]
+            [ HH.span
+              []
+              [ HH.text "Tags: " ]
+            , HH.ul
+                [ css "tags" ]
+                ( map (\(Tag tag) ->
+                  HH.li
+                    []
+                    [ HH.a
+                      [ css "tag" ]
+                      [ HH.text tag.label ]
+                    ]) post.tags )
+            ]
     ]

@@ -36,6 +36,7 @@ import Resource.BlogPost                (class ManageBlogPost
                                         ,getBlogPost
                                         ,updateBlogPost)
 import Resource.Media                   (class ManageMedia)
+import Resource.Tag                     (class ManageTag)
 
 type Input = 
   { blogPostId :: BlogPostId
@@ -68,6 +69,7 @@ component :: forall m
           => MonadAff m
           => MonadEffect m
           => ManageMedia m
+          => ManageTag m
           => Navigate m
           => H.Component HH.HTML Query Input Void m
 component =

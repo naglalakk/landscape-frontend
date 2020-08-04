@@ -47,6 +47,7 @@ import Data.URL                     (BaseURL)
 import Resource.BlogPost            (class ManageBlogPost)
 import Resource.Media               (class ManageMedia)
 import Resource.User                (class ManageUser)
+import Resource.Tag                 (class ManageTag)
 
 
 newtype AppM a = AppM (ReaderT Env Aff a)
@@ -252,6 +253,23 @@ instance manageUserAppM :: ManageUser AppM where
         let user = decodeJson json
         case user of
           Right u -> pure $ Just u
+          Left err -> do
+            logMessage $ Log.Log { message: err }
+            pure Nothing
+      Nothing -> pure Nothing
+
+instance manageTagAppM :: ManageTag AppM where
+  createTag tag = do
+    req <- mkRequest
+      { endpoint: API.TagCreate tag
+      , method: Post Nothing
+      , auth: Just apiAuth
+      }
+    case req of
+      Just json -> do
+        let newTag = decodeJson json
+        case newTag of
+          Right t -> pure $ Just t
           Left err -> do
             logMessage $ Log.Log { message: err }
             pure Nothing

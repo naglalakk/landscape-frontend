@@ -1,9 +1,10 @@
+@import "fonts"
 @import "libs"
 @import "table"
 @import "buttons"
+@import "tags"
 @import "admin"
 @import "constants"
-@import "fonts"
 @import "queries"
 
 
@@ -340,8 +341,39 @@ ul,li
       .lightgallery
         a
           border 1px solid #fff
+
+      .post-tags
+        .tags
+          .tag
+            color #000
+            background #fff
+            &:hover
+              background-color #dc143c
+              color #fff
+              &::after
+                border-left-color #dc143c
+
+            &::before
+              background #000
+            &::after
+              background #000
+              border-left 10px solid #fff
+
   .header .menu .socials .social-item 
     a 
       color #fff
       &:visited
         color #fff
+
+#tags
+  display none
+
+.post-tags
+  margin-top separator
+  margin-bottom separator
+
+  span
+    font-size 20px
+    font-family 'Rajdhani', sans-serif
+    display block
+    margin-bottom 12.5px

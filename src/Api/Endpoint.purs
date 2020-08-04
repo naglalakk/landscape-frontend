@@ -16,7 +16,8 @@ import Data.BlogPost                    as BP
 import Data.Image                       (ImageId)
 import Utils.Route                      (blogPostId
                                         ,imageId
-                                        ,slug)
+                                        ,slug
+                                        ,tag)
 
 type PaginationRep =
   ( page :: Maybe Int
@@ -37,6 +38,7 @@ data Endpoint
   | ImageDelete ImageId
   | ImageUpload  
   | UserLogin
+  | TagCreate String
 
 derive instance genericEndpoint :: Generic Endpoint _
 
@@ -62,4 +64,5 @@ endpointCodec = root $ sum
   , "ImageDelete" : "media" / "images" / imageId / "delete"
   , "ImageUpload" : "media" / "images" / "upload" / noArgs
   , "UserLogin" : "users" / "authenticate" / noArgs
+  , "TagCreate" : "tags" / tag
   }

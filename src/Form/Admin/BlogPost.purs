@@ -9,7 +9,8 @@ import Data.Argonaut                    (encodeJson
 import Data.Argonaut.Core               (Json)
 import Data.Array                       (head
                                         ,filter
-                                        ,length)
+                                        ,length
+                                        ,catMaybes)
 import Data.Const                       (Const(..))
 import Data.Either                      (Either(..))
 import Data.Maybe                       (Maybe(..)
@@ -58,12 +59,15 @@ import Data.BlogPost                    (BlogPost(..)
 import Data.Image                       (Image(..)
                                         ,ImageType
                                         ,ImageArray)
+import Data.Tag                         (Tag(..), TagArray)
 import Data.Route                       as R
 import Foreign.Flatpickr                (loadFlatpickr)
+import Foreign.Tagify                   as Tagify
 import Form.Error                       (FormError(..))
 import Form.Validation                  (validateStr
                                         ,validateDateTime)
 import Resource.Media                   (class ManageMedia)
+import Resource.Tag                     (class ManageTag, createTag)
 import Utils.Record                     (fromTimestampField)
 
 
@@ -75,6 +79,7 @@ newtype BlogPostForm r f = BlogPostForm (r
   , htmlContent     :: f Void       (Maybe String)      (Maybe String)
   , featuredImage   :: f Void       (Maybe Image)       (Maybe Image)
   , images          :: f Void       ImageArray          ImageArray
+  , tags            :: f Void       TagArray            TagArray
   , published       :: f Void       Boolean             Boolean
   , publishTime     :: f FormError  String              Timestamp
   , showDate        :: f Void       Boolean             Boolean
@@ -94,7 +99,8 @@ type Input =
 
 type AddedState = (
   featuredImageBrowserActive :: Boolean,
-  imageBrowserActive :: Boolean
+  imageBrowserActive :: Boolean,
+  tagify :: Maybe Tagify.Tagify
 )
 
 data Action
@@ -121,6 +127,7 @@ component :: forall m
           => MonadAff m
           => MonadEffect m
           => ManageMedia m
+          => ManageTag m
           => F.Component BlogPostForm (Const Void) ChildSlots Input BlogPost m
 component = F.component input F.defaultSpec
   { render = render
@@ -137,6 +144,9 @@ component = F.component input F.defaultSpec
     Initialize -> do
       H.liftEffect $ loadFlatpickr ".datetime"
       -- void $ H.fork $ handleAction AutoSave
+      -- Init tagify instance
+      tagify <- H.liftEffect $ Tagify.createTagify "tags"
+      H.modify_ _ { tagify = Just tagify }
 
     AutoSave -> do
       -- Autosave every 3 seconds
@@ -171,6 +181,7 @@ component = F.component input F.defaultSpec
           eval $ F.setValidate prx.htmlContent blogPost.htmlContent
           eval $ F.setValidate prx.featuredImage blogPost.featuredImage
           eval $ F.setValidate prx.images blogPost.images
+          eval $ F.setValidate prx.tags blogPost.tags
           eval $ F.setValidate prx.published blogPost.published
           eval $ F.setValidate prx.publishTime 
                $ formatToDateTimeShortStr blogPost.publishTime
@@ -179,6 +190,13 @@ component = F.component input F.defaultSpec
           eval $ F.setValidate prx.createdAt blogPost.createdAt
           eval $ F.setValidate prx.updatedAt blogPost.updatedAt
 
+          -- handle tags
+          state <- H.get
+          case state.tagify of
+            Just tagify -> do
+              let strTags = map (\(Tag tag) -> tag.label) blogPost.tags
+              H.liftEffect $ Tagify.addTags tagify strTags
+            Nothing -> pure unit
         Nothing -> pure unit
       H.modify_ _ { featuredImageBrowserActive = false 
                   , imageBrowserActive = false
@@ -220,7 +238,16 @@ component = F.component input F.defaultSpec
     RemoveImage (Image image) -> pure unit
 
     SubmitForm -> do
+      state <- H.get
       handleAction HandleEditorDelta
+      -- get tags
+      case state.tagify of
+        Just tF -> do
+          strTags <- H.liftEffect $ Tagify.getTags tF
+          tags <- traverse createTag strTags
+          let finalTags = catMaybes tags
+          eval $ F.setValidate prx.tags finalTags
+        Nothing -> pure unit
       eval F.submit
 
     where
@@ -260,6 +287,7 @@ component = F.component input F.defaultSpec
       , htmlContent: F.noValidation
       , featuredImage: F.noValidation
       , images: F.noValidation
+      , tags: F.noValidation
       , published: F.noValidation
       , publishTime: validateDateTime
       , showDate: F.noValidation
@@ -269,6 +297,7 @@ component = F.component input F.defaultSpec
       }
     , featuredImageBrowserActive: false
     , imageBrowserActive: false
+    , tagify: Nothing
     }
 
   render :: F.PublicState BlogPostForm AddedState
@@ -395,6 +424,12 @@ component = F.component input F.defaultSpec
           [ HP.checked $ F.getInput prx.isCover st.form
           , HP.type_ HP.InputCheckbox
           , HE.onChecked \_ -> Just $ F.modify prx.isCover not
+          ]
+        ])
+      , withLabel "Tags" (HH.div
+        [ css "post-tags" ]
+        [ HH.input
+          [ HP.id_ "tags"
           ]
         ])
       , maybeElem slug \s ->

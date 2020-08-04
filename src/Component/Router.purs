@@ -39,6 +39,7 @@ import Page.Login                       as Login
 import Resource.BlogPost                (class ManageBlogPost)
 import Resource.Media                   (class ManageMedia)
 import Resource.User                    (class ManageUser)
+import Resource.Tag                     (class ManageTag)
 
 type State = 
   { route :: Maybe Route 
@@ -68,6 +69,7 @@ component
   => ManageBlogPost m
   => ManageMedia m
   => ManageUser m
+  => ManageTag m
   => Navigate m
   => H.Component HH.HTML Query Unit Void m 
 component = H.mkComponent 

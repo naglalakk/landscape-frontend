@@ -1,7 +1,6 @@
 module Data.BlogPost where
 
 import Prelude
-
 import Data.Argonaut            (Json
                                 ,decodeJson
                                 ,encodeJson
@@ -22,6 +21,7 @@ import Halogen.Media.Data.Media (MediaRow)
 import Slug                     as Slug
 
 import Data.Image               (Image(..), ImageArray)
+import Data.Tag                 (Tag(..), TagArray)
 import Timestamp                (Timestamp(..)
                                 ,defaultTimestamp
                                 ,nowTimestamp)
@@ -50,6 +50,7 @@ newtype BlogPost = BlogPost
   , htmlContent   :: Maybe String
   , featuredImage :: Maybe Image
   , images        :: ImageArray
+  , tags          :: TagArray
   , published     :: Boolean
   , publishTime   :: Timestamp
   , showDate      :: Boolean
@@ -78,6 +79,7 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
     htmlContent   <- obj .:? "htmlContent"
     featuredImage <- obj .:? "featured_image"
     images        <- obj .:  "images"
+    tags          <- obj .:  "tags"
     published     <- obj .:  "published"
     publishTime   <- obj .:  "publish_time"
     showDate      <- obj .:  "show_date"
@@ -92,6 +94,7 @@ instance decodeJsonBlogPost :: DecodeJson BlogPost where
       , htmlContent
       , featuredImage
       , images
+      , tags
       , published
       , publishTime
       , showDate
@@ -108,6 +111,7 @@ instance encodeJsonBlogPost :: EncodeJson BlogPost where
     ~> "htmlContent"    := blogPost.htmlContent
     ~> "featured_image" := blogPost.featuredImage
     ~> "images"         := blogPost.images
+    ~> "tags"           := map (\(Tag tag) -> tag.id) blogPost.tags
     ~> "published"      := blogPost.published
     ~> "publish_time"   := blogPost.publishTime
     ~> "show_date"      := blogPost.showDate
@@ -129,6 +133,7 @@ defaultBlogPost = do
     , htmlContent: Nothing
     , featuredImage: Nothing
     , images: []
+    , tags: []
     , published: false
     , publishTime: now
     , showDate: true

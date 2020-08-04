@@ -1,9 +1,10 @@
 {
   "name": "donnabot.dev",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@yaireo/tagify": "^3.16.3",
     "aos": "^2.3.4",
     "decimal.js": "^10.2.0",
     "flatpickr": "^4.6.3",
