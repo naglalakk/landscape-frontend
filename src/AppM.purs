@@ -141,6 +141,22 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
             pure Nothing
       Nothing -> pure Nothing
 
+  getBlogPostsByTagId tagId = do
+    req <- mkRequest
+      { endpoint: API.BlogPostsByTagId tagId
+      , method: Get
+      , auth: Nothing
+      }
+    case req of
+      Just json -> do
+        let blogPosts = decodeJson json
+        case blogPosts of
+          Right bps -> pure bps
+          Left err -> do
+            logMessage $ Log.Log { message: err }
+            pure []
+      Nothing -> pure []
+  
   searchBlogPost query = do
     req <- mkRequest
       { endpoint: API.BlogPostSearch
@@ -269,6 +285,22 @@ instance manageTagAppM :: ManageTag AppM where
       Just json -> do
         let newTag = decodeJson json
         case newTag of
+          Right t -> pure $ Just t
+          Left err -> do
+            logMessage $ Log.Log { message: err }
+            pure Nothing
+      Nothing -> pure Nothing
+
+  getTagById tagId = do
+    req <- mkRequest
+      { endpoint: API.Tag tagId
+      , method: Get
+      , auth: Nothing
+      }
+    case req of
+      Just json -> do
+        let tag = decodeJson json
+        case tag of
           Right t -> pure $ Just t
           Left err -> do
             logMessage $ Log.Log { message: err }

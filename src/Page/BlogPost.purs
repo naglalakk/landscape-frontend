@@ -20,6 +20,8 @@ import Web.DOM.HTMLCollection       as HTMLCollection
 import Web.HTML.HTMLDocument        as HTMLDoc
 import Web.HTML.Window              as Window
 
+import Capability.Navigate          (class Navigate
+                                    ,navigate)
 import Component.HTML.BlogPost      (renderBlogPost)
 import Component.HTML.Header        (header)
 import Component.HTML.Utils         (css, safeHref)
@@ -36,6 +38,7 @@ import Utils.Site                   (siteURL)
 data Action
   = Initialize
   | LoadBlogPost (Maybe Slug.Slug)
+  | NavigateAction R.Route
 
 type Query = Const Void
 
@@ -60,6 +63,7 @@ component :: forall m
            . MonadAff m
           => MonadEffect m
           => ManageBlogPost m
+          => Navigate m
           => H.Component HH.HTML Query Input Void m
 component =
   H.mkComponent
@@ -121,6 +125,8 @@ component =
           Nothing -> pure unit
       Nothing -> pure unit
 
+    NavigateAction route -> navigate route
+
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state = 
@@ -130,7 +136,7 @@ component =
         Just post -> 
           HH.div
             [ css "posts-container post-single" ]
-            [ renderBlogPost post   
+            [ (renderBlogPost NavigateAction) post   
             , HH.a
               [ safeHref R.Home
               , css "button navigation-back text-center" 

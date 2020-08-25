@@ -166,6 +166,9 @@ body {
     padding: 25px;
   }
 }
+a:visited {
+  color: #000;
+}
 h1 {
   padding-top: 0;
   margin-top: 0;
@@ -199,8 +202,10 @@ li {
     width: 100%;
   }
 }
-.header h2 {
+.header .title {
+  font-size: 24px;
   font-weight: lighter;
+  text-decoration: none;
 }
 .header .profile-image {
   width: 160px;
@@ -529,11 +534,23 @@ li {
   background: #000;
   border-left: 10px solid #fff;
 }
+.dark-mode-true .header > .title {
+  color: #fff !important;
+}
 .dark-mode-true .header .menu .socials .social-item a {
   color: #fff;
 }
 .dark-mode-true .header .menu .socials .social-item a:visited {
   color: #fff;
+}
+.dark-mode-true .tags-wrapper .post-preview {
+  border: 0.5px solid #fff;
+}
+@media (max-width: 511px) {
+  .dark-mode-true .tags-wrapper .post-preview {
+    border: 0;
+    border-bottom: 0.5px solid #fff;
+  }
 }
 #tags {
   display: none;
@@ -549,4 +566,79 @@ li {
   font-family: 'Rajdhani', sans-serif;
   display: block;
   margin-bottom: 12.5px;
+}
+.post-preview {
+  border: 0.5px solid #000;
+  padding: 12.5px;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+}
+.post-preview .featured-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.post-preview .featured-image img {
+  width: 150px;
+  height: auto;
+}
+.post-preview .post-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+}
+.post-preview .post-info h3 {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.post-preview .post-info .post-preview-date {
+  margin-bottom: 25px;
+}
+.tags-wrapper {
+  width: 1100px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+  .tags-wrapper {
+    width: calc(100% - 50px);
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+}
+@media (min-width: 512px) and (max-width: 991px) {
+  .tags-wrapper {
+    width: calc(100% - 50px);
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+}
+@media (max-width: 511px) {
+  .tags-wrapper {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+  }
+  .tags-wrapper .post-preview {
+    border: 0;
+    border-bottom: 0.5px solid #000;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    margin-bottom: 0;
+    flex-direction: column;
+  }
+  .tags-wrapper .post-preview .featured-image {
+    width: 100%;
+    margin-bottom: 25px;
+  }
+  .tags-wrapper .post-preview .post-info {
+    text-align: center;
+  }
+  .tags-wrapper .post-preview .post-info .button {
+    margin: 0 auto;
+  }
 }

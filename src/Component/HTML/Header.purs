@@ -17,8 +17,10 @@ header :: forall props act
 header darkModeToggle = 
   HH.div
     [ css "header" ]
-    [ HH.h2
-      [ css "title" ]
+    [ HH.a
+      [ css "title" 
+      , HP.href "/"
+      ]
       [ HH.text "Donna" ]
     , HH.div
       [ css "menu" ]

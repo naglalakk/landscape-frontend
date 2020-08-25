@@ -30,6 +30,10 @@ body
   +mobile()
     padding separator
 
+a
+  &:visited
+    color #000
+
 h1
   padding-top 0
   margin-top 0
@@ -56,8 +60,10 @@ ul,li
   +mobile()
     width 100%
 
-  h2
+  .title
+    font-size 24px
     font-weight lighter
+    text-decoration none
 
   .profile-image
     width 160px
@@ -327,7 +333,6 @@ ul,li
   -moz-transition: background-color .5s;
 
 .dark-mode-true
-
   background-color #000
   color #fff
 
@@ -365,11 +370,22 @@ ul,li
               background #000
               border-left 10px solid #fff
 
+  .header > .title
+    color #fff !important
+
   .header .menu .socials .social-item 
     a 
       color #fff
       &:visited
         color #fff
+
+  .tags-wrapper
+    .post-preview
+      border 0.5px solid #fff
+
+      +mobile()
+        border 0
+        border-bottom 0.5px solid #fff
 
 #tags
   display none
@@ -385,3 +401,67 @@ ul,li
     font-family 'Rajdhani', sans-serif
     display block
     margin-bottom 12.5px
+
+.post-preview
+  border 0.5px solid #000
+  padding 12.5px
+  margin-bottom separator
+  display flex
+  justify-content space-between
+  .featured-image
+    display flex
+    justify-content center
+    align-items center
+    img
+      width 150px
+      height auto
+
+  .post-info
+    display flex
+    flex-direction column
+    justify-content space-between
+    text-align right
+
+    h3
+      padding-top 0
+      padding-bottom 0
+      margin-top 0
+      margin-bottom 0
+
+    .post-preview-date
+      margin-bottom separator
+
+.tags-wrapper
+  width content-width
+  margin 0 auto
+  min-height 100vh
+
+  +desktop()
+    width calc(100% - 50px)
+    padding-left separator
+    padding-right separator
+
+  +tablet()
+    width calc(100% - 50px)
+    padding-left separator
+    padding-right separator
+
+  +mobile()
+    display flex
+    width 100%
+    flex-direction column
+    .post-preview
+      border 0
+      border-bottom 0.5px solid #000
+      padding-top separator
+      padding-bottom separator
+      margin-bottom 0
+      flex-direction column
+      .featured-image
+        width 100%
+        margin-bottom separator
+      .post-info
+        text-align center
+
+        .button
+          margin 0 auto

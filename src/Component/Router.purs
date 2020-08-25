@@ -27,11 +27,14 @@ import Web.HTML.Location                as Location
 
 import Capability.Navigate              (class Navigate, navigate)
 import Component.Utils                  (OpaqueSlot, busEventSource)
+import Component.HTML.Header            (header)
+import Component.HTML.Utils             (css)
 import Data.Environment                 (UserEnv(..))
 import Data.Route                       (Route(..), routeCodec)
 import Data.User                        (User(..))
 import Page.Home                        as Home
 import Page.BlogPost                    as BlogPost
+import Page.Tag                         as TagPage
 import Page.Admin.Home                  as AdminHome
 import Page.Admin.BlogPosts             as AdminBlogPosts
 import Page.Admin.BlogPost              as AdminBlogPost
@@ -44,6 +47,7 @@ import Resource.Tag                     (class ManageTag)
 type State = 
   { route :: Maybe Route 
   , currentUser :: Maybe User
+  , darkMode :: Boolean
   }
 
 data Query a
@@ -52,15 +56,30 @@ data Query a
 data Action 
   = Initialize
   | HandleUserBus (Maybe User)
+  | DarkModeToggle
 
 type ChildSlots = 
   ( home :: OpaqueSlot Unit 
   , login :: OpaqueSlot Unit
   , blogPost :: OpaqueSlot Unit
+  , tag :: OpaqueSlot Unit
   , adminHome :: OpaqueSlot Unit
   , adminBlogPosts :: OpaqueSlot Unit
   , adminBlogPost :: OpaqueSlot Unit
   )
+
+-- Container including header
+headerContainer :: forall props act
+                 . Boolean           -- Dark mode off/on
+                ->  act              -- Dark mode action
+                -> HH.HTML props act -- html
+                -> HH.HTML props act
+headerContainer dmStatus dmAction slot =
+  HH.div
+    [ css $ "wrapper dark-mode-" <> (show dmStatus) ]
+    [ header dmAction 
+    , slot
+    ]
 
 component
   :: forall m r
@@ -73,7 +92,11 @@ component
   => Navigate m
   => H.Component HH.HTML Query Unit Void m 
 component = H.mkComponent 
-  { initialState: \_ -> { route: Nothing, currentUser: Nothing}
+  { initialState: \_ -> 
+    { route: Nothing
+    , currentUser: Nothing
+    , darkMode: false
+    }
   , render
   , eval: H.mkEval $ H.defaultEval
       { handleQuery = handleQuery
@@ -98,6 +121,10 @@ component = H.mkComponent
                   , route = Just $ fromMaybe Home initialRoute
                   }
 
+    DarkModeToggle -> do
+      state <- H.get
+      H.modify_ _ { darkMode = not state.darkMode }
+
     HandleUserBus user -> H.modify_ _ { currentUser = user }
 
   handleQuery :: forall a. Query a -> H.HalogenM State Action ChildSlots Void m (Maybe a)
@@ -118,13 +145,15 @@ component = H.mkComponent
       html
   
   render :: State -> H.ComponentHTML Action ChildSlots m
-  render { route, currentUser } = case route of
+  render { route, currentUser, darkMode } = case route of
     Just Home -> 
-      HH.slot (SProxy :: _ "home") unit Home.component unit absurd
+      headerContainer darkMode DarkModeToggle $ HH.slot (SProxy :: _ "home") unit Home.component unit absurd
     Just (BlogPost slug) ->
       HH.slot (SProxy :: _ "blogPost") unit BlogPost.component { slug: (Slug.generate slug) } absurd
     Just Login ->
       HH.slot (SProxy :: _ "login") unit Login.component { redirect: true } absurd
+    Just (Tag tagId) -> 
+      headerContainer darkMode DarkModeToggle $ HH.slot (SProxy :: _ "tag") unit TagPage.component { tagId: tagId } absurd
     -- Admin
     Just AdminHome ->
       HH.slot (SProxy :: _ "adminHome") unit AdminHome.component unit absurd

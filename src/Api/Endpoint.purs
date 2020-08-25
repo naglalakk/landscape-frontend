@@ -14,10 +14,12 @@ import Slug                             (Slug)
 
 import Data.BlogPost                    as BP
 import Data.Image                       (ImageId)
+import Data.Tag                         (TagId)
 import Utils.Route                      (blogPostId
                                         ,imageId
                                         ,slug
-                                        ,tag)
+                                        ,tag
+                                        ,tagId)
 
 type PaginationRep =
   ( page :: Maybe Int
@@ -30,6 +32,7 @@ data Endpoint
   = BlogPosts Pagination
   | BlogPost BP.BlogPostId
   | BlogPostBySlug String
+  | BlogPostsByTagId TagId
   | BlogPostSearch
   | BlogPostCreate
   | BlogPostUpdate BP.BlogPostId
@@ -39,6 +42,7 @@ data Endpoint
   | ImageUpload  
   | UserLogin
   | TagCreate String
+  | Tag TagId
 
 derive instance genericEndpoint :: Generic Endpoint _
 
@@ -53,6 +57,7 @@ endpointCodec = root $ sum
     }
   , "BlogPost" : "posts" / blogPostId
   , "BlogPostBySlug" : "posts" / slug
+  , "BlogPostsByTagId"  : "posts" / "tags" / tagId
   , "BlogPostSearch" : "posts" / "search" / noArgs
   , "BlogPostCreate" : "posts" / noArgs
   , "BlogPostUpdate" : "posts" / blogPostId / "update"
@@ -64,5 +69,6 @@ endpointCodec = root $ sum
   , "ImageDelete" : "media" / "images" / imageId / "delete"
   , "ImageUpload" : "media" / "images" / "upload" / noArgs
   , "UserLogin" : "users" / "authenticate" / noArgs
+  , "Tag" : "tags" / tagId
   , "TagCreate" : "tags" / tag
   }

@@ -39,6 +39,7 @@ import Web.UIEvent.KeyboardEvent.EventTypes as KET
 import Web.UIEvent.WheelEvent               as WE
 import Web.UIEvent.WheelEvent.EventTypes    as WET
 
+import Capability.Navigate                  (class Navigate, navigate)
 import Component.Utils                      (OpaqueSlot)
 import Component.HTML.BlogPost              (renderBlogPost)
 import Component.HTML.Header                (header)
@@ -47,6 +48,7 @@ import CSS.Utils                            (backgroundCover)
 import Data.BlogPost                        (BlogPost(..)
                                             ,BlogPostArray)
 import Data.Image                           (Image(..))
+import Data.Route                           as R
 import Data.Search                          (SearchQuery(..))
 import Foreign.AOS                          (loadAOS)
 import Foreign.Highlight                    as Highlight
@@ -63,13 +65,12 @@ type State =
   , currentPage :: Int
   , scroll :: Boolean
   , lazyLoad :: Maybe LZ.LazyLoad
-  , darkMode :: Boolean
   }
 
 data Action 
   = Initialize
   | HandleWheel WE.WheelEvent
-  | DarkModeToggle
+  | NavigateAction R.Route
 
 type ChildSlots = ( html :: H.Slot (Const Void) Void Unit )
 
@@ -79,13 +80,13 @@ initialState =
   , currentPage: 1
   , scroll: true
   , lazyLoad: Nothing
-  , darkMode: false
   }
 
 component :: forall m
            . MonadAff m
           => MonadEffect m
           => ManageBlogPost m
+          => Navigate m
           => H.Component HH.HTML (Const Void) Unit Void m
 component =
   H.mkComponent
@@ -138,9 +139,7 @@ component =
       H.liftEffect Highlight.highlightBlock
       pure unit
 
-    DarkModeToggle -> do
-      state <- H.get
-      H.modify_ _ { darkMode = not state.darkMode }
+    NavigateAction route -> navigate route
 
     HandleWheel ev -> do
       state       <- H.get
@@ -203,18 +202,12 @@ component =
                 false -> pure unit
             Nothing  -> pure unit
         Nothing   -> pure unit
-
       H.liftAff $ Aff.delay $ Aff.Milliseconds 500.0
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
-    HH.div
-      [ css $ "wrapper dark-mode-" <> (show state.darkMode)
+    HH.div 
+      [ css "posts-container" 
+      , HP.attr (HH.AttrName "data-aos") "fade-up"
       ]
-      [ header DarkModeToggle
-      , HH.div 
-        [ css "posts-container" 
-        , HP.attr (HH.AttrName "data-aos") "fade-up"
-        ]
-        (map renderBlogPost state.blogPosts)
-      ]
+      (map (renderBlogPost NavigateAction) state.blogPosts)

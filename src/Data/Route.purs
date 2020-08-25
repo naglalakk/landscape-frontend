@@ -9,12 +9,16 @@ import Routing.Duplex.Generic.Syntax    ((/))
 import Slug                             (Slug)
 
 import Data.BlogPost                    (BlogPostId)
-import Utils.Route                      (blogPostId, slug)
+import Data.Tag                         (TagId)
+import Utils.Route                      (blogPostId
+                                        ,slug
+                                        ,tagId)
 
 data Route
   = Home
   | BlogPost String
   | Login
+  | Tag TagId
   -- Admin
   | AdminHome
   | AdminBlogPosts
@@ -32,6 +36,7 @@ routeCodec = sum
   { "Home": noArgs
   , "BlogPost" : "posts" / slug
   , "Login" : "login" / noArgs
+  , "Tag"   : "tags" / tagId
   -- Admin
   , "AdminHome" : "admin" / noArgs
   , "AdminBlogPosts" : "admin" / "posts" / noArgs

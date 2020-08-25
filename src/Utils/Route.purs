@@ -8,6 +8,7 @@ import Slug                             as Slug
 
 import Data.BlogPost                    (BlogPostId)
 import Data.Image                       (ImageId)
+import Data.Tag                         (TagId)
 
 
 blogPostId :: RouteDuplex' BlogPostId
@@ -21,3 +22,6 @@ slug = string segment
 
 tag :: RouteDuplex' String
 tag = string segment
+
+tagId :: RouteDuplex' TagId
+tagId = _Newtype (int segment)

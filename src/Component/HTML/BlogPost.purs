@@ -2,23 +2,30 @@ module Component.HTML.BlogPost where
 
 import Prelude
 import Data.Array                           (length)
-import Data.Maybe                           (Maybe(..))
+import Data.Maybe                           (Maybe(..), fromMaybe)
 import Data.Newtype                         (unwrap)
 import Halogen                              as H
 import Halogen.HTML                         as HH
+import Halogen.HTML.Events                  as HE
 import Halogen.HTML.CSS                     as HCSS
 import Halogen.HTML.Properties              as HP
+
+import Slug                                 as Slug
 import Timestamp                            (formatToDateStr)
 
-import Component.HTML.Utils                 (css)
+import Component.HTML.Utils                 (css, maybeElem)
 import CSS.Utils                            (backgroundCover)
 import Data.BlogPost                        (BlogPost(..)
                                             ,BlogPostArray)
 import Data.Image                           (Image(..))
 import Data.Tag                             (Tag(..))
+import Data.Route                           as R
 
-renderBlogPost :: forall i p. BlogPost -> HH.HTML i p 
-renderBlogPost (BlogPost post) = 
+renderBlogPost :: forall props act
+                . (R.Route -> act) 
+               -> BlogPost 
+               -> HH.HTML props act
+renderBlogPost navigateAction (BlogPost post) = 
   HH.div
     [ css $ "post cover-" <> (show post.isCover) 
     ]
@@ -96,8 +103,40 @@ renderBlogPost (BlogPost post) =
                   HH.li
                     []
                     [ HH.a
-                      [ css "tag" ]
+                      [ css "tag" 
+                      , HE.onClick \_ -> Just $ navigateAction $ R.Tag tag.id
+                      ]
                       [ HH.text tag.label ]
                     ]) post.tags )
             ]
+    ]
+
+renderBlogPostPreview :: forall props act
+                       . (R.Route -> act) 
+                      -> BlogPost 
+                      -> HH.HTML props act
+renderBlogPostPreview navigateAction (BlogPost post) = 
+  HH.div
+    [ css "post-preview" ]
+    [ HH.div
+      [ css "featured-image" ]
+      [ maybeElem post.featuredImage \(Image fImage) ->
+        HH.img
+          [ HP.src fImage.src ]
+      ]
+    , HH.div
+      [ css "post-info" ]
+      [ HH.h3
+        [ css "post-preview-title" ]
+        [ HH.text post.title ]
+      , HH.span
+        [ css "post-preview-date" ]
+        [ HH.text $ formatToDateStr post.publishTime 
+        ]
+      , HH.button
+        [ css "button" 
+        , HE.onClick \_ -> Just $ navigateAction $ R.BlogPost (fromMaybe "" (map Slug.toString post.slug))
+        ]
+        [ HH.text "Read" ]
+      ]
     ]
