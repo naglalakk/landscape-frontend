@@ -32,6 +32,7 @@ import Component.HTML.Utils             (css)
 import Data.Environment                 (UserEnv(..))
 import Data.Route                       (Route(..), routeCodec)
 import Data.User                        (User(..))
+import Foreign.Window                   as CWindow
 import Page.Home                        as Home
 import Page.BlogPost                    as BlogPost
 import Page.Tag                         as TagPage
@@ -133,7 +134,10 @@ component = H.mkComponent
       { route, currentUser } <- H.get 
       when (route /= Just dest) do
         case (isJust currentUser && dest `elem` [ Login ]) of
-          false -> H.modify_ _ { route = Just dest }
+          false -> do
+            H.modify_ _ { route = Just dest }
+            w <- H.liftEffect window
+            H.liftEffect $ CWindow.scrollTo 0 0 w
           _ -> pure unit
       pure (Just a)
 
