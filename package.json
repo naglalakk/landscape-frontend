@@ -1,6 +1,6 @@
 {
   "name": "donnacodes.dev",
-  "version": "0.21.1",
+  "version": "0.21.3",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {

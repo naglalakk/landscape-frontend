@@ -40,7 +40,7 @@
     nodejs = pkgs.nodejs-12_x;
   in
     pkgs.stdenv.mkDerivation {
-      name = "donnabot.dev-frontend";
+      name = "donnacodes.dev-frontend";
       src = gitignoreSource ./.;
       buildInputs = [ 
         easy-ps.purs easy-ps.spago npm pkgs.nodejs-12_x
@@ -53,7 +53,7 @@
             (x: ''"${x.outPath}/src/**/*.purs"'')
             (builtins.attrValues spagoPkgs.inputs))}
         mv output $out
-        cp -r ${npm}/libexec/donnabot.dev/node_modules $out
+        cp -r ${npm}/libexec/donnacodes.dev/node_modules $out
       '';
 
       installPhase = ''

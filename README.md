@@ -1,8 +1,6 @@
 donnacodes.dev
 ===
 
-[![Codeship Status for naglalakk/donnabot.dev](https://app.codeship.com/projects/f1bd17e0-3345-0138-8cc3-2a8c146c4934/status?branch=master)](https://app.codeship.com/projects/385603)
-
 Used with API backend service: [donnabot-service](https://github.com/naglalakk/donnabot-service)
 
 ### Requirements
