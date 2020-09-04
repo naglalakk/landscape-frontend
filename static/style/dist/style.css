@@ -504,6 +504,9 @@ li {
   -o-transition: background-color 0.5s;
   -moz-transition: background-color 0.5s;
 }
+.dark-mode-true a {
+  color: #fff;
+}
 .dark-mode-true .posts-container .post .title {
   color: #fff;
 }
