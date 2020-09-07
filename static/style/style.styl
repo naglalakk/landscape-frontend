@@ -6,6 +6,8 @@
 @import "admin"
 @import "constants"
 @import "queries"
+@import "colors"
+@import "highlightjs/gruvbox_dark"
 
 
 html
@@ -32,7 +34,7 @@ body
 
 a
   &:visited
-    color #000
+    color color-black
 
 h1
   padding-top 0
@@ -69,7 +71,7 @@ ul,li
     width 160px
     height 160px
     border-radius 80px
-    border 1px solid #000
+    border 1px solid color-black
     margin 0 auto
     overflow hidden
 
@@ -100,16 +102,16 @@ ul,li
         font-size 26px
 
         a
-          color #000
+          color color-black
           text-decoration none
           &:visited 
-            color #000
+            color color-black
 
 .line
   width 50%
   margin 0 auto
   height 1px
-  background-color #000
+  background-color color-black
 
 .posts-container
   width 100%
@@ -151,7 +153,7 @@ ul,li
       margin-top separator
       margin-bottom separator
       width content-width
-      color #000
+      color color-black
 
       +tablet()
         width 100%
@@ -179,7 +181,7 @@ ul,li
           height 300px
 
         .title
-          background-color #000
+          background-color color-black
           color #fff
           position absolute
           bottom 0
@@ -198,10 +200,10 @@ ul,li
         width 100%
 
       .title
-        color #000
+        color color-black
           
         .title-line
-          background-color #000
+          background-color color-black
 
 .post-single
   .post
@@ -243,7 +245,7 @@ ul,li
 
       &:hover
         background-color #fff
-        color #000
+        color color-black
 
 .image-preview
   position relative
@@ -277,7 +279,7 @@ ul,li
     flex: 1 0 21%;
     justify-content center
     align-items center
-    border 1px solid #000
+    border 1px solid color-black
     margin-right separator
     margin-bottom separator
 
@@ -319,13 +321,15 @@ ul,li
   margin-bottom separator
 
 .hljs
-  font-size 17px
+  font-size 20px
+  padding separator
+  font-family: 'Source Code Pro', monospace;
 
 
 // Dark mode
 .dark-mode-false
   background-color #fff
-  color #000
+  color color-black
 
   transition: background-color .5s;
   -webkit-transition: background-color .5s;
@@ -333,7 +337,7 @@ ul,li
   -moz-transition: background-color .5s;
 
 .dark-mode-true
-  background-color #000
+  background-color color-black
   color #fff
 
   a
@@ -359,7 +363,7 @@ ul,li
       .post-tags
         .tags
           .tag
-            color #000
+            color color-black
             background #fff
             &:hover
               background-color #dc143c
@@ -368,9 +372,9 @@ ul,li
                 border-left-color #dc143c
 
             &::before
-              background #000
+              background color-black
             &::after
-              background #000
+              background color-black
               border-left 10px solid #fff
 
   .header > .title
@@ -406,7 +410,7 @@ ul,li
     margin-bottom 12.5px
 
 .post-preview
-  border 0.5px solid #000
+  border 0.5px solid color-black
   padding 12.5px
   margin-bottom separator
   display flex
@@ -455,7 +459,7 @@ ul,li
     flex-direction column
     .post-preview
       border 0
-      border-bottom 0.5px solid #000
+      border-bottom 0.5px solid color-black
       padding-top separator
       padding-bottom separator
       margin-bottom 0
@@ -468,3 +472,24 @@ ul,li
 
         .button
           margin 0 auto
+
+
+/*
+.hljs-string
+  color rgb(179, 36, 79)
+
+.hljs-comment
+  color rgb(179, 36, 79)
+
+.hljs-title
+  color rgb(141, 218, 240)
+
+.hljs-type
+  color #6BA5DF //#71A0CE //rgb(110, 146, 182)
+
+.hljs-class
+  color #fff
+
+
+.hljs-keyword
+  color #BABAC6*/
