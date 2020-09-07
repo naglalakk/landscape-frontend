@@ -78,7 +78,8 @@ instance navigateAppM :: Navigate AppM where
     -- Get our PushStateInterface instance from env
     env <- ask
     let 
-      href = (print Route.routeCodec route)
+      href = "/" <> (print Route.routeCodec route)
+    logShow href
     -- pushState new destination
     liftEffect $ 
       env.pushInterface.pushState 
