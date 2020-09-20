@@ -14,34 +14,69 @@ import Data.Maybe                   (Maybe(..))
 import Data.Options                 (Options, (:=))
 import Data.String.Utils            (startsWith)
 import Data.Symbol                  (SProxy(..))
-import Effect.Class                 (class MonadEffect)
+import Effect                       (Effect)
+import Effect.Class                 (class MonadEffect, liftEffect)
 import Effect.Class.Console         as Console
+import Effect.Aff.Class             (class MonadAff)
 import Foreign.Generic              (genericDecodeJSON
                                     ,decodeJSON, encodeJSON)
 import Halogen                      as H
 import Halogen.HTML                 as HH
 import Halogen.HTML.Properties      as HP
+import Halogen.Query.EventSource    as HES
 import Foreign                      as Foreign
 import Quill.Config                 as QConfig
 import Quill.API.Content            as QContent
 import Quill.API.Delta              as QDelta
 import Quill.API.Events             as QEvents
 import Quill.API.Formats            as QFormats
+import Quill.API.Modules            as QModules
 import Quill.API.Range              (Range)
 import Quill.API.Embed              as QEmbed
 import Quill.Editor                 as QEditor
 import Quill.API.Source             as QSource
 import Quill.API.HTML               as QHTML
+import Web.Event.EventTarget        as ET
+import Web.Event.Event              as EV
 import Web.HTML.HTMLElement         (HTMLElement)
 
 import Component.Utils              (OpaqueSlot)
 import Component.HTML.Utils         (css)
+
+foreign import _imageHandlerImpl :: Effect Unit
+foreign import _editorHandler :: Effect ET.EventTarget
+
+editorHandler :: forall m
+               . MonadEffect m
+              => m ET.EventTarget
+editorHandler = liftEffect _editorHandler
+
+imageHandler :: Effect Unit
+imageHandler = do
+  Console.log "running ImageHandler"
+
+onImage :: EV.EventType 
+onImage = EV.EventType "image"
 
 editorConfig :: Options QConfig.Config
 editorConfig = fold
   [ QConfig.debug   := QConfig.DebugWarn
   , QConfig.theme   := QConfig.SnowTheme
   , QConfig.placeholder := "Write here!"
+  , QConfig.modules := fold
+    [ QModules.toolbar := fold
+      [ QModules.container :=
+        [ ["bold", "italic", "underline"]
+        , ["link", "video", "image"]
+        , ["align"]
+        , ["color"]
+        , ["code", "code-block"]
+        ]
+      , QModules.handlers := fold
+        [ QModules.imgHandler := _imageHandlerImpl
+        ]
+      ]
+    ]
   , QConfig.formats := 
     [ QConfig.allow QFormats.bold
     , QConfig.allow QFormats.italic
@@ -66,14 +101,19 @@ type State =
   , content :: Maybe String
   }
 
+data Output
+  = ImageHandleClicked
+
 data Action 
   = Initialize
+  | ImageHandler (Effect Unit)
   | Receive Input
 
 type ChildSlots = ()
 
 data Query a = GetText (String -> a)
              | GetHTMLText (String -> a)
+             | GetEditor (QEditor.Editor -> a)
 
 initialState :: State
 initialState = 
@@ -83,7 +123,8 @@ initialState =
 
 component :: forall m
            . MonadEffect m
-          => H.Component HH.HTML Query Input Void m
+          => MonadAff m
+          => H.Component HH.HTML Query Input Output m
 component =
   H.mkComponent
     { initialState: \_ -> initialState
@@ -96,6 +137,17 @@ component =
       }
     }
   where
+
+  imageHandlerCallback :: EV.Event -> Maybe (Effect Unit)
+  imageHandlerCallback ev = Just $ pure unit
+
+  imageHandlerEventSource :: ET.EventTarget -> HES.EventSource m (Effect Unit)
+  imageHandlerEventSource et =
+    HES.eventListenerEventSource
+      onImage
+      et
+      imageHandlerCallback
+
   handleAction = case _ of
 
     Initialize -> do
@@ -104,8 +156,15 @@ component =
       case element of
         Just e -> do
           editor <- QEditor.new editorConfig e
+          Console.log "get here?"
+          editorHandle <- editorHandler
+          _ <- H.subscribe (ImageHandler <$> imageHandlerEventSource editorHandle)
           H.modify_ _ { editor = Just editor }
         Nothing -> pure unit
+
+    ImageHandler eff -> do
+      Console.log "in Imagehandler"
+      H.raise ImageHandleClicked
 
     Receive input -> do
       state <- H.get
@@ -131,7 +190,7 @@ component =
 
   handleQuery :: forall a
                . Query a 
-              -> H.HalogenM State Action ChildSlots Void m (Maybe a)
+              -> H.HalogenM State Action ChildSlots Output m (Maybe a)
   handleQuery = case _ of
     GetText t -> do
       state <- H.get
@@ -150,6 +209,12 @@ component =
                   Just <<< t <$> (pure encodedOps)
                 Left err -> pure Nothing
             Left err -> pure Nothing
+        Nothing -> pure Nothing
+
+    GetEditor t -> do
+      state <- H.get
+      case state.editor of
+        Just e -> Just <<< t <$> (pure e)
         Nothing -> pure Nothing
 
     GetHTMLText t -> do

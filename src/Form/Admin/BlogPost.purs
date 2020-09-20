@@ -41,6 +41,9 @@ import Halogen.Media.Component.Upload   as Upload
 import Halogen.Media.Data.Media         (Media(..))
 import Halogen.Query.EventSource        as HES
 import Quill.API.Delta                  as QDelta
+import Quill.API.Content                as QContent
+import Quill.API.Embed                  as QEmbed
+import Quill.API.Source                 as QSource
 import Slug                             as Slug
 import Timestamp                        (Timestamp
                                         ,nowTimestamp
@@ -100,6 +103,7 @@ type Input =
 type AddedState = (
   featuredImageBrowserActive :: Boolean,
   imageBrowserActive :: Boolean,
+  editorImageBrowserActive :: Boolean,
   tagify :: Maybe Tagify.Tagify
 )
 
@@ -107,6 +111,8 @@ data Action
   = Initialize
   | AutoSave
   | Receive Input
+  | HandleEditorOutput Editor.Output
+  | HandleEditorImageBrowser (Browser.Output ImageType)
   | HandleFeaturedImageBrowserOutput (Browser.Output ImageType)
   | HandleFeaturedImageModal
   | RemoveFeaturedImage
@@ -118,8 +124,9 @@ data Action
 
 type ChildSlots = (
   imageBrowser :: H.Slot (Const Void) (Browser.Output ImageType) Unit,
-  featuredImageBrowser:: H.Slot (Const Void) (Browser.Output ImageType) Unit,
-  editor :: H.Slot Editor.Query Void Unit
+  featuredImageBrowser :: H.Slot (Const Void) (Browser.Output ImageType) Unit,
+  editorImageBrowser :: H.Slot (Const Void) (Browser.Output ImageType) Unit,
+  editor :: H.Slot Editor.Query Editor.Output Unit
 )
 
 component :: forall m
@@ -137,7 +144,6 @@ component = F.component input F.defaultSpec
   , receive = Just <<< Receive
   }
   where
-
   handleAction :: Action
                -> F.HalogenM BlogPostForm AddedState Action ChildSlots BlogPost m Unit
   handleAction = case _ of
@@ -147,12 +153,14 @@ component = F.component input F.defaultSpec
       -- Init tagify instance
       tagify <- H.liftEffect $ Tagify.createTagify "tags"
       H.modify_ _ { tagify = Just tagify }
+      
 
     AutoSave -> do
       -- Autosave every 3 seconds
       H.liftAff $ Aff.delay $ Aff.Milliseconds 3000.0
       handleAction SubmitForm
       handleAction AutoSave
+
 
     HandleEditorDelta -> do
       -- Fetch latest delta as Text
@@ -171,6 +179,27 @@ component = F.component input F.defaultSpec
                $ Just hContent
         Nothing -> pure unit
 
+    HandleEditorOutput output -> do
+      case output of
+        Editor.ImageHandleClicked -> H.modify_ _ { editorImageBrowserActive = true }
+
+    HandleEditorImageBrowser output -> do
+      case output of
+        Browser.InsertedMedia images -> do
+          H.modify_ _ { editorImageBrowserActive = false }
+          editor <- H.query (SProxy :: SProxy "editor") unit (H.request Editor.GetEditor)
+
+          case editor of
+            Just e -> do
+              length <- runExceptT $ QContent.getLength e
+              case length of
+                Right l -> do
+                  _ <- traverse (\(Media image) -> do
+                    runExceptT $ QContent.insertEmbed l (QEmbed.Image image.src) QSource.API e) images
+                  pure unit
+                Left err -> pure unit
+            Nothing -> pure unit
+        _ -> pure unit
     Receive inp -> do
       case inp.blogPost of
         Just (BlogPost blogPost) -> do
@@ -297,6 +326,7 @@ component = F.component input F.defaultSpec
       }
     , featuredImageBrowserActive: false
     , imageBrowserActive: false
+    , editorImageBrowserActive: false
     , tagify: Nothing
     }
 
@@ -335,7 +365,13 @@ component = F.component input F.defaultSpec
           unit
           Editor.component
           { content: Just content }
-          (\_ -> Nothing)
+          (Just <<< F.injAction <<< HandleEditorOutput)
+        , HH.slot
+          (SProxy :: _ "editorImageBrowser")
+          unit
+          (Media.component)
+          { isActive: st.editorImageBrowserActive }
+          (Just <<< F.injAction <<< HandleEditorImageBrowser)
         ]
       , HH.div
         [ css "field-featuredImage" ]

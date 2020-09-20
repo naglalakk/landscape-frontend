@@ -226,7 +226,7 @@ let additions =
       mkPackage
       ["colors"]
       "https://github.com/naglalakk/purescript-quill"
-      "850664f0b6cb746e0aadc806e3bea71365ac43e1"
+      "e61b8805e98092ab71788995b18692e6366fa220"
   }
 
 in  upstream ⫽ overrides ⫽ additions

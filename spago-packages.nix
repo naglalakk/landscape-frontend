@@ -2455,11 +2455,11 @@ let
 
     "quill" = pkgs.stdenv.mkDerivation {
         name = "quill";
-        version = "850664f0b6cb746e0aadc806e3bea71365ac43e1";
+        version = "e61b8805e98092ab71788995b18692e6366fa220";
         src = pkgs.fetchgit {
           url = "https://github.com/naglalakk/purescript-quill";
-          rev = "850664f0b6cb746e0aadc806e3bea71365ac43e1";
-          sha256 = "01fjw55nz6n6j3wrf7dwnwy11kv5hyrw2949k18zrl79qfsprid7";
+          rev = "e61b8805e98092ab71788995b18692e6366fa220";
+          sha256 = "1yrqnjf9fv5ywqg20jbn41r0qlyns6c3cmwr8673nzw01ladq7lf";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";

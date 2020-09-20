@@ -7,6 +7,7 @@ import Data.Const                       (Const)
 import Data.Maybe                       (Maybe(..))
 import Data.Newtype                     (unwrap)
 import Data.Symbol                      (SProxy(..))
+import Effect                           (Effect)
 import Effect.Aff.Class                 (class MonadAff)
 import Effect.Class                     (class MonadEffect)
 import Effect.Class.Console             (logShow)
@@ -14,13 +15,17 @@ import Foreign                          as Foreign
 import Formless                         as F
 import Halogen                          as H
 import Halogen.HTML                     as HH
+import Halogen.Query.EventSource        as HES
 import Timestamp                        (nowTimestamp
                                         ,formatToDateStr)
+import Web.Event.EventTarget            as ET
+import Web.Event.Event                  as EV
 
 
 import Api.Endpoint                     (Pagination)
 import Capability.Navigate              (class Navigate
                                         ,navigate)
+import Component.Editor                 as Editor
 import Component.HTML.Admin             (withAdmin)
 import Component.HTML.Utils             (css)
 import Component.Table                  as Table
@@ -82,6 +87,8 @@ component =
       }
     }
   where
+
+      
   handleAction = case _ of
     Initialize -> do
       state <- H.get
