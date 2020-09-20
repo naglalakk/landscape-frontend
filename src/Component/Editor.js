@@ -16,7 +16,6 @@ defineEventAttribute(EditorHandler.prototype, "image");
 const handler = new EditorHandler();
 handler.onimage = e => console.log("onimage");
 
-
 // Export the editorHandler instance as Effect EventTarget
 exports._editorHandler = function() {
     return handler;

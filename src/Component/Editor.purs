@@ -138,15 +138,12 @@ component =
     }
   where
 
-  imageHandlerCallback :: EV.Event -> Maybe (Effect Unit)
-  imageHandlerCallback ev = Just $ pure unit
-
   imageHandlerEventSource :: ET.EventTarget -> HES.EventSource m (Effect Unit)
   imageHandlerEventSource et =
     HES.eventListenerEventSource
       onImage
       et
-      imageHandlerCallback
+      (\ev -> Just $ pure unit)
 
   handleAction = case _ of
 
