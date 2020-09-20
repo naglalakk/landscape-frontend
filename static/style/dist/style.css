@@ -510,6 +510,15 @@ li {
 .dark-mode-true a {
   color: #fff;
 }
+.dark-mode-true .posts-container .navigation-back {
+  background-color: #030c22;
+  border: 0.5px solid #fff;
+}
+.dark-mode-true .posts-container .navigation-back:hover {
+  background-color: #fff;
+  color: #030c22;
+  border: 0.5px solid #030c22;
+}
 .dark-mode-true .posts-container .post .title {
   color: #fff;
 }

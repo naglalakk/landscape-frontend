@@ -153,7 +153,7 @@ component = H.mkComponent
     Just Home -> 
       headerContainer darkMode DarkModeToggle $ HH.slot (SProxy :: _ "home") unit Home.component unit absurd
     Just (BlogPost slug) ->
-      HH.slot (SProxy :: _ "blogPost") unit BlogPost.component { slug: (Slug.generate slug) } absurd
+      headerContainer darkMode DarkModeToggle $ HH.slot (SProxy :: _ "blogPost") unit BlogPost.component { slug: (Slug.generate slug) } absurd
     Just Login ->
       HH.slot (SProxy :: _ "login") unit Login.component { redirect: true } absurd
     Just (Tag tagId) -> 
