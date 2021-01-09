@@ -2,52 +2,37 @@ module AppM where
 
 import Prelude
 
-import Control.Monad.Reader.Trans   (class MonadAsk
-                                    ,ReaderT
-                                    ,ask, asks, runReaderT)
-import Data.Argonaut                (encodeJson, decodeJson)
-import Data.Either                  (Either(..))
-import Data.Environment             (Environment(..), Env)
-import Data.Maybe                   (Maybe(..))
-import Data.String                  (drop)
-import Effect.Aff                   (Aff)
-import Effect.Aff.Class             (class MonadAff)
-import Effect.Class                 (class MonadEffect
-                                    ,liftEffect)
-import Effect.Class.Console         (logShow)
-import Effect.Console               as Console
-import Elasticsearch.Client         (SearchResponse(..), SearchHit(..))
-import Routing.Duplex               (print)
-import Routing.Hash                 (setHash)
-import Simple.JSON                  (write)
-import Type.Equality                (class TypeEquals, from)
-import Web.HTML                     (window)
-import Web.HTML.Window              as Window
-import Web.HTML.Location            (pathname, setHref, Location)
-import Slug                         as Slug
-
-import Api.Endpoint                 as API
-import Api.Request                  (RequestMethod(..)
-                                    ,FormDataRequestMethod(..)
-                                    ,mkRequest
-                                    ,mkFormDataRequest)
-import Capability.LogMessages       (class LogMessages
-                                    ,logMessage)
-import Capability.Navigate          (class Navigate)
-import Data.Auth                    (APIAuth(..)
-                                    ,Password(..)
-                                    ,apiAuth
-                                    ,base64encodeUserAuth)
-import Data.BlogPost                (BlogPost(..))
-import Data.Image                   (decodeImageArray)
-import Data.Log                     as Log
-import Data.Route                   as Route
-import Data.User                    (Username(..))
-import Data.URL                     (BaseURL)
-import Resource.BlogPost            (class ManageBlogPost)
-import Resource.Media               (class ManageMedia)
-import Resource.User                (class ManageUser)
-import Resource.Tag                 (class ManageTag)
+import Api.Endpoint as API
+import Api.Request (RequestMethod(..), FormDataRequestMethod(..), mkRequest, mkFormDataRequest)
+import Capability.LogMessages (class LogMessages, logMessage)
+import Capability.Navigate (class Navigate)
+import Control.Monad.Reader.Trans (class MonadAsk, ReaderT, ask, asks, runReaderT)
+import Data.Argonaut (encodeJson, decodeJson)
+import Data.Auth (APIAuth(..), apiAuth, base64encodeUserAuth)
+import Data.BlogPost (BlogPost(..))
+import Data.Either (Either(..))
+import Data.Environment (Environment(..), Env)
+import Data.Image (decodeImageArray)
+import Data.Log as Log
+import Data.Maybe (Maybe(..))
+import Data.Route as Route
+import Effect.Aff (Aff)
+import Effect.Aff.Class (class MonadAff)
+import Effect.Class (class MonadEffect, liftEffect)
+import Effect.Class.Console (logShow)
+import Effect.Console as Console
+import Elasticsearch.Client (SearchResponse(..), SearchHit(..))
+import Resource.BlogPost (class ManageBlogPost)
+import Resource.Media (class ManageMedia)
+import Resource.Tag (class ManageTag)
+import Resource.User (class ManageUser)
+import Routing.Duplex (print)
+import Simple.JSON (write)
+import Slug as Slug
+import Type.Equality (class TypeEquals, from)
+import Web.HTML (window)
+import Web.HTML.Location (setHref)
+import Web.HTML.Window as Window
 
 
 newtype AppM a = AppM (ReaderT Env Aff a)
