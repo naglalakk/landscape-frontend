@@ -2,26 +2,19 @@ module Data.Image where
 
 import Prelude
 
-import Data.Argonaut            (Json
-                                ,decodeJson
-                                ,encodeJson
-                                ,(~>), (~>?)
-                                ,(:=), (:=?)
-                                ,(.:), (.:?))
-import Data.Argonaut.Encode     (class EncodeJson)
-import Data.Argonaut.Decode     (class DecodeJson)
-import Data.Either              (Either(..))
-import Data.Generic.Rep         (class Generic)
-import Data.Generic.Rep.Show    (genericShow)
-import Data.Maybe               (Maybe(..))
-import Data.Newtype             (class Newtype)
-import Data.Traversable         (traverse)
-import Formless                 as F
+import Config (apiURL)
+import Data.Argonaut (Json, JsonDecodeError, decodeJson, encodeJson, (.:), (.:?), (:=), (:=?), (~>), (~>?))
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
+import Data.Either (Either(..))
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
+import Data.Maybe (Maybe(..))
+import Data.Newtype (class Newtype)
+import Data.Traversable (traverse)
+import Formless as F
 import Halogen.Media.Data.Media (MediaRow)
-
-import Config                   (apiURL)
-import Timestamp                (Timestamp(..)
-                                ,defaultTimestamp)
+import Timestamp (Timestamp(..), defaultTimestamp)
 
 
 
@@ -90,5 +83,5 @@ instance decodeJsonImage :: DecodeJson Image where
 instance encodeJsonImage :: EncodeJson Image where
   encodeJson (Image img) = encodeJson img.id
 
-decodeImageArray :: Json -> Either String ImageArray
+decodeImageArray :: Json -> Either JsonDecodeError ImageArray
 decodeImageArray json = decodeJson json >>= traverse decodeJson

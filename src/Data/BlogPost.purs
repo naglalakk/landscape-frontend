@@ -1,30 +1,23 @@
 module Data.BlogPost where
 
 import Prelude
-import Data.Argonaut            (Json
-                                ,decodeJson
-                                ,encodeJson
-                                ,(~>), (~>?)
-                                ,(:=), (:=?)
-                                ,(.:), (.:?))
-import Data.Argonaut.Encode     (class EncodeJson)
-import Data.Argonaut.Decode     (class DecodeJson)
-import Data.Either              (Either(..))
-import Data.Generic.Rep         (class Generic)
-import Data.Generic.Rep.Show    (genericShow)
-import Data.Maybe               (Maybe(..))
-import Data.Newtype             (class Newtype)
-import Data.Traversable         (traverse)
-import Effect                   (Effect)
-import Formless                 as F
-import Halogen.Media.Data.Media (MediaRow)
-import Slug                     as Slug
 
-import Data.Image               (Image(..), ImageArray)
-import Data.Tag                 (Tag(..), TagArray)
-import Timestamp                (Timestamp(..)
-                                ,defaultTimestamp
-                                ,nowTimestamp)
+import Data.Argonaut (Json, JsonDecodeError, decodeJson, encodeJson, (.:), (.:?), (:=), (:=?), (~>), (~>?))
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
+import Data.Either (Either(..))
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
+import Data.Image (Image(..), ImageArray)
+import Data.Maybe (Maybe(..))
+import Data.Newtype (class Newtype)
+import Data.Tag (Tag(..), TagArray)
+import Data.Traversable (traverse)
+import Effect (Effect)
+import Formless as F
+import Halogen.Media.Data.Media (MediaRow)
+import Slug as Slug
+import Timestamp (Timestamp(..), defaultTimestamp, nowTimestamp)
 
 newtype BlogPostId = BlogPostId Int
 
@@ -119,7 +112,7 @@ instance encodeJsonBlogPost :: EncodeJson BlogPost where
     ~> "created_at"     := blogPost.createdAt
     ~> "updated_at"     := blogPost.updatedAt
 
-decodeBlogPostArray :: Json -> Either String BlogPostArray
+decodeBlogPostArray :: Json -> Either JsonDecodeError BlogPostArray
 decodeBlogPostArray json = decodeJson json >>= traverse decodeJson
 
 defaultBlogPost :: Effect BlogPost

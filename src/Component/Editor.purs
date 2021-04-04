@@ -153,7 +153,6 @@ component =
       case element of
         Just e -> do
           editor <- QEditor.new editorConfig e
-          Console.log "get here?"
           editorHandle <- editorHandler
           _ <- H.subscribe (ImageHandler <$> imageHandlerEventSource editorHandle)
           H.modify_ _ { editor = Just editor }

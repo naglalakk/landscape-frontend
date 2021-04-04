@@ -96,7 +96,7 @@ component = H.mkComponent
   { initialState: \_ -> 
     { route: Nothing
     , currentUser: Nothing
-    , darkMode: false
+    , darkMode: true
     }
   , render
   , eval: H.mkEval $ H.defaultEval

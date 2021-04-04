@@ -108,11 +108,8 @@ let additions =
 -------------------------------
 -}
 
-let mkPackage =
-      https://raw.githubusercontent.com/purescript/package-sets/psc-0.13.3-20190818/src/mkPackage.dhall sha256:0b197efa1d397ace6eb46b243ff2d73a3da5638d8d0ac8473e8e4a8fc528cf57
-
 let upstream =
-      https://raw.githubusercontent.com/purescript/package-sets/psc-0.13.3-20190818/src/packages.dhall sha256:c95c4a8b8033a48a350106b759179f68a695c7ea2208228c522866fd43814dc8
+      https://github.com/purescript/package-sets/releases/download/psc-0.13.8-20210118/packages.dhall sha256:a59c5c93a68d5d066f3815a89f398bcf00e130a51cb185b2da29b20e2d8ae115
 
 let overrides =
   { halogen =
@@ -131,54 +128,103 @@ let overrides =
   }
 
 let additions = 
-  { elasticsearch = 
-      mkPackage
-      ([] : List Text)
+  { argonaut =
+    { dependencies =
+      ["argonaut-codecs"
+      ,"argonaut-core"
+      ,"argonaut-traversals"]
+    , repo =
+      "https://github.com/purescript-contrib/purescript-argonaut"
+    , version =
+      "2b81ce16b4c0e8cac0be88b4bf616523b6ddda56"
+    }
+  , argonaut-codecs =
+    { dependencies =
+      ["argonaut-core"
+      ,"arrays"
+      ,"effect"
+      ,"foreign-object"
+      ,"identity"
+      ,"integers"
+      ,"maybe"
+      ,"nonempty"
+      ,"ordered-collections"
+      ,"record"]
+    , repo =
+      "https://github.com/purescript-contrib/purescript-argonaut-codecs/"
+    , version =
+      "9b00fcc6b04bd999d3fd3b9de2ae830bff473a71"
+    }
+  , argonaut-traversals =
+    { dependencies =
+      ["argonaut-core"
+      ,"argonaut-codecs"
+      ,"profunctor-lenses"]
+    , repo =
+      "https://github.com/purescript-contrib/purescript-argonaut-traversals"
+    , version =
+      "9543b517011a4dbc66dfd5cd4d8d774aa620b764"
+    }
+  , elasticsearch = 
+    { dependencies = [] : List Text
+    , repo =
       "https://github.com/naglalakk/purescript-elasticsearch"
-      "0acab0b6405fdf73e9690a2d3805cd6a1992210c"
+    , version =
+      "06b48a3df3ba4c85406e120cff457b680d4aa297"
+    }
   , express  = 
-      mkPackage 
+    { dependencies = 
       [ "foreign"
       , "foreign-generic"
       , "node-http"
       , "test-unit"
       , "aff"
       ]
+    , repo =
       "https://github.com/nkly/purescript-express"
+    , version =
       "b0d3d31703a02a7dddc48fa23669bebe6de85e90"
+    }
   , halogen-formless = 
-      mkPackage 
-      [ "halogen-renderless"
-      , "variant"
+    { dependencies = 
+      [ "variant"
       , "heterogeneous"
       , "generics-rep"
+      , "profunctor-lenses"
       ]
+    , repo = 
       "https://github.com/thomashoneyman/purescript-halogen-formless.git"
-      "b42d54ec9a74be9b99d45aed273c68bac3fdbfda"
+    , version = 
+      "07f877c99420b33dd8813cbf8ab2c30ca40bbb49"
+    }
   , halogen-media =
-      mkPackage
+    { dependencies = 
       [ "dom-filereader" 
       , "uuid"
       ]
+    , repo = 
       "https://github.com/naglalakk/purescript-halogen-media"
+    , version = 
       "37bd8cd606f85f0ebd37cf47e8975ba723566de6"
+    }
   , halogen-rawhtml =
-    mkPackage
-    ["halogen"]
-    "https://github.com/naglalakk/purescript-halogen-rawhtml"
-    "2b38c6cfb71ebb1ab75bf3724886f70dd05de651"
+    { dependencies = 
+      ["halogen"]
+    , repo = 
+      "https://github.com/naglalakk/purescript-halogen-rawhtml"
+    , version = 
+      "2b38c6cfb71ebb1ab75bf3724886f70dd05de651"
+    }
   , halogen-select = 
-      mkPackage
+    { dependencies = 
       ["halogen", "record"]
+    , repo = 
       "https://github.com/citizennet/purescript-halogen-select"
+    , version = 
       "467b35fa5dd05d64dbdbcab77442153f729bd0a8"
-  , halogen-renderless = 
-      mkPackage
-      ["control"]
-      "https://github.com/thomashoneyman/purescript-halogen-renderless"
-      "83278eaa735001803a751a82472f2caa9c2c9c70"
+    }
   , precise-datetime =
-      mkPackage
+    { dependencies = 
       [ "arrays"
       , "console"
       , "datetime"
@@ -197,10 +243,13 @@ let additions =
       , "numbers"
       , "decimals"
       ]
+    , repo = 
       "https://github.com/awakesecurity/purescript-precise-datetime"
+    , version = 
       "2355b3471b758e16d17078e09bb79ee26d82b90a"
+    }
   , routing-duplex = 
-      mkPackage
+    { dependencies = 
       [ "typelevel-prelude"
       , "arrays"
       , "globals"
@@ -208,25 +257,37 @@ let additions =
       , "lazy"
       , "profunctor"
       ]
+    , repo = 
       "https://github.com/natefaubion/purescript-routing-duplex"
+    , version = 
       "150d92bab24e0f8ad23f84e4a3e24c6c9ebc5ac6"
+    }
   , slug = 
-      mkPackage
+    { dependencies =
       [ "unicode" ]
+    , repo = 
       "https://github.com/thomashoneyman/purescript-slug"
-      "a97735d47be7398f181085e0b117499462ba7a11"
+    , version = 
+      "96815a42dd1f572774bc54c606a4741b0dc64c2f"
+    }
   , timestamp =
-      mkPackage
+    { dependencies = 
       ["argonaut"
       ,"formatters"
       ,"precise-datetime"]
+    , repo = 
       "https://github.com/naglalakk/purescript-timestamp"
-      "c308b43655ba1c100e53a15ce8146916c4b90e63"
+    , version = 
+      "fc494eef323beb9e084d31c2b78fcd197de36c10"
+    }
   , quill = 
-      mkPackage
+    { dependencies = 
       ["colors"]
+    , repo = 
       "https://github.com/naglalakk/purescript-quill"
+    , version = 
       "e61b8805e98092ab71788995b18692e6366fa220"
+    }
   }
 
 in  upstream ⫽ overrides ⫽ additions

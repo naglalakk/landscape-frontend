@@ -23,6 +23,7 @@ You can edit this file as you like.
     , "halogen"
     , "halogen-css"
     , "halogen-formless"
+    , "halogen-hooks"
     , "halogen-media"
     , "halogen-rawhtml"
     , "js-timers"

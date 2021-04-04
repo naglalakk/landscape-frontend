@@ -322,7 +322,6 @@ li {
 }
 .posts-container .post {
   box-sizing: border-box;
-  margin-top: 25px;
   margin-bottom: 25px;
 }
 .posts-container .post .post-content {

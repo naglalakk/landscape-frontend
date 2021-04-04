@@ -59,7 +59,6 @@ import Resource.BlogPost                    (class ManageBlogPost
 import Utils.EventTypes                     (onscroll)
 import Utils.DOM                            (setHTML)
 
-
 type State = 
   { blogPosts :: BlogPostArray
   , currentPage :: Int

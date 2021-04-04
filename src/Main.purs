@@ -1,43 +1,39 @@
 module Main where
 
 import Prelude
-import Affjax                       (request)
-import Control.Monad.Error.Class    (class MonadError)
-import Data.Argonaut                (encodeJson, decodeJson)
-import Data.Bifunctor               (bimap)
-import Data.Either                  (Either(..), hush)
-import Data.Foldable                (traverse_)
-import Data.Maybe                   (Maybe(..))
-import Data.String                  (drop)
-import Effect                       (Effect)
-import Effect.Class.Console         (logShow)
-import Effect.Aff                   (Aff, launchAff_)
-import Effect.Aff.Class             (class MonadAff)
-import Effect.Aff.Bus               as Bus
-import Effect.Ref                   as Ref
-import Foreign                      as Foreign
-import Halogen                      as H
-import Halogen.Aff                  as HA
-import Halogen.HTML                 as HH
-import Halogen.VDom.Driver          (runUI)
-import Routing.Duplex               (parse)
-import Routing.PushState            (makeInterface, matchesWith)
-import Simple.JSON                  (read_)
 
-import AppM                         (runAppM)
-import Api.Request                  (RequestMethod(..)
-                                    ,defaultRequest)
-import Api.Endpoint                 as API
-import Component.Router             as Router
-import Config                       (environment, apiURL)
-import Data.Auth                    (APIAuth(..)
-                                    ,readToken)
-import Data.Environment             (Env
-                                    ,UserEnv
-                                    ,toEnvironment)
-import Data.Route                   (routeCodec)
-import Data.User                    (User)
-import Data.URL                     (BaseURL(..))
+import Affjax (printError, request)
+import Api.Endpoint as API
+import Api.Request (RequestMethod(..), defaultRequest)
+import AppM (runAppM)
+import Component.Router as Router
+import Config (environment, apiURL)
+import Control.Monad.Error.Class (class MonadError)
+import Data.Argonaut (JsonDecodeError, decodeJson, encodeJson, printJsonDecodeError)
+import Data.Auth (APIAuth(..), readToken)
+import Data.Bifunctor (bimap)
+import Data.Either (Either(..), hush)
+import Data.Environment (Env, UserEnv, toEnvironment)
+import Data.Foldable (traverse_)
+import Data.Maybe (Maybe(..))
+import Data.Route (routeCodec)
+import Data.String (drop)
+import Data.URL (BaseURL(..))
+import Data.User (User)
+import Effect (Effect)
+import Effect.Aff (Aff, launchAff_)
+import Effect.Aff.Bus as Bus
+import Effect.Aff.Class (class MonadAff)
+import Effect.Class.Console (log, logShow)
+import Effect.Ref as Ref
+import Foreign as Foreign
+import Halogen as H
+import Halogen.Aff as HA
+import Halogen.HTML as HH
+import Halogen.VDom.Driver (runUI)
+import Routing.Duplex (parse)
+import Routing.PushState (makeInterface, matchesWith)
+import Simple.JSON (read_)
 
 main :: Effect Unit
 main = HA.runHalogenAff do
@@ -56,14 +52,18 @@ main = HA.runHalogenAff do
         }
     res <- H.liftAff $ request $ defaultRequest (BaseURL apiURL) requestOptions
 
-    case (hush res.body) of
-      Just json -> do
+    case res of
+      Right json -> do
         let 
-          user = (decodeJson json) :: Either String User
+          user = (decodeJson json.body) :: Either JsonDecodeError User
         case user of
           Right u -> H.liftEffect $ Ref.write (Just u) currentUser
-          Left err -> pure unit
-      Nothing -> pure unit
+          Left err -> do
+            logShow $ printJsonDecodeError err
+            pure unit
+      Left err -> do
+        logShow $ printError err
+        pure unit
 
   let 
     environ = toEnvironment environment
