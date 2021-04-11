@@ -1,6 +1,7 @@
-donnacodes.dev
+Blog Frontend
 ===
 
+Frontend for my blog [inalandscape.dev](https://inalandscape.dev)
 Used with API backend service: [donnabot-service](https://github.com/naglalakk/donnabot-service)
 
 ### Requirements
