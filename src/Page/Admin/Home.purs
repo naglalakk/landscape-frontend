@@ -44,10 +44,6 @@ component =
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
-    HH.div 
-      [] 
-      [ withAdmin $
-        HH.div
-          []
-          [ HH.text "Testing" ]
-      ]
+    HH.div
+      []
+      [ HH.text "Testing" ]

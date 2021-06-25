@@ -11,12 +11,15 @@ import Control.Monad.Reader.Trans (class MonadAsk, ReaderT, ask, asks, runReader
 import Data.Argonaut (JsonDecodeError, decodeJson, encodeJson, printJsonDecodeError)
 import Data.Auth (APIAuth(..), apiAuth, base64encodeUserAuth)
 import Data.BlogPost (BlogPost(..))
+import Data.Exhibition (Exhibition(..))
 import Data.Either (Either(..))
 import Data.Environment (Environment(..), Env)
 import Data.Image (decodeImageArray)
+import Data.Item (Item(..))
 import Data.Log as Log
 import Data.Maybe (Maybe(..))
 import Data.Route as Route
+import Data.Token (Token(..))
 import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect, liftEffect)
@@ -24,8 +27,11 @@ import Effect.Class.Console (logShow)
 import Effect.Console as Console
 import Elasticsearch.Client (SearchResponse(..), SearchHit(..))
 import Resource.BlogPost (class ManageBlogPost)
+import Resource.Exhibition (class ManageExhibition)
+import Resource.Item (class ManageItem)
 import Resource.Media (class ManageMedia)
 import Resource.Tag (class ManageTag)
+import Resource.Token (class ManageToken)
 import Resource.User (class ManageUser)
 import Routing.Duplex (print)
 import Simple.JSON (write)
@@ -170,6 +176,165 @@ instance manageBlogPostAppM :: ManageBlogPost AppM where
   deleteBlogPost postId = do
     req <- mkRequest
       { endpoint: API.BlogPostDelete postId
+      , method: Delete
+      , auth: Just apiAuth
+      }
+    pure unit
+
+instance manageExhibitionAppM :: ManageExhibition AppM where
+  allExhibitions 
+    = genericListRequest
+        API.Exhibitions
+        Get
+        Nothing
+
+  getExhibitionById exId 
+    = genericRequest
+        (API.Exhibition exId)
+        Get
+        Nothing
+
+  getExhibitionItems exId
+    = genericListRequest
+        (API.ExhibitionItems exId)
+        Get
+        Nothing
+
+  createExhibition ex 
+    = genericRequest
+        API.Exhibitions
+        (Post $ Just $ encodeJson ex)
+        (Just apiAuth)
+
+  updateExhibition (Exhibition ex)
+    = genericRequest
+        (API.ExhibitionUpdate ex.id)
+        (Post $ Just $ encodeJson $ Exhibition ex)
+        (Just apiAuth)
+
+  deleteExhibition exId = do
+    req <- mkRequest
+      { endpoint: (API.ExhibitionDelete exId)
+      , method: Delete
+      , auth: Just apiAuth
+      }
+    pure unit
+
+instance manageTokenAppM :: ManageToken AppM where
+  allTokens
+    = genericListRequest
+        API.Tokens
+        Get
+        Nothing
+
+  getTokenById tokenId
+    = genericRequest
+        (API.Token tokenId)
+        Get
+        Nothing
+
+  getTokenAmount tokenId
+    = genericRequest
+        (API.TokenAmount tokenId)
+        Get
+        (Just apiAuth)
+
+  getTokenAmountByHash hash
+    = genericRequest 
+        (API.TokenAmountByHash hash)
+        Get
+        Nothing
+
+  createToken token 
+    = genericRequest
+        API.Tokens
+        (Post $ Just $ encodeJson token)
+        (Just apiAuth)
+
+  updateToken (Token token) 
+    = genericRequest
+        (API.TokenUpdate token.id)
+        (Post $ Just $ encodeJson $ Token token)
+        (Just apiAuth)
+
+  deleteToken tokenId = do
+    req <- mkRequest
+      { endpoint: API.TokenDelete tokenId
+      , method: Delete
+      , auth: Just apiAuth
+      }
+    pure unit
+
+  requestToken tokenId = do
+    req <- mkRequest
+      { endpoint: API.TokenRequest tokenId
+      , method: Get
+      , auth: Nothing
+      }
+    case req of
+      Right json -> do
+        let et = decodeJson json.body
+        case et of
+          Right e -> pure $ Just e
+          Left err -> do
+            logMessage $ printJsonDecodeError err
+            pure Nothing
+      Left err -> do
+        logMessage $ printError err
+        pure Nothing
+
+  updateTxStatus hash status
+    = genericRequest
+      (API.TokenUpdateTxStatus hash status)
+      Get
+      Nothing
+
+  allTokenTransactions status
+    = genericListRequest
+        (API.TokenTransactions status)
+        Get
+        (Just apiAuth)
+
+  getTokenTransaction hash
+    = genericRequest
+        (API.TokenTransaction hash)
+        Get
+        Nothing
+
+  updateTokenTransaction tokenTx 
+    = genericRequest
+        API.TokenTransactionUpdate
+        (Post $ Just $ encodeJson tokenTx)
+        (Just apiAuth)
+
+instance manageItemAppM :: ManageItem AppM where
+  allItems 
+    = genericListRequest
+        API.Items
+        Get
+        Nothing
+
+  getItemById itemId
+    = genericRequest
+        (API.Item itemId)
+        Get
+        Nothing
+
+  createItem item
+    = genericRequest
+        API.Items
+        (Post $ Just $ encodeJson item)
+        (Just apiAuth)
+
+  updateItem (Item item)
+    = genericRequest
+        (API.ItemUpdate item.id)
+        (Post $ Just $ encodeJson $ Item item)
+        (Just apiAuth)
+
+  deleteItem itemId = do
+    req <- mkRequest
+      { endpoint: API.ItemDelete itemId
       , method: Delete
       , auth: Just apiAuth
       }

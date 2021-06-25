@@ -120,16 +120,12 @@ component =
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
-    HH.div 
-      [] 
-      [ withAdmin $
-        HH.div
-          []
-          [ HH.h1
-            []
-            [ HH.text "Post" ]
-          , blogPostFormSlot state.blogPost
-          ]
+    HH.div
+      []
+      [ HH.h1
+        []
+        [ HH.text "Post" ]
+      , blogPostFormSlot state.blogPost
       ]
 
     where

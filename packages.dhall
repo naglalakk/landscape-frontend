@@ -221,7 +221,7 @@ let additions =
     , repo = 
       "https://github.com/citizennet/purescript-halogen-select"
     , version = 
-      "467b35fa5dd05d64dbdbcab77442153f729bd0a8"
+      "ea85ca795a8a28cf0ce474710d6df8bb8a1c8270"
     }
   , precise-datetime =
     { dependencies = 

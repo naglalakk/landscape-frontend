@@ -100,7 +100,7 @@ component =
 
     render state = 
       HH.table 
-        [ css "responsive-table" ]
+        [ css "full-width responsive-table" ]
         [ HH.thead
           []
           [ HH.tr
