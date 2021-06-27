@@ -55,8 +55,7 @@ instance decodeJsonToken :: DecodeJson Token where
     id  <- obj .: "id"
     title <- obj .: "title"
     policyId <- obj .:? "policyId"
-    -- Amount is hidden in response 
-    let amount = 0
+    amount <- obj .: "amount"
     quantity <- obj .: "quantity"
     minted <- obj .: "minted"
     available <- obj .: "available"
@@ -94,6 +93,7 @@ data TransactionStatus
   | Completed
   | Expired
   | Minting
+  | Minted
   | Error String
 
 derive instance genericTransactionStatus :: Generic TransactionStatus _
@@ -106,6 +106,7 @@ readTransactionStatus "cancelled" = Cancelled
 readTransactionStatus "completed" = Completed
 readTransactionStatus "expired" = Expired
 readTransactionStatus "minting" = Minting
+readTransactionStatus "minted" = Minted
 readTransactionStatus x = Error x
 
 instance showTransactionStatus :: Show TransactionStatus where
