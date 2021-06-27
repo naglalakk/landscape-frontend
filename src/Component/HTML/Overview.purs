@@ -26,16 +26,19 @@ overview closeAction selectAction showOverview items =
         []
       ]
     , HH.div
-      [ css "artworks-container container flex space-between" ]
-      (map (\(Item item) -> 
-        HH.div
-          [ css "artwork" 
-          , HE.onClick \_ -> Just $ selectAction item.id
-          ]
-          [ maybeElem item.image \(Image img) ->
-            maybeElem img.thumbnail \thumb -> 
-              HH.img
-                [ HP.src thumb ]
-          ]
-        ) items)
+      [ css "artworks-container container" ]
+      [ HH.div
+        [ css "container-padding flex space-between" ]
+        (map (\(Item item) -> 
+          HH.div
+            [ css "artwork" 
+            , HE.onClick \_ -> Just $ selectAction item.id
+            ]
+            [ maybeElem item.image \(Image img) ->
+              maybeElem img.thumbnail \thumb -> 
+                HH.img
+                  [ HP.src thumb ]
+            ]
+          ) items)
+      ]
     ]

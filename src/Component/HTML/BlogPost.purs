@@ -32,7 +32,7 @@ renderBlogPost navigateAction (BlogPost post) =
     [ case post.isCover of
       true ->
         HH.div
-          [ css "cover-image lazy" 
+          [ css "cover-image lazy relative" 
           , case post.featuredImage of
             Just (Image image) -> 
               HH.attr (HH.AttrName "data-bg") image.src
@@ -40,7 +40,30 @@ renderBlogPost navigateAction (BlogPost post) =
             Nothing -> css "no-cover"
           ]
           [ HH.div
-            [ css "title" ]
+            [ css "title-bar" ]
+            [ HH.div
+              [ css "container" ]
+              [ HH.div
+                [ css "title container-padding" ]
+                [ HH.h1
+                  []
+                  [ HH.text post.title ]
+                , HH.div [ css "title-line" ] []
+                , case post.showDate of
+                  true -> 
+                    HH.div
+                      [ css "post-date" ]
+                      [ HH.text $ formatToDateStr post.publishTime ]
+                  false -> HH.div [] []
+                ]
+              ]
+            ]
+          ]
+      false ->
+        HH.div
+          [ css "title container" ]
+          [ HH.div
+            [ css "container-padding"]
             [ HH.h1
               []
               [ HH.text post.title ]
@@ -53,30 +76,19 @@ renderBlogPost navigateAction (BlogPost post) =
               false -> HH.div [] []
             ]
           ]
-      false ->
-        HH.div
-          [ css "title" ]
-          [ HH.h1
-            []
-            [ HH.text post.title ]
-          , HH.div [ css "title-line" ] []
-          , case post.showDate of
-            true -> 
-              HH.div
-                [ css "post-date" ]
-                [ HH.text $ formatToDateStr post.publishTime ]
-            false -> HH.div [] []
-          ]
     , HH.div
-      [ css "post-content" 
-      , HP.ref (H.RefLabel ("element-" <> (show $ unwrap post.id)))
+      [ css "post-content container" 
       ]
-      []
+      [ HH.div
+        [ css "container-padding"
+        , HP.ref (H.RefLabel ("element-" <> (show $ unwrap post.id))) ]
+        []
+      ]
     , case length post.images of
         0 -> HH.div [] []
         _ -> 
           HH.div
-            [ css "lightgallery" ]
+            [ css "lightgallery container" ]
             (map (\(Image image) -> 
               HH.a
                 [ HP.href image.src ]
@@ -93,7 +105,7 @@ renderBlogPost navigateAction (BlogPost post) =
         0 -> HH.div [] []
         _ -> 
           HH.div
-            [ css "post-tags" ]
+            [ css "post-tags container" ]
             [ HH.span
               []
               [ HH.text "Tags: " ]

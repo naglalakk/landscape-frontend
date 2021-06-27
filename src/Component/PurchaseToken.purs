@@ -102,7 +102,14 @@ component =
       state <- H.get 
       if state.minutes == 0 && state.seconds == 0 || not state.heartbeat
         then do
-          H.modify_ _ { heartbeat = false }
+          -- Change TokenTransaction status to Expired
+          tokenTx <- case state.tokenTx of
+              Just (TokenTransaction tx) -> 
+                updateTxStatus tx.hash $ show Expired
+              Nothing -> pure Nothing
+          H.modify_ _ { heartbeat = false 
+                      , tokenTx = tokenTx
+                      }
           case state.clockFork of
             Just fId -> H.kill fId
             Nothing -> pure unit
@@ -183,96 +190,105 @@ component =
     HH.div
       [ css $ "flex flex-center purchase-container show-flex-" <> (show $ isJust state.tokenId )]
       [ HH.div
-        [ css "container-padding container" ]
-        [ case state.showAmount of
-          false -> 
-            HH.div
-              []
-              [ HH.p
+        [ css "container" ]
+        [ HH.div
+          [ css "container-padding" ]
+          [ case state.showAmount of
+            false -> 
+              HH.div
                 []
-                [ HH.text "You are about to purchase 1 NFT. " ]
-              , HH.p
-                []
-                [ HH.text "For more information on how to purchase NFTs on this site, refer to " 
-                , HH.a
-                  []
-                  [ HH.text "this page" ]
-                ]
-              , HH.p
-                []
-                [ HH.text "Once you confirm the purchase you will get an address and exact amount of ADA that you will need to send to the address in order to receive your NFT.  Your request is reserved for 15 minutes. If the amount is not received in this timeframe the NFT is released and will be avaialble again for purchase." ]
-              , HH.p
-                []
-                [ HH.text "Confirm the purchase by clicking “Continue” below." ]
-              , HH.div
-                [ css "error-message" ]
-                [ HH.text state.errorMsg
-                ]
-              , HH.div
-                [ css "flex flex-center actions" ]
-                [ HH.button
-                  [ css "button" 
-                  , HE.onClick \_ -> Just Close ]
-                  [ HH.text "Cancel" ]
-                , HH.button
-                  [ css "button" 
-                  , HE.onClick \_ -> Just Continue ]
-                  [ HH.text "Continue" ]
-                ]
-              ]
-          true ->
-            HH.div
-              []
-              [ HH.p
-                [ css "bold text-center" ]
-                [ HH.text "Your amount is: " ]
-              , HH.p
-                [ css "text-center amount" ]
-                [ HH.text $ show $ fromLovelace state.tokenAmount 
-                , HH.text " ₳"
-                ]
-              , HH.p
-                [ css "text-center bold" ]
-                [ HH.text "Send exactly this amount to the following address" ]
-              , HH.div
-                [ css "addr-container flex flex-center" ]
                 [ HH.p
                   []
-                  [ HH.text recvAddr ]
-                ] 
-              , HH.p
-                [ css "text-center bold" ]
-                [ HH.text "expires-in" ]
-              , HH.div
-                [ css "clock text-center" ]
-                [ HH.h2
+                  [ HH.text "You are about to purchase 1 NFT. " ]
+                , HH.p
                   []
-                  [ HH.text $ show state.minutes
-                  , HH.text ":"
-                  , if state.seconds < 10 
-                      then HH.text $ "0" <> (show state.seconds)
-                      else HH.text $ show state.seconds
+                  [ HH.text "For more information on how to purchase NFTs on this site, refer to " 
+                  , HH.a
+                    []
+                    [ HH.text "this page" ]
+                  ]
+                , HH.p
+                  []
+                  [ HH.text "Once you confirm the purchase you will get an address and exact amount of ADA that you will need to send to the address in order to receive your NFT.  Your request is reserved for 15 minutes. If the amount is not received in this timeframe the NFT is released and will be avaialble again for purchase." ]
+                , HH.p
+                  []
+                  [ HH.text "Confirm the purchase by clicking “Continue” below." ]
+                , HH.div
+                  [ css "error-message" ]
+                  [ HH.text state.errorMsg
+                  ]
+                , HH.div
+                  [ css "flex flex-center actions" ]
+                  [ HH.button
+                    [ css "button" 
+                    , HE.onClick \_ -> Just Close ]
+                    [ HH.text "Cancel" ]
+                  , HH.button
+                    [ css "button" 
+                    , HE.onClick \_ -> Just Continue ]
+                    [ HH.text "Continue" ]
                   ]
                 ]
-              , HH.p
-                [ css "text-center bold" ]
-                [ HH.text "Status:" ]
-              , HH.p
-                [ css "text-center" ]
-                [ HH.text $ show state.status
-                ]
-              , HH.div
-                [ css "flex flex-center" ]
-                [ HH.button
-                  [ css "button" 
-                  , HE.onClick \_ -> Just CancelRequest
+            true ->
+              HH.div
+                []
+                [ HH.p
+                  [ css "bold text-center" ]
+                  [ HH.text "Your amount is: " ]
+                , HH.p
+                  [ css "text-center amount" ]
+                  [ HH.text $ show $ fromLovelace state.tokenAmount 
+                  , HH.text " ₳"
                   ]
-                  [ case state.status of
-                    Just Completed -> HH.text "Close"
-                    _ -> HH.text "Cancel" 
-
+                , HH.p
+                  [ css "text-center bold" ]
+                  [ HH.text "Send exactly this amount to the following address" ]
+                , HH.div
+                  [ css "addr-container flex flex-center" ]
+                  [ HH.p
+                    []
+                    [ HH.text recvAddr ]
+                  ] 
+                , HH.p
+                  [ css "text-center bold" ]
+                  [ HH.text "expires-in" ]
+                , HH.div
+                  [ css "clock text-center" ]
+                  [ HH.h2
+                    []
+                    [ HH.text $ show state.minutes
+                    , HH.text ":"
+                    , if state.seconds < 10 
+                        then HH.text $ "0" <> (show state.seconds)
+                        else HH.text $ show state.seconds
+                    ]
+                  ]
+                , HH.p
+                  [ css "text-center bold" ]
+                  [ HH.text "Status:" ]
+                , HH.p
+                  [ css "text-center" ]
+                  [ HH.text $ show $ fromMaybe Request state.status
+                  ]
+                , HH.div
+                  [ css "flex flex-center" ]
+                  [ HH.button
+                    [ css "button" 
+                    , cta
+                    ]
+                    [ HH.text ctaText
+                    ]
                   ]
                 ]
               ]
-        ]
+          ]
       ]
+    where
+      ctaText = if state.status == Just Completed || state.status == Just Expired
+        then "Close"
+        else "Cancel"
+      cta = if state.status == Just Completed || state.status == Just Expired
+        then
+          HE.onClick \_ -> Just Close
+        else
+          HE.onClick \_ -> Just CancelRequest

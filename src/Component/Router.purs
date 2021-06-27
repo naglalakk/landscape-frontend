@@ -35,8 +35,10 @@ import Page.Admin.Home as AdminHome
 import Page.Admin.Token as AdminToken
 import Page.Admin.Tokens as AdminTokens
 import Page.Admin.Transactions as AdminTransactions
+import Page.About as About
 import Page.BlogPost as BlogPost
 import Page.Exhibition as Exhibition
+import Page.Exhibitions as Exhibitions
 import Page.Home as Home
 import Page.Login as Login
 import Page.Tag as TagPage
@@ -74,6 +76,8 @@ type ChildSlots =
   , login :: OpaqueSlot Unit
   , blogPost :: OpaqueSlot Unit
   , exhibition :: OpaqueSlot Unit
+  , exhibitions :: OpaqueSlot Unit
+  , about :: OpaqueSlot Unit
   , tag :: OpaqueSlot Unit
   , adminHome :: OpaqueSlot Unit
   , adminBlogPosts :: OpaqueSlot Unit
@@ -157,15 +161,14 @@ adminContainer navigateAction slot =
 
 -- Container including header
 headerContainer :: forall props act
-                 . Boolean           -- Dark mode off/on
-                ->  act              -- Dark mode action
+                 . (Route -> act)    -- navigate
                 -> HH.HTML props act -- html
                 -> HH.HTML props act
-headerContainer dmStatus dmAction slot =
+headerContainer navigateAction slot =
   HH.div
-    [ css $ "wrapper dark-mode-" <> (show dmStatus) ]
+    [ css $ "wrapper" ]
     [ Style.stylesheet
-    , header dmAction 
+    , header navigateAction
     , HH.div
       [ css "content" ]
       [ slot ]
@@ -247,8 +250,7 @@ component = H.mkComponent
     case route of
       Just Home -> 
         headerContainer 
-          darkMode 
-          DarkModeToggle $ 
+          NavigateAction $ 
             HH.slot 
             (SProxy :: _ "home") 
             unit 
@@ -258,8 +260,7 @@ component = H.mkComponent
 
       Just (BlogPost slug) ->
         headerContainer 
-          darkMode 
-          DarkModeToggle $ 
+          NavigateAction $ 
             HH.slot 
             (SProxy :: _ "blogPost") 
             unit 
@@ -267,10 +268,19 @@ component = H.mkComponent
             { slug: (Slug.generate slug) }
             absurd
 
+      Just Exhibitions ->
+        headerContainer
+          NavigateAction $
+            HH.slot
+              (SProxy :: _ "exhibitions")
+              unit
+              Exhibitions.component
+              unit
+              absurd
+
       Just (Exhibition exId) ->
         headerContainer
-          darkMode
-          DarkModeToggle $
+          NavigateAction $
             HH.slot 
             (SProxy :: _ "exhibition")
             unit
@@ -278,6 +288,16 @@ component = H.mkComponent
             { exhibitionId: exId }
             absurd
 
+      Just About -> 
+        headerContainer
+          NavigateAction $
+            HH.slot
+              (SProxy :: _ "about")
+              unit
+              About.component
+              unit
+              absurd
+  
       Just Login ->
         HH.slot 
           (SProxy :: _ "login") 
@@ -288,8 +308,7 @@ component = H.mkComponent
 
       Just (Tag tagId) -> 
         headerContainer 
-          darkMode 
-          DarkModeToggle $ 
+          NavigateAction $ 
             HH.slot 
             (SProxy :: _ "tag") 
             unit 

@@ -18,6 +18,8 @@ data Route
   = Home
   | BlogPost String
   | Exhibition ExhibitionId
+  | Exhibitions
+  | About
   | Login
   | Tag TagId
   -- Admin
@@ -42,6 +44,8 @@ routeCodec = sum
   { "Home": noArgs
   , "BlogPost" : "posts" / slug
   , "Exhibition" : "exhibitions" / exhibitionId
+  , "Exhibitions" : "exhibitions" / noArgs
+  , "About" : "about" / noArgs
   , "Login" : "login" / noArgs
   , "Tag"   : "tags" / tagId
   -- Admin

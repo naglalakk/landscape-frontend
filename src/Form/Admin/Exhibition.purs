@@ -2,12 +2,13 @@ module Form.Admin.ExhibitionForm where
 
 import Prelude
 
-import Component.HTML.Utils (css, withLabel)
+import Component.HTML.Utils (css, maybeElem, withLabel)
+import Component.Media as Media
 import Component.Table as Table
 import Data.Array (filter, head, snoc)
 import Data.Const (Const(..))
 import Data.Exhibition (ExhibitionId(..), Exhibition(..))
-import Data.Image (Image(..))
+import Data.Image (Image(..), ImageType)
 import Data.Item (Item(..), ItemId(..))
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (class Newtype, unwrap)
@@ -20,6 +21,8 @@ import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Halogen.Media.Component.Browser as Browser
+import Halogen.Media.Data.Media (Media(..))
 import Resource.Exhibition (class ManageExhibition, getExhibitionItems)
 import Resource.Item (class ManageItem, createItem, updateItem)
 import Resource.Media (class ManageMedia)
@@ -32,8 +35,8 @@ newtype ExhibitionForm r f = ExhibitionForm (r
   , featuredImage :: f Void (Maybe Image) (Maybe Image)
   , introduction :: f Void (Maybe String) (Maybe String)
   , items :: f Void (Array ItemId) (Array ItemId)
-  , startDate :: f Void Timestamp Timestamp
-  , endDate :: f Void Timestamp Timestamp
+  , startDate :: f Void (Maybe Timestamp) (Maybe Timestamp)
+  , endDate :: f Void (Maybe Timestamp) (Maybe Timestamp)
   , createdAt :: f Void Timestamp Timestamp
   , updatedAt :: f Void (Maybe Timestamp) (Maybe Timestamp)
   ))
@@ -52,18 +55,22 @@ data Action
   | Receive Input
   | HandleItemForm Item
   | HandleTableAction Table.Output
+  | HandleImageModal
+  | HandleImageBrowserOutput (Browser.Output ImageType)
   | SaveExhibition
 
 type ChildSlots = (
   itemForm :: H.Slot (F.Query ItemForm.ItemForm (Const Void) ItemForm.ChildSlots) Item Unit,
-  itemTable :: H.Slot (Const Void) Table.Output Unit
+  itemTable :: H.Slot (Const Void) Table.Output Unit,
+  imageBrowser :: H.Slot (Const Void) (Browser.Output ImageType) Unit
 )
 
 type Query = Const Void
 
 type AddedState = (
   item :: Maybe Item,
-  items :: Array Item
+  items :: Array Item,
+  imageBrowserActive :: Boolean
 )
 
 component :: forall m
@@ -100,6 +107,7 @@ component = F.component input F.defaultSpec
       }
     , item: Nothing
     , items: []
+    , imageBrowserActive: false
     }
 
   handleAction :: Action
@@ -110,6 +118,19 @@ component = F.component input F.defaultSpec
       let id = F.getInput prx.id state.form
       items <- getExhibitionItems id
       H.modify_ _ { items = items }
+
+    HandleImageModal ->
+      H.modify_ _ { imageBrowserActive = true 
+                  }
+    
+    HandleImageBrowserOutput output -> case output of
+      Browser.InsertedMedia images -> do
+        state <- H.get
+        let 
+          modImages = map (\(Media x) -> Image x) images
+        eval $ F.setValidate prx.featuredImage $ head modImages
+        H.modify_ _ { imageBrowserActive = false }
+      _ -> pure unit
     
     HandleItemForm (Item item) -> do
       state <- H.get
@@ -179,6 +200,23 @@ component = F.component input F.defaultSpec
         , HP.value $ F.getInput prx.title st.form
         , HE.onValueInput $ Just <<< F.setValidate prx.title
         ])
+      , maybeElem (F.getInput prx.featuredImage st.form) \(Image img) ->
+        withLabel "Current image" (HH.img
+          [ HP.src $ fromMaybe img.src img.thumbnail])
+
+      , withLabel "Featured Image" (HH.a
+        [ css "button"
+        , HE.onClick \_ -> 
+          Just $ F.injAction $ HandleImageModal
+        ]
+        [ HH.text "+ Add Image" ])
+      , HH.slot
+        (SProxy :: _ "imageBrowser")
+        unit
+        (Media.component)
+        { isActive: st.imageBrowserActive }
+        (Just <<< F.injAction <<< HandleImageBrowserOutput)
+
       , withLabel "Introduction" (HH.textarea
         [ HP.value $ fromMaybe "" $ F.getInput prx.introduction st.form
         , HE.onValueInput (\str -> Just $ F.setValidate prx.introduction (Just str))

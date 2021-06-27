@@ -52,6 +52,11 @@ borderWhite =
     CSS.borderLeft CSS.solid (CSS.px 1.0) Colors.white
     CSS.borderRight CSS.solid (CSS.px 1.0) Colors.white
 
+boxWhite :: CSS.CSS
+boxWhite = 
+  CSS.fromString ".box-white" ? do
+    CSS.border CSS.solid (CSS.px 1.0) Colors.white
+
 flex :: CSS.CSS
 flex =
   CSS.fromString ".flex" ? do
@@ -68,6 +73,11 @@ flexWrap :: CSS.CSS
 flexWrap =
   CSS.fromString ".flex-wrap" ? do
     CSS.flexWrap CSS.wrap
+
+flexEnd :: CSS.CSS
+flexEnd = 
+  CSS.fromString ".flex-end" ? do
+    CSS.alignContent CSS.flexEnd
 
 column :: CSS.CSS
 column =

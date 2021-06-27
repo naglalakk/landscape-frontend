@@ -2,6 +2,7 @@ module Page.Exhibition where
 
 import Prelude
 
+import CSS (offsetTop)
 import Component.HTML.ExhibitionItem (exhibitionItem)
 import Component.HTML.Overview (overview)
 import Component.HTML.Utils (css, maybeElem)
@@ -10,17 +11,22 @@ import Component.PurchaseToken as PurchaseToken
 import Data.Const (Const(..))
 import Data.Exhibition (Exhibition(..), ExhibitionId)
 import Data.Functor.Variant (SProxy(..))
+import Data.Int (fromNumber)
 import Data.Item (Item(..), ItemId(..))
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (unwrap)
 import Data.Token (TokenId(..))
 import Effect.Aff.Class (class MonadAff)
+import Effect.Class.Console (logShow)
+import Foreign.Window (scrollTo)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Resource.Exhibition (class ManageExhibition, getExhibitionById, getExhibitionItems)
 import Resource.Token (class ManageToken)
+import Utils.DOM (getTop)
+import Web.HTML as HTML
 
 type Input =
   { exhibitionId :: ExhibitionId
@@ -91,6 +97,13 @@ component =
       let 
         identifier = "item-" <> (show $ unwrap itemId)
       H.modify_ _ { overviewOpen = false }
+
+      top <- H.liftEffect $ getTop identifier
+      case top of
+        Just t -> do
+          w <- H.liftEffect HTML.window
+          H.liftEffect $ scrollTo 0 (fromMaybe 0 $ fromNumber t) w
+        Nothing -> pure unit
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state = 

@@ -5,10 +5,12 @@ import Prelude
 import Data.Argonaut (decodeJson, encodeJson, jsonEmptyObject, (:=), (~>), (.:), (.:?))
 import Data.Argonaut.Decode (class DecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
+import Data.Formatter.DateTime (Formatter, FormatterCommand(..))
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Image (Image(..))
 import Data.Item (ItemId)
+import Data.List (fromFoldable)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Formless as F
@@ -36,8 +38,8 @@ newtype Exhibition = Exhibition
   , featuredImage :: Maybe Image
   , introduction :: Maybe String
   , items :: Array ItemId
-  , startDate :: Timestamp
-  , endDate :: Timestamp
+  , startDate :: Maybe Timestamp
+  , endDate :: Maybe Timestamp
   , createdAt :: Timestamp
   , updatedAt :: Maybe Timestamp
   }
@@ -58,3 +60,13 @@ instance encodeJsonExhibition :: EncodeJson Exhibition where
     ~> "updatedAt" := exhibition.updatedAt
 
 derive newtype instance decodeJsonExhibition :: DecodeJson Exhibition
+
+dateTimeFormat :: Formatter
+dateTimeFormat 
+  = fromFoldable
+    [ DayOfMonthTwoDigits
+    , Placeholder "."
+    , MonthTwoDigits
+    , Placeholder "."
+    , YearFull
+    ]

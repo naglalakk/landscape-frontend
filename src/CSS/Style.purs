@@ -12,7 +12,7 @@ import CSS.Property as CSS
 import CSS.Queries as Q
 import CSS.Selector (with)
 import CSS.TextAlign as CSS
-import CSS.Shared (button, container, containerWhite, containerPadding, relative, borderWhite, underlined, bold, textCenter, flex, flexCenter, flexWrap, column, spaceB, alignCenter, listStyleTypeNone, showElement, textRight, textLeft)
+import CSS.Shared (button, container, containerWhite, containerPadding, relative, borderWhite, boxWhite, underlined, bold, textCenter, flex, flexCenter, flexWrap, flexEnd, column, spaceB, alignCenter, listStyleTypeNone, showElement, textRight, textLeft)
 import CSS.Utils (padding)
 import Data.NonEmpty (singleton)
 import Halogen.HTML (HTML(..))
@@ -27,6 +27,14 @@ stylesheet = HCSS.stylesheet do
   h4
   header
   borderWhite
+  boxWhite
+  -- Pages
+  pageHome
+
+  -- Exhibitions
+  pageExhibitions
+  exhibitions
+
   -- Exhibition
   exhibition
   exhibitionItem
@@ -36,6 +44,11 @@ stylesheet = HCSS.stylesheet do
   overview
   overviewIcon
 
+  -- About 
+  pageAbout
+
+  -- Elements
+  coverImage
   -- Utility
   button
   container
@@ -51,6 +64,7 @@ stylesheet = HCSS.stylesheet do
   flex
   flexCenter
   flexWrap
+  flexEnd
   column
   spaceB
   alignCenter
@@ -93,12 +107,24 @@ h4 = CSS.fromString "h4" ? do
 header :: CSS.CSS
 header = 
   CSS.fromString ".header" ? do
-    CSS.key (CSS.fromString "visibility") "hidden"
     CSS.position CSS.absolute
     CSS.top $ CSS.px 0.0
     CSS.left $ CSS.px 0.0
     CSS.width $ CSS.pct 100.0
     CSS.height $ CSS.px 100.0
+    CSS.zIndex 999
+
+    CSS.fromString ".menu" ? do
+      CSS.fontFamily ["Oswald"] (singleton CSS.sansSerif)
+      CSS.fontSize $ CSS.px 18.0
+      CSS.paddingRight $ CSS.px 25.0
+
+      CSS.fromString "a" ? do
+        CSS.textDecoration CSS.noneTextDecoration
+
+      CSS.fromString ".divider" ? do
+        CSS.marginLeft $ CSS.px 12.5
+        CSS.marginRight $ CSS.px 12.5
 
 
 -- White arrow down background
@@ -141,7 +167,7 @@ exhibition =
 exhibitionItem :: CSS.CSS
 exhibitionItem =
   CSS.fromString ".exhibition-item" ? do
-    CSS.paddingTop $ CSS.px 200.0
+    CSS.paddingTop $ CSS.px 50.0
     CSS.fromString ".image" ? do
       CSS.key (CSS.fromString "object-fit") "contain"
       CSS.marginBottom $ CSS.px 25.0
@@ -212,11 +238,12 @@ overview :: CSS.CSS
 overview = 
   CSS.fromString ".overview" ? do
     CSS.position CSS.fixed
-    CSS.zIndex 999
+    CSS.zIndex 1000
     CSS.width $ CSS.pct 100.0
     CSS.height $ CSS.pct 100.0
     CSS.top $ CSS.px 0.0
     CSS.left $ CSS.px 0.0
+    CSS.backgroundColor Colors.black
     CSS.backgroundImage $ CSS.url "/static/img/overviewbg.png" 
     CSS.backgroundRepeat CSS.noRepeat
     CSS.backgroundSize $ CSS.fromString "cover"
@@ -236,3 +263,78 @@ navigation :: CSS.CSS
 navigation = 
   CSS.fromString ".navigation" ? do
     CSS.marginBottom $ CSS.px 100.0
+
+
+pageHome :: CSS.CSS
+pageHome =
+  CSS.fromString ".page-home" ? do
+    CSS.paddingTop $ CSS.px 100.0
+
+
+coverImage :: CSS.CSS
+coverImage = 
+  CSS.fromString ".cover-image" ? do
+    CSS.width $ CSS.pct 100.0
+    CSS.height $ CSS.px 800.0
+    CSS.backgroundRepeat CSS.noRepeat
+    CSS.backgroundAttachment $ CSS.fromString "fixed"
+    CSS.backgroundSize $ CSS.fromString "cover" 
+    CSS.backgroundPosition $ CSS.fromString "center center"
+
+    CSS.fromString ".title-bar" ? do
+      CSS.position CSS.absolute
+      CSS.bottom $ CSS.px 0.0
+      CSS.left $ CSS.px 0.0
+      CSS.width $ CSS.pct 100.0
+      CSS.height $ CSS.px 100.0
+      CSS.key (CSS.fromString "background") "linear-gradient(to bottom, transparent 0%, rgb(3, 12, 34) 100%);"
+
+    CSS.fromString ".title" ? do
+      CSS.paddingBottom $ CSS.px 25.0
+
+-- Exhibitions
+pageExhibitions :: CSS.CSS
+pageExhibitions = 
+  CSS.fromString ".page-exhibitions" ? do
+    CSS.paddingTop $ CSS.px 100.0
+
+exhibitions :: CSS.CSS
+exhibitions =
+  CSS.fromString ".exhibitions" ? do
+    CSS.marginTop $ CSS.px 25.0
+
+    CSS.fromString ".featured" `with` CSS.fromString ".exhibition" ? do
+      CSS.flexBasis $ CSS.pct 100.0
+      CSS.height $ CSS.px 450.0
+
+    CSS.fromString ".exhibition" ? do
+      CSS.height $ CSS.px 332.0
+      CSS.key (CSS.fromString "cursor") "pointer"
+      CSS.key (CSS.fromString "flex-basis") "calc(50% - 25px)"
+      CSS.backgroundRepeat CSS.noRepeat
+      CSS.backgroundAttachment $ CSS.fromString "fixed"
+      CSS.backgroundSize $ CSS.fromString "cover" 
+      CSS.backgroundPosition $ CSS.fromString "center center"
+      CSS.marginBottom $ CSS.px 25.0
+
+      CSS.fromString ".info" ? do
+        CSS.position CSS.absolute
+        CSS.left $ CSS.px 0.0
+        CSS.bottom $ CSS.px 0.0
+        CSS.width $ CSS.pct 100.0
+        CSS.height $ CSS.px 160.0
+        CSS.key (CSS.fromString "background") "linear-gradient(to bottom, transparent 0%, rgb(3, 12, 34) 100%);"
+
+        CSS.fromString ".title" ? do
+          CSS.fontSize $ CSS.px 36.0
+          CSS.paddingLeft $ CSS.px 25.0
+          CSS.paddingRight $ CSS.px 25.0
+
+        CSS.fromString ".start-date" ? do
+          CSS.paddingLeft $ CSS.px 25.0
+
+pageAbout :: CSS.CSS
+pageAbout =
+  CSS.fromString ".page-about" ? do
+    CSS.paddingTop $ CSS.px 100.0
+    CSS.key (CSS.fromString "min-height") "100vh"
