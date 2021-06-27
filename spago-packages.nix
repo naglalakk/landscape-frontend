@@ -665,6 +665,18 @@ let
         installPhase = "ln -s $src $out";
       };
 
+    "halogen-hooks-extra" = pkgs.stdenv.mkDerivation {
+        name = "halogen-hooks-extra";
+        version = "v0.7.1";
+        src = pkgs.fetchgit {
+          url = "https://github.com/jordanmartinez/purescript-halogen-hooks-extra.git";
+          rev = "e46af0629bcdfb2b875d101d7d526650083d4ce8";
+          sha256 = "0l48pbcv31gxh48ngg0gbg3bg1smnb48048v2kmq2bsmwlnd60hn";
+        };
+        phases = "installPhase";
+        installPhase = "ln -s $src $out";
+      };
+
     "halogen-media" = pkgs.stdenv.mkDerivation {
         name = "halogen-media";
         version = "37bd8cd606f85f0ebd37cf47e8975ba723566de6";
@@ -684,6 +696,18 @@ let
           url = "https://github.com/naglalakk/purescript-halogen-rawhtml";
           rev = "2b38c6cfb71ebb1ab75bf3724886f70dd05de651";
           sha256 = "0zhgkvqv9xw5kd7jdpr0m4w2j2x8snhk7lggzrs942qkvxpjim7y";
+        };
+        phases = "installPhase";
+        installPhase = "ln -s $src $out";
+      };
+
+    "halogen-select" = pkgs.stdenv.mkDerivation {
+        name = "halogen-select";
+        version = "ea85ca795a8a28cf0ce474710d6df8bb8a1c8270";
+        src = pkgs.fetchgit {
+          url = "https://github.com/citizennet/purescript-halogen-select";
+          rev = "ea85ca795a8a28cf0ce474710d6df8bb8a1c8270";
+          sha256 = "1nxsman22jlj0w3y7zd85fwlf23gmr2kwnyg2i7prl1jfda8w1kx";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";
