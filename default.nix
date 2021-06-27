@@ -2,7 +2,7 @@
 , apiURL ? ""
 , apiKey ? ""
 , environment ? "Production"
-, recvAddress ? ""
+, recvAddr ? ""
 }:
   let
     pkgs = import ./packages.nix {};
@@ -70,7 +70,7 @@
         echo API_URL=${apiURL} >> $out/.env
         echo API_KEY=${apiKey} >> $out/.env
         echo ENVIRONMENT=${environment} >> $out/.env
-        echo RECV_ADDRESS=${recvAddress} >> $out/.env
+        echo RECV_ADDR=${recvAddr} >> $out/.env
 
         # Make bundle
         cd $out && spago bundle-app --no-install --no-build --to $out/static/build/index.js
