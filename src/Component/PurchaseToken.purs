@@ -100,7 +100,7 @@ component =
     -- Loop for countdown
     ClockLoop -> do
       state <- H.get 
-      if state.minutes == 0 && state.seconds == 0 || not state.heartbeat
+      if state.minutes == 0 && state.seconds == 0
         then do
           -- Change TokenTransaction status to Expired
           tokenTx <- case state.tokenTx of
@@ -110,9 +110,6 @@ component =
           H.modify_ _ { heartbeat = false 
                       , tokenTx = tokenTx
                       }
-          case state.clockFork of
-            Just fId -> H.kill fId
-            Nothing -> pure unit
         else do
           let
             newMinutes = 
@@ -130,8 +127,15 @@ component =
                       , seconds = newSeconds
                       }
 
-          H.liftAff $ Aff.delay $ Aff.Milliseconds 1000.0
-          handleAction ClockLoop
+          state <- H.get 
+          if state.heartbeat 
+            then do
+              H.liftAff $ Aff.delay $ Aff.Milliseconds 1000.0
+              handleAction ClockLoop
+            else
+              case state.clockFork of
+                Just fId -> H.kill fId
+                Nothing -> pure unit
 
     PollLoop -> do
       state <- H.get
@@ -140,20 +144,25 @@ component =
           refreshTx <- getTokenTransaction tokenTx.hash
           case refreshTx of
             Just (TokenTransaction rTx) -> 
-              if rTx.status == Completed  || not state.heartbeat
+              if rTx.status == Completed
                 then do
                   H.modify_ _ { heartbeat = false 
                               , status = Just rTx.status
                               }
-                  case state.pollFork of
-                    Just fId -> H.kill fId
-                    Nothing -> pure unit
                 else do
                   H.modify_ _ { status = Just rTx.status }
             Nothing -> pure unit
         Nothing -> pure unit
-      H.liftAff $ Aff.delay $ Aff.Milliseconds 5000.0
-      handleAction PollLoop
+
+      state <- H.get
+      if state.heartbeat 
+        then do
+          H.liftAff $ Aff.delay $ Aff.Milliseconds 5000.0
+          handleAction PollLoop
+        else 
+          case state.pollFork of
+            Just fId -> H.kill fId
+            Nothing -> pure unit
 
     Continue -> do
       state <- H.get
