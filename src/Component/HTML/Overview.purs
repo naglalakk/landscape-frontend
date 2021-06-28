@@ -28,7 +28,7 @@ overview closeAction selectAction showOverview items =
     , HH.div
       [ css "artworks-container container" ]
       [ HH.div
-        [ css "container-padding flex space-between" ]
+        [ css "container-padding align-center flex-wrap flex space-between" ]
         (map (\(Item item) -> 
           HH.div
             [ css "artwork" 

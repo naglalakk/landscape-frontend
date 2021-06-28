@@ -211,13 +211,6 @@ component =
                   [ HH.text "You are about to purchase 1 NFT. " ]
                 , HH.p
                   []
-                  [ HH.text "For more information on how to purchase NFTs on this site, refer to " 
-                  , HH.a
-                    []
-                    [ HH.text "this page" ]
-                  ]
-                , HH.p
-                  []
                   [ HH.text "Once you confirm the purchase you will get an address and exact amount of ADA that you will need to send to the address in order to receive your NFT.  Your request is reserved for 15 minutes. If the amount is not received in this timeframe the NFT is released and will be avaialble again for purchase." ]
                 , HH.p
                   []
@@ -255,7 +248,7 @@ component =
                 , HH.div
                   [ css "addr-container flex flex-center" ]
                   [ HH.p
-                    []
+                    [ css "address" ]
                     [ HH.text recvAddr ]
                   ] 
                 , HH.p

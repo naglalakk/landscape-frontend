@@ -142,10 +142,10 @@ component =
             ]
           , HH.div
             [ css "layer-2 container-padding" ]
-            [ HH.h1
+            [ {--HH.h1
               [ css "underlined" ]
-              [ HH.text "Instructions" ]
-            , HH.div
+              [ HH.text "Instructions" ]--}
+              HH.div
               [ css "instruction-visual flex flex-center" ]
               [ HH.div
                 [ css "flex column" ]
@@ -203,11 +203,6 @@ component =
                   [ css "bold" ]
                   [ HH.text "Note that only a single copy of each artwork will be minted." ]
                 , HH.br []
-                {--, HH.text "See "
-                , HH.a
-                  [ HP.href "#" ]
-                  [ HH.text "this page" ]
-                  , HH.text " for extensive documentation about the sale." --}
                 ]
               ]
           , HH.div

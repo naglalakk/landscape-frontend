@@ -70,6 +70,7 @@ stylesheet = HCSS.stylesheet do
   alignCenter
   listStyleTypeNone
   showElement
+  -- overflowYShow
 
 body :: CSS.CSS
 body =
@@ -97,6 +98,8 @@ h1 =
     CSS.fontSize $ CSS.px 54.0
     CSS.paddingBottom $ CSS.px 12.5
     CSS.key (CSS.fromString "display") "inline-block"
+    CSS.query Media.screen (singleton $ Media.maxWidth $ CSS.px  767.0) $ do
+      CSS.fontSize $ CSS.px 28.0
 
 h4 :: CSS.CSS
 h4 = CSS.fromString "h4" ? do
@@ -107,6 +110,7 @@ h4 = CSS.fromString "h4" ? do
 header :: CSS.CSS
 header = 
   CSS.fromString ".header" ? do
+    CSS.key (CSS.fromString "visibility") "hidden"
     CSS.position CSS.absolute
     CSS.top $ CSS.px 0.0
     CSS.left $ CSS.px 0.0
@@ -172,13 +176,23 @@ exhibitionItem =
       CSS.key (CSS.fromString "object-fit") "contain"
       CSS.marginBottom $ CSS.px 25.0
 
+      CSS.fromString "img" ? do
+        CSS.maxWidth $ CSS.pct 100.0
+
     CSS.fromString ".info" ? do
       CSS.fromString ".title" ? do
         CSS.fontSize $ CSS.px 32.0
 
     CSS.fromString ".token-data" ? do
+      CSS.fromString ".data-info" ? do
+        CSS.query Media.screen (singleton $ Media.maxWidth $ CSS.px  767.0) $ do
+          CSS.flexDirection CSS.column
+
       CSS.fromString ".width-half" ? do
         CSS.key (CSS.fromString "width") "calc(50% - 50px)"
+        
+        CSS.query Media.screen (singleton $ Media.maxWidth $ CSS.px  767.0) $ do
+          CSS.width $ CSS.pct 100.0
 
       CSS.fromString "ul" ? do
         CSS.fromString "li" ? do
@@ -202,6 +216,8 @@ exhibitionItem =
 instructionVisual :: CSS.CSS
 instructionVisual =
   CSS.fromString ".instruction-visual" ? do
+    CSS.key (CSS.fromString "display") "none !important"
+
     CSS.marginTop $ CSS.px 200.0
     CSS.marginBottom $ CSS.px 200.0
 
@@ -209,9 +225,13 @@ instructionVisual =
       CSS.height $ CSS.px 191.0
       CSS.key (CSS.fromString "width") "auto"
 
+    CSS.query Media.screen (singleton $ Media.maxWidth $ CSS.px  767.0) $ do
+      CSS.flexDirection CSS.column
+
 purchaseContainer :: CSS.CSS
 purchaseContainer = 
   CSS.fromString ".purchase-container" ? do
+    CSS.key (CSS.fromString "overflow-y") "scroll"
     CSS.backgroundColor Colors.black
     CSS.position CSS.fixed
     CSS.width $ CSS.pct 100.0
@@ -231,6 +251,11 @@ purchaseContainer =
       CSS.height $ CSS.px 100.0
       CSS.width $ CSS.pct 100.0
 
+      
+      CSS.query Media.screen (singleton $ Media.maxWidth $ CSS.px  767.0) $ do
+        CSS.fromString ".address" ? do
+          CSS.fontSize $ CSS.px 8.0
+
     CSS.fromString ".clock" ? do
       CSS.fontSize $ CSS.px 56.0
 
@@ -238,6 +263,7 @@ overview :: CSS.CSS
 overview = 
   CSS.fromString ".overview" ? do
     CSS.position CSS.fixed
+    -- CSS.key (CSS.fromString "overflow-y") "scroll"
     CSS.zIndex 1000
     CSS.width $ CSS.pct 100.0
     CSS.height $ CSS.pct 100.0
@@ -253,10 +279,18 @@ overview =
       CSS.marginTop $ CSS.px 50.0
       CSS.fromString ".artwork" ? do
         CSS.marginBottom $ CSS.px 25.0
+        
+        CSS.fromString "img" ? do
+          CSS.maxWidth $ CSS.pct 100.0
+
+      
+      CSS.query Media.screen (singleton $ Media.maxWidth $ CSS.px  767.0) $ do
+        CSS.flexDirection CSS.column
 
 overviewIcon :: CSS.CSS
 overviewIcon =
   CSS.fromString ".overview-icon" ? do
+    CSS.display CSS.displayNone
     CSS.height $ CSS.px 40.0
 
 navigation :: CSS.CSS
@@ -338,3 +372,12 @@ pageAbout =
   CSS.fromString ".page-about" ? do
     CSS.paddingTop $ CSS.px 100.0
     CSS.key (CSS.fromString "min-height") "100vh"
+
+
+overflowYShow :: CSS.CSS
+overflowYShow = do
+  CSS.fromString ".overflow-y-true" ? do
+    CSS.key (CSS.fromString "overflow-y") "scroll"
+  CSS.fromString ".overflow-y-false" ? do
+    CSS.key (CSS.fromString "overflow-y") "hidden"
+

@@ -32,9 +32,9 @@ exhibitionItem purchaseAction triggerOverview (Item item) =
           [ HP.src img.src
           ]
         ]
-      , HH.p
+      {--, HH.p
         [ css "text-center" ]
-        [ HH.text "( Click image for fullscreen )" ]
+        [ HH.text "( Click image for fullscreen )" ]--}
       ]
     , HH.div
       [ css "info underlined" ]
@@ -56,7 +56,7 @@ exhibitionItem purchaseAction triggerOverview (Item item) =
       HH.div
         [ css "token-data" ]
         [ HH.div
-          [ css "flex space-between" ]
+          [ css "flex space-between data-info" ]
           [ HH.div
             [ css "info width-half" ]
             [ HH.p

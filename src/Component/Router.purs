@@ -12,6 +12,7 @@ import Control.Monad.Error.Class (class MonadError)
 import Control.Monad.Reader (class MonadAsk, asks)
 import Data.Either (hush)
 import Data.Environment (UserEnv(..))
+import Data.Exhibition as E
 import Data.Foldable (elem)
 import Data.Maybe (Maybe(..), fromMaybe, isJust)
 import Data.Route (Route(..), routeCodec)
@@ -249,13 +250,13 @@ component = H.mkComponent
   render { route, currentUser, darkMode } = 
     case route of
       Just Home -> 
-        headerContainer 
-          NavigateAction $ 
+        headerContainer
+          NavigateAction $
             HH.slot 
-            (SProxy :: _ "home") 
-            unit 
-            Home.component 
-            unit 
+            (SProxy :: _ "exhibition")
+            unit
+            Exhibition.component
+            { exhibitionId: E.ExhibitionId 1 }
             absurd
 
       Just (BlogPost slug) ->
