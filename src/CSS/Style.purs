@@ -202,6 +202,7 @@ exhibitionItem =
       CSS.fromString ".metadata" ? do
 
         CSS.fromString ".code" ? do
+          CSS.fontSize $ CSS.px 12.0
           CSS.fontFamily ["Source Code Pro"] (singleton CSS.sansSerif)
           CSS.border CSS.solid (CSS.px 1.0) Colors.white
           padding 12.5
