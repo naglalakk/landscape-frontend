@@ -14,7 +14,7 @@ import Data.Either (hush)
 import Data.Environment (UserEnv(..))
 import Data.Exhibition as E
 import Data.Foldable (elem)
-import Data.Maybe (Maybe(..), fromMaybe, isJust)
+import Data.Maybe (Maybe(..), fromMaybe, isJust, isNothing)
 import Data.Route (Route(..), routeCodec)
 import Data.String (drop)
 import Data.Symbol (SProxy(..))
@@ -95,70 +95,74 @@ type ChildSlots =
 -- TODO: Move to own file
 adminContainer :: forall props act
                 . (Route -> act)
+               -> Maybe User
                -> HH.HTML props act
                -> HH.HTML props act
-adminContainer navigateAction slot =
-  HH.div
-    [ css "admin-container full-width flex-center" ]
-    [ AdminStyle.stylesheet
-    , HH.div
-      [ css "container flex" ]
-      [ HH.div
-        [ css "admin-menu" ]
-        [ HH.a
-          [ HE.onClick \_ -> Just $ navigateAction AdminHome 
-          , css "menu-link"
-          ]
-          [ HH.i
-            [ css "fas fa-home" ]
-            []
-          , HH.text "Home" 
-          ]
-        , HH.a
-          [ HE.onClick \_ -> Just $ navigateAction AdminBlogPosts
-          , css "menu-link"
-          ]
-          [ HH.i
-            [ css "fas fa-blog" ]
-            []
-          , HH.text "Blog" 
-          ]
-        , HH.a
-          [ css "menu-link"
-          , HE.onClick \_ -> Just $ navigateAction AdminExhibitions
-          ]
-          [ HH.i
-            [ css "fas fa-th"
+adminContainer navigateAction currentUser slot = 
+  if isNothing currentUser 
+    then slot
+    else
+      HH.div
+        [ css "admin-container full-width flex-center" ]
+        [ AdminStyle.stylesheet
+        , HH.div
+          [ css "container flex" ]
+          [ HH.div
+            [ css "admin-menu" ]
+            [ HH.a
+              [ HE.onClick \_ -> Just $ navigateAction AdminHome 
+              , css "menu-link"
+              ]
+              [ HH.i
+                [ css "fas fa-home" ]
+                []
+              , HH.text "Home" 
+              ]
+            , HH.a
+              [ HE.onClick \_ -> Just $ navigateAction AdminBlogPosts
+              , css "menu-link"
+              ]
+              [ HH.i
+                [ css "fas fa-blog" ]
+                []
+              , HH.text "Blog" 
+              ]
+            , HH.a
+              [ css "menu-link"
+              , HE.onClick \_ -> Just $ navigateAction AdminExhibitions
+              ]
+              [ HH.i
+                [ css "fas fa-th"
+                ]
+                []
+              , HH.text "Exhibitions" 
+              ]
+            , HH.a
+              [ HE.onClick \_ -> Just $ navigateAction AdminTokens
+              , css "menu-link"
+              ]
+              [ HH.i
+                [ css "fas fa-coins"
+                ]
+                []
+              , HH.text "Tokens" 
+              ]
+            , HH.a
+              [ HE.onClick \_ -> Just $ navigateAction AdminTransactions
+              , css "menu-link"
+              ]
+              [ HH.i
+                [ css "fas fa-server"
+                ]
+                []
+              , HH.text "Transactions" 
+              ]
             ]
-            []
-          , HH.text "Exhibitions" 
-          ]
-        , HH.a
-          [ HE.onClick \_ -> Just $ navigateAction AdminTokens
-          , css "menu-link"
-          ]
-          [ HH.i
-            [ css "fas fa-coins"
-            ]
-            []
-          , HH.text "Tokens" 
-          ]
-        , HH.a
-          [ HE.onClick \_ -> Just $ navigateAction AdminTransactions
-          , css "menu-link"
-          ]
-          [ HH.i
-            [ css "fas fa-server"
-            ]
-            []
-          , HH.text "Transactions" 
+          , HH.div
+            [ css "admin-content" ]
+            [ slot ]
           ]
         ]
-      , HH.div
-        [ css "admin-content" ]
-        [ slot ]
-      ]
-    ]
 
 -- Container including header
 headerContainer :: forall props act
@@ -253,10 +257,10 @@ component = H.mkComponent
         headerContainer
           NavigateAction $
             HH.slot 
-            (SProxy :: _ "exhibition")
+            (SProxy :: _ "home")
             unit
-            Exhibition.component
-            { exhibitionId: E.ExhibitionId 1 }
+            Home.component
+            unit
             absurd
 
       Just (BlogPost slug) ->
@@ -319,7 +323,7 @@ component = H.mkComponent
 
       -- Admin
       Just AdminHome ->
-        adminContainer NavigateAction $
+        adminContainer NavigateAction currentUser $
           HH.slot 
           (SProxy :: _ "adminHome") 
           unit 
@@ -329,7 +333,7 @@ component = H.mkComponent
           # authorize currentUser
 
       Just AdminBlogPosts ->
-        adminContainer NavigateAction $
+        adminContainer NavigateAction currentUser $
           HH.slot 
           (SProxy :: _ "adminBlogPosts")
           unit 
@@ -339,7 +343,7 @@ component = H.mkComponent
           # authorize currentUser
 
       Just (AdminBlogPost blogPostId) -> 
-        adminContainer NavigateAction $
+        adminContainer NavigateAction currentUser $
           HH.slot 
           (SProxy :: _ "adminBlogPost") 
           unit 
@@ -349,7 +353,7 @@ component = H.mkComponent
           # authorize currentUser
 
       Just AdminExhibitions ->
-        adminContainer NavigateAction $
+        adminContainer NavigateAction currentUser $
           HH.slot 
           (SProxy :: _ "adminExhibitions")
           unit
@@ -359,7 +363,7 @@ component = H.mkComponent
           # authorize currentUser
 
       Just (AdminExhibition exId) ->
-        adminContainer NavigateAction $
+        adminContainer NavigateAction currentUser $
           HH.slot
           (SProxy :: _ "adminExhibition")
           unit
@@ -369,7 +373,7 @@ component = H.mkComponent
           # authorize currentUser
 
       Just AdminTokens ->
-        adminContainer NavigateAction $
+        adminContainer NavigateAction currentUser $
           HH.slot
           (SProxy :: _ "adminTokens") 
           unit
@@ -379,7 +383,7 @@ component = H.mkComponent
           # authorize currentUser
 
       Just (AdminToken tokenId) ->
-        adminContainer NavigateAction $
+        adminContainer NavigateAction currentUser $
           HH.slot
           (SProxy :: _ "adminToken")
           unit
@@ -389,7 +393,7 @@ component = H.mkComponent
           # authorize currentUser
 
       Just AdminTransactions ->
-        adminContainer NavigateAction $
+        adminContainer NavigateAction currentUser $
           HH.slot
           (SProxy :: _ "adminTransactions")
           unit

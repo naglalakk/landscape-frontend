@@ -5,6 +5,7 @@ import Prelude
 import CSS (Selector(..), element, hover, pseudo, select, (&), (?), (|>))
 import CSS as CSS
 import CSS.Colors as Colors
+import CSS.Common (center)
 import CSS.Font.Style as Font
 import CSS.Geometry as CSS
 import CSS.Media as Media
@@ -12,7 +13,7 @@ import CSS.Property as CSS
 import CSS.Queries as Q
 import CSS.Selector (with)
 import CSS.TextAlign as CSS
-import CSS.Shared (button, container, containerWhite, containerPadding, relative, borderWhite, boxWhite, underlined, bold, textCenter, flex, flexCenter, flexWrap, flexEnd, column, spaceB, alignCenter, listStyleTypeNone, showElement, textRight, textLeft)
+import CSS.Shared (button, container, containerWhite, containerPadding, relative, borderWhite, boxWhite, underlined, bold, textCenter, flex, flexCenter, flexWrap, flexEnd, column, spaceB, alignCenter, listStyleTypeNone, showElement, textRight, textLeft, breathe)
 import CSS.Utils (padding)
 import Data.NonEmpty (singleton)
 import Halogen.HTML (HTML(..))
@@ -43,6 +44,7 @@ stylesheet = HCSS.stylesheet do
   navigation
   overview
   overviewIcon
+  sale
 
   -- About 
   pageAbout
@@ -70,6 +72,7 @@ stylesheet = HCSS.stylesheet do
   alignCenter
   listStyleTypeNone
   showElement
+  breathe
   -- overflowYShow
 
 body :: CSS.CSS
@@ -91,6 +94,8 @@ p =
     CSS.marginBottom $ CSS.px 25.0
     CSS.lineHeight $ CSS.px 30.0
     CSS.fontSize $ CSS.px 18.0
+    -- CSS.letterSpacing $ CSS.px 1.2
+    CSS.fontFamily ["Open Sans"] (singleton CSS.sansSerif)
 
 h1 :: CSS.CSS
 h1 = 
@@ -110,7 +115,6 @@ h4 = CSS.fromString "h4" ? do
 header :: CSS.CSS
 header = 
   CSS.fromString ".header" ? do
-    CSS.key (CSS.fromString "visibility") "hidden"
     CSS.position CSS.absolute
     CSS.top $ CSS.px 0.0
     CSS.left $ CSS.px 0.0
@@ -153,6 +157,7 @@ exhibition =
       CSS.paddingBottom $ CSS.px 12.5
 
     CSS.fromString ".introduction" ? do
+      CSS.fontFamily ["Lato"] (singleton CSS.sansSerif)
       CSS.maxWidth $ CSS.px 800.0
       CSS.key (CSS.fromString "margin") "0 auto"
       CSS.marginTop $ CSS.px 300.0
@@ -182,6 +187,7 @@ exhibitionItem =
     CSS.fromString ".info" ? do
       CSS.fromString ".title" ? do
         CSS.fontSize $ CSS.px 32.0
+        CSS.fontFamily ["Lato"] (singleton CSS.sansSerif)
 
     CSS.fromString ".token-data" ? do
       CSS.fromString ".data-info" ? do
@@ -342,6 +348,10 @@ exhibitions =
       CSS.flexBasis $ CSS.pct 100.0
       CSS.height $ CSS.px 450.0
 
+    CSS.fromString ".exhibition" `with` hover ? do
+      CSS.fromString ".info" ? do
+        CSS.opacity 1.0
+
     CSS.fromString ".exhibition" ? do
       CSS.height $ CSS.px 332.0
       CSS.key (CSS.fromString "cursor") "pointer"
@@ -353,12 +363,14 @@ exhibitions =
       CSS.marginBottom $ CSS.px 25.0
 
       CSS.fromString ".info" ? do
+        CSS.opacity 0.0
         CSS.position CSS.absolute
         CSS.left $ CSS.px 0.0
         CSS.bottom $ CSS.px 0.0
         CSS.width $ CSS.pct 100.0
         CSS.height $ CSS.px 160.0
         CSS.key (CSS.fromString "background") "linear-gradient(to bottom, transparent 0%, rgb(3, 12, 34) 100%);"
+        CSS.key (CSS.fromString "transition") "all 0.6s ease-in-out"
 
         CSS.fromString ".title" ? do
           CSS.fontSize $ CSS.px 36.0
@@ -374,6 +386,10 @@ pageAbout =
     CSS.paddingTop $ CSS.px 100.0
     CSS.key (CSS.fromString "min-height") "100vh"
 
+    CSS.fromString ".about-section" ? do
+      CSS.fromString "p" ? do
+        CSS.fontFamily ["Lato"] (singleton CSS.sansSerif)
+
 
 overflowYShow :: CSS.CSS
 overflowYShow = do
@@ -382,3 +398,8 @@ overflowYShow = do
   CSS.fromString ".overflow-y-false" ? do
     CSS.key (CSS.fromString "overflow-y") "hidden"
 
+sale ::  CSS.CSS
+sale =
+  CSS.fromString ".sale" ? do
+    CSS.marginTop $ CSS.px 200.0
+    CSS.marginBottom $ CSS.px 200.0

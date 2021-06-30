@@ -1,30 +1,27 @@
 module Page.Login where
 
 import Prelude
-import Control.Monad.Reader         (class MonadAsk, asks)
-import Data.Const                   (Const)
-import Data.Maybe                   (Maybe(..))
-import Data.Newtype                 (unwrap)
-import Data.Symbol                  (SProxy(..))
-import Effect.Aff.Class             (class MonadAff)
-import Halogen                      as H
-import Halogen.HTML                 as HH
-import Formless                     as F
 
-import Api.Utils                    (authenticate)
-import Capability.Navigate          (class Navigate
-                                    ,navigate)
-import Component.Utils              (OpaqueSlot)
-import Component.HTML.Utils         (css)
-import Data.Auth                    (APIAuth(..)
-                                    ,UserAuth(..)
-                                    ,base64encode
-                                    ,writeToken)
-import Data.Environment             (UserEnv(..))
-import Data.Route                   as R
-import Form.Login                   as LoginForm
-import Resource.User                (class ManageUser
-                                    ,loginUser)
+import Api.Utils (authenticate)
+import CSS.Shared (button, loginForm)
+import Capability.Navigate (class Navigate, navigate)
+import Component.HTML.Utils (css)
+import Component.Utils (OpaqueSlot)
+import Control.Monad.Reader (class MonadAsk, asks)
+import Data.Auth (APIAuth(..), UserAuth(..), base64encode, writeToken)
+import Data.Const (Const)
+import Data.Environment (UserEnv(..))
+import Data.Maybe (Maybe(..))
+import Data.Newtype (unwrap)
+import Data.Route as R
+import Data.Symbol (SProxy(..))
+import Effect.Aff.Class (class MonadAff)
+import Form.Login as LoginForm
+import Formless as F
+import Halogen as H
+import Halogen.HTML as HH
+import Halogen.HTML.CSS as HCSS
+import Resource.User (class ManageUser, loginUser)
 
 type State =
   { redirect :: Boolean }
@@ -68,7 +65,10 @@ component =
   render state =
     HH.div 
       [] 
-      [ loginSlot 
+      [ HCSS.stylesheet do
+        loginForm
+        button
+      , loginSlot 
       ]
 
     where

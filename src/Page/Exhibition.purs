@@ -133,12 +133,12 @@ component =
               [ css "text-center introduction" ]
               [ HH.text $ fromMaybe "" exhibition.introduction
               ]
-            , HH.div
+            {--, HH.div
               [ css "navigation flex flex-center" ]
               [ HH.div
                 [ css "arrow-down-white" ]
                 []
-              ]
+              ]--}
             ]
           , HH.div
             [ css "layer-2 container-padding" ]
@@ -178,7 +178,7 @@ component =
                 ]
               ]
             , HH.div
-              [ css "text-center"] 
+              [ css "text-center sale"] 
               [ HH.h4
                 [ css "bold underlined" ]
                 [ HH.text "Sale" ]

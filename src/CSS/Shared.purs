@@ -102,6 +102,8 @@ button = do
     CSS.backgroundColor Colors.black
     CSS.textAlign CSS.center
 
+    CSS.key (CSS.fromString "transition") "all 0.8s ease-in-out"
+
   CSS.fromString "a.button" ? do
     CSS.display CSS.block
     CSS.lineHeight $ CSS.px 40.0
@@ -193,3 +195,36 @@ showElement = do
   
   CSS.fromString ".show-flex-false" ? do
     CSS.display CSS.displayNone
+
+loginForm :: CSS.CSS
+loginForm =
+  CSS.fromString ".login-form" ? do
+    CSS.display CSS.flex
+    CSS.justifyContent $ CSS.JustifyContentValue center
+    CSS.alignItems $ CSS.AlignItemsValue center
+    CSS.flexDirection CSS.column
+    CSS.height $ CSS.vh 100.0
+
+    CSS.fromString "div" ? do
+      CSS.marginBottom $ CSS.px 25.0
+      CSS.width $ CSS.px 200.0
+
+      CSS.fromString "input" ? do
+        CSS.width $ CSS.pct 100.0
+        CSS.boxSizing CSS.borderBox
+        CSS.fontSize $ CSS.px 18.0
+        CSS.key (CSS.fromString "outline") "none"
+
+        CSS.key (CSS.fromString "border") "0"
+        CSS.borderBottom CSS.solid (CSS.px 1.0) Colors.black
+
+      CSS.fromString "label" ? do
+        CSS.display CSS.block
+        CSS.fontSize $ CSS.px 18.0
+
+
+breathe :: CSS.CSS
+breathe = 
+  CSS.fromString ".breathe" ? do
+    CSS.width $ CSS.pct 100.0
+    CSS.height $ CSS.px 100.0
