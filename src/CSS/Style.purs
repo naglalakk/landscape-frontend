@@ -161,12 +161,9 @@ exhibition =
       CSS.maxWidth $ CSS.px 800.0
       CSS.key (CSS.fromString "margin") "0 auto"
       CSS.marginTop $ CSS.px 300.0
-      CSS.marginBottom $ CSS.px 150.0
+      CSS.marginBottom $ CSS.px 125.0
       CSS.fontSize $ CSS.px 20.0
       CSS.fontWeight $ CSS.FontWeight $ CSS.value Font.regular
-
-    CSS.fromString ".navigation" ? do
-      CSS.marginTop $ CSS.px 150.0
 
     CSS.fromString ".instruction-divider" ? do
       CSS.fontSize $ CSS.px 36.0
@@ -386,9 +383,9 @@ pageAbout =
     CSS.paddingTop $ CSS.px 100.0
     CSS.key (CSS.fromString "min-height") "100vh"
 
-    CSS.fromString ".about-section" ? do
+    {--CSS.fromString ".about-section" ? do
       CSS.fromString "p" ? do
-        CSS.fontFamily ["Lato"] (singleton CSS.sansSerif)
+        CSS.fontFamily ["Lato"] (singleton CSS.sansSerif)--}
 
 
 overflowYShow :: CSS.CSS
@@ -402,4 +399,3 @@ sale ::  CSS.CSS
 sale =
   CSS.fromString ".sale" ? do
     CSS.marginTop $ CSS.px 200.0
-    CSS.marginBottom $ CSS.px 200.0
