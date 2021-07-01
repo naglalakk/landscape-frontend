@@ -64,13 +64,7 @@ component =
         then pure unit 
         else do
           token <- getTokenById state.tokenId
-          -- Get the amount separately
-          tokenAmount <- getTokenAmount state.tokenId
-          let
-            finalToken = 
-              map (\(Token tkn) -> 
-                Token tkn { amount = fromMaybe 0 tokenAmount }) token
-          H.modify_ _ { token = finalToken }
+          H.modify_ _ { token = token }
 
     HandleTokenForm (Token token) -> case token.id of
       TokenId 0 -> do

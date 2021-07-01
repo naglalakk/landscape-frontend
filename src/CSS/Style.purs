@@ -127,8 +127,10 @@ header =
       CSS.fontSize $ CSS.px 18.0
       CSS.paddingRight $ CSS.px 25.0
 
-      CSS.fromString "a" ? do
+      CSS.fromString ".menu-item" ? do
         CSS.textDecoration CSS.noneTextDecoration
+        CSS.key (CSS.fromString "cursor") "pointer"
+
 
       CSS.fromString ".divider" ? do
         CSS.marginLeft $ CSS.px 12.5

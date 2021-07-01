@@ -12,6 +12,7 @@ import Data.Token (Token(..), TokenId(..))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Utils.Text (shorten)
 
 exhibitionItem :: forall props act
                 . (TokenId -> act)
@@ -89,7 +90,7 @@ exhibitionItem purchaseAction triggerOverview (Item item) =
                   [ HH.text token.title ]
                 , HH.li
                   []
-                  [ HH.text $ fromMaybe "NA" token.policyId ]
+                  [ HH.text $ shorten 8 $ fromMaybe "NA" token.policyId ]
                 , HH.li
                   []
                   [ HH.text $ show token.quantity ]

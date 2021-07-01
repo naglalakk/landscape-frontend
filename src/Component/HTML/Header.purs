@@ -25,7 +25,7 @@ header navigateAction =
       [ css "menu flex" ]
       [ HH.a
         [ HE.onClick \_ -> Just $ navigateAction Home
-        , HP.href "#"
+        , css "menu-item"
         ]
         [ HH.text "blog" ]
       , HH.span
@@ -33,7 +33,7 @@ header navigateAction =
         [ HH.text "/" ]
       , HH.a
         [ HE.onClick \_ -> Just $ navigateAction Exhibitions
-        , HP.href "#"
+        , css "menu-item"
         ]
         [ HH.text "exhibitions"
         ]
@@ -41,8 +41,8 @@ header navigateAction =
         [ css "divider" ]
         [ HH.text "/" ]
       , HH.a
-        [ HP.href "#" 
-        , HE.onClick \_ -> Just $ navigateAction About
+        [ HE.onClick \_ -> Just $ navigateAction About
+        , css "menu-item"
         ]
         [ HH.text "about"
         ]
