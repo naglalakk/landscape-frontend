@@ -55,8 +55,6 @@ defaultRequest (BaseURL baseURL) { endpoint, method, auth} =
   , headers: case auth of
       Just (Basic token) -> do
         [ RequestHeader "Authorization" $ "Basic " <> token ]
-      Just (Token token) -> 
-        [ RequestHeader "Authorization" $ "Bearer " <> token ]
       Nothing        -> []
   , content: RB.json <$> body
   , username: Nothing
@@ -81,7 +79,6 @@ formDataRequest (BaseURL baseURL) { endpoint, method, auth} =
   , headers: case auth of
       Just (Basic token) -> 
         [ RequestHeader "Authorization" $ "Basic " <> token ]
-      Just      _          -> []
       Nothing              -> []
   , content: RB.formData <$> body
   , username: Nothing

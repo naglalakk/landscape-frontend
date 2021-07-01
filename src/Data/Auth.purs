@@ -29,7 +29,6 @@ derive newtype instance encodeJsonPassword :: EncodeJson Password
 
 data APIAuth
   = Basic String
-  | Token String
 
 -- Default API Auth credentials
 apiAuth :: APIAuth 

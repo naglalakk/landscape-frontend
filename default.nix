@@ -2,6 +2,7 @@
 , apiURL ? ""
 , apiKey ? ""
 , environment ? "Production"
+, recvAddr ? ""
 }:
   let
     pkgs = import ./packages.nix {};
@@ -40,7 +41,7 @@
     nodejs = pkgs.nodejs-12_x;
   in
     pkgs.stdenv.mkDerivation {
-      name = "donnacodes.dev-frontend";
+      name = "inalandscape.dev-frontend";
       src = gitignoreSource ./.;
       buildInputs = [ 
         easy-ps.purs easy-ps.spago npm pkgs.nodejs-12_x
@@ -53,11 +54,11 @@
             (x: ''"${x.outPath}/src/**/*.purs"'')
             (builtins.attrValues spagoPkgs.inputs))}
         mv output $out
-        cp -r ${npm}/libexec/donnacodes.dev/node_modules $out
+        cp -r ${npm}/libexec/inalandscape.dev/node_modules $out
       '';
 
       installPhase = ''
-        mkdir -p $out/output/donnabot
+        mkdir -p $out/output/inalandscape.dev
         mkdir -p $out/static
 
         # Copy static files
@@ -69,6 +70,7 @@
         echo API_URL=${apiURL} >> $out/.env
         echo API_KEY=${apiKey} >> $out/.env
         echo ENVIRONMENT=${environment} >> $out/.env
+        echo RECV_ADDR=${recvAddr} >> $out/.env
 
         # Make bundle
         cd $out && spago bundle-app --no-install --no-build --to $out/static/build/index.js
@@ -77,10 +79,10 @@
         $out/node_modules/parcel/bin/cli.js build $out/static/build/index.js -d $out/static/dist
 
         # Bundle Server
-        cd $out && spago bundle-app --main Server --no-install --no-build --to $out/output/donnabot/server.js
+        cd $out && spago bundle-app --main Server --no-install --no-build --to $out/output/inalandscape.dev/server.js
 
         echo "#!/usr/bin/env bash" >> $out/run.sh
-        echo "${nodejs}/bin/node $out/output/donnabot/server.js" >> $out/run.sh
+        echo "${nodejs}/bin/node $out/output/inalandscape.dev/server.js" >> $out/run.sh
         chmod +x $out/run.sh
         echo "Build Done"
       '';

@@ -205,8 +205,10 @@ component =
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
-    HH.div 
-      [ css "posts-container" 
-      , HP.attr (HH.AttrName "data-aos") "fade-up"
+    HH.div
+      [ css "page-home"  ]
+      [ HH.div 
+        [ css "posts-container" 
+        ]
+        (map (renderBlogPost NavigateAction) state.blogPosts)
       ]
-      (map (renderBlogPost NavigateAction) state.blogPosts)

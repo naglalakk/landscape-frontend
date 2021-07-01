@@ -89,25 +89,17 @@ component =
 
   render :: State -> H.ComponentHTML Action ChildSlots m
   render state =
-    HH.div 
-      [] 
-      [ withAdmin $
-        HH.div
-          []
-          [ HH.div
-            [ css "top-bar" ]
-            [ HH.h1
-              []
-              [ HH.text "Posts" ]
-            , HH.button
-              [ css "button" 
-              , HE.onClick \_ -> Just <<< NavigateToBlogPost $ BlogPostId 0
-              ]
-              [ HH.text "+ New Post" 
-              ]
-            ]
-          , (tableSlot headers (rows state.blogPosts))
-          ]
+    HH.div_
+      [ HH.h1
+        []
+        [ HH.text "Posts" ]
+      , HH.a
+        [ css "button" 
+        , HE.onClick \_ -> Just <<< NavigateToBlogPost $ BlogPostId 0
+        ]
+        [ HH.text "+ New Post" 
+        ]
+      , (tableSlot headers (rows state.blogPosts))
       ]
     where
       tableSlot h r = 
