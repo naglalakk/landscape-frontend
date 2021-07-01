@@ -2,7 +2,8 @@ Blog Frontend
 ===
 
 Frontend for my blog [inalandscape.dev](https://inalandscape.dev)
-Used with API backend service: [donnabot-service](https://github.com/naglalakk/donnabot-service)
+Used with API backend service:
+[landscape-service](https://github.com/naglalakk/landscape-service)
 
 ### Requirements
 
