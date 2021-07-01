@@ -356,7 +356,7 @@ exhibitions =
       CSS.key (CSS.fromString "cursor") "pointer"
       CSS.key (CSS.fromString "flex-basis") "calc(50% - 25px)"
       CSS.backgroundRepeat CSS.noRepeat
-      CSS.backgroundAttachment $ CSS.fromString "fixed"
+      -- CSS.backgroundAttachment $ CSS.fromString "fixed"
       CSS.backgroundSize $ CSS.fromString "cover" 
       CSS.backgroundPosition $ CSS.fromString "center center"
       CSS.marginBottom $ CSS.px 25.0
