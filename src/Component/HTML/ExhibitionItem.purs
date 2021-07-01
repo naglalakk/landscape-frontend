@@ -90,7 +90,9 @@ exhibitionItem purchaseAction triggerOverview (Item item) =
                   [ HH.text token.title ]
                 , HH.li
                   []
-                  [ HH.text $ shorten 8 $ fromMaybe "NA" token.policyId ]
+                  [ HH.a
+                    [ HP.href "https://github.com/naglalakk/cardano-worker/blob/main/policy/policy.json" ]
+                    [ HH.text $ shorten 8 $ fromMaybe "NA" token.policyId ]]
                 , HH.li
                   []
                   [ HH.text $ show token.quantity ]
