@@ -341,7 +341,7 @@ pageExhibitions =
 exhibitions :: CSS.CSS
 exhibitions =
   CSS.fromString ".exhibitions" ? do
-    CSS.marginTop $ CSS.px 25.0
+    CSS.marginTop $ CSS.px 65.0
 
     CSS.fromString ".featured" `with` CSS.fromString ".exhibition" ? do
       CSS.flexBasis $ CSS.pct 100.0
@@ -357,7 +357,7 @@ exhibitions =
       CSS.key (CSS.fromString "flex-basis") "calc(50% - 25px)"
       CSS.backgroundRepeat CSS.noRepeat
       -- CSS.backgroundAttachment $ CSS.fromString "fixed"
-      CSS.backgroundSize $ CSS.fromString "cover" 
+      CSS.backgroundSize $ CSS.fromString "contain" 
       CSS.backgroundPosition $ CSS.fromString "center center"
       CSS.marginBottom $ CSS.px 25.0
 

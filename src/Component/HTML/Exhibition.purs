@@ -22,7 +22,7 @@ exhibition :: forall props act
            -> HH.HTML props act
 exhibition navigateAction (E.Exhibition ex) addedCls =
   HH.div
-    [ css $ "exhibition relative box-white " <> addedCls
+    [ css $ "exhibition relative" <> addedCls
     , HE.onClick \_ -> Just $ navigateAction $ R.Exhibition ex.id
     , HP.attr (HH.AttrName "style") 
       ("background-image: url('" <> 
