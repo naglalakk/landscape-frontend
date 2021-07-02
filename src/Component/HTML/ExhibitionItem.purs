@@ -53,7 +53,7 @@ exhibitionItem purchaseAction triggerOverview (Item item) =
           ]
         ]
       ]
-    , maybeElem item.token \(Token token) ->
+    {--,  maybeElem item.token \(Token token) ->
       HH.div
         [ css "token-data" ]
         [ HH.div
@@ -135,5 +135,5 @@ exhibitionItem purchaseAction triggerOverview (Item item) =
                 [ css "button disabled" ]
                 [ HH.text "Sold out" ]
           ]
-        ]
+        ]--}
     ]
