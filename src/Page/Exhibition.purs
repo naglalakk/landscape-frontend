@@ -184,10 +184,6 @@ component =
                 [ HH.text "Sale" ]
               , HH.p
                 []
-                [ HH.text "The sale has been temporarily closed until monday, July 5th at 12:00PM GMT. Thank you for understanding."
-                ]
-              {--, HH.p
-                []
                 [ HH.text "During the exhibition, guests can purchase a unique copy of each artwork in the form of an NFT, minted on the Cardano blockchain." 
                 , HH.br []
                 , HH.text "In order to purchase a NFT you need to have access to a wallet that can send and receive ADA such as " 
@@ -207,7 +203,7 @@ component =
                   [ css "bold" ]
                   [ HH.text "Note that only a single copy of each artwork will be minted." ]
                 , HH.br []
-                ]--}
+                ]
               ]
           , HH.div
             [ css "layer-3" ]
