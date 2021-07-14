@@ -177,7 +177,7 @@ component =
                   [ HH.text "Use the overview to view all artworks" ]
                 ]
               ]
-            , HH.div
+            {--, HH.div
               [ css "text-center sale"] 
               [ HH.h4
                 [ css "bold underlined" ]
@@ -204,7 +204,7 @@ component =
                   [ HH.text "Note that only a single copy of each artwork will be minted." ]
                 , HH.br []
                 ]
-              ]
+              ]--}
           , HH.div
             [ css "layer-3" ]
             (state.items <#> (exhibitionItem Purchase ToggleOverview))
