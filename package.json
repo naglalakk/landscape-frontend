@@ -20,7 +20,7 @@
     "lightgallery": "./node_modules/lightgallery.js"
   },
   "devDependencies": {
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "parcel": "^1.12.4",
     "parcel-plugin-bundle-visualiser": "^1.2.0",
     "parcel-plugin-prerender": "^1.4.1"
